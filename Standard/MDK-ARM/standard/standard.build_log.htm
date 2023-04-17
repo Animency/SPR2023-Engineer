@@ -1,0 +1,165 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: ¦ÌVision V5.23.0.0
+Copyright (C) 2017 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: zhu Administrator, 1, LIC=21E4T-R07QC-Y8QFK-ZQAPR-9WMZ9-B52G5
+ 
+Tool Versions:
+Toolchain:       MDK-ARM Plus  Version: 5.23
+Toolchain Path:  C:\Keil_v5\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.06 update 4 (build 422)
+Assembler:       Armasm.exe V5.06 update 4 (build 422)
+Linker/Locator:  ArmLink.exe V5.06 update 4 (build 422)
+Library Manager: ArmAr.exe V5.06 update 4 (build 422)
+Hex Converter:   FromElf.exe V5.06 update 4 (build 422)
+CPU DLL:         SARMCM3.DLL V5.23
+Dialog DLL:      DCM.DLL V1.15.0.0
+Target DLL:      Segger\JL2CM3.dll V2.99.23.0
+Dialog DLL:      TCM.DLL V1.27.0.0
+ 
+<h2>Project:</h2>
+C:\Users\16539\Desktop\RC-CONTROL\R1\Standard\Standard\MDK-ARM\standard.uvprojx
+Project File Date:  07/07/2022
+
+<h2>Output:</h2>
+*** Using Compiler 'V5.06 update 4 (build 422)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
+Build target 'standard'
+<<<<<<< HEAD
+compiling chassis_behaviour.c...
+..\application\chassis_behaviour.c(286): warning:  #223-D: function "chassis_rc_to_control_vector" declared implicitly
+    chassis_rc_to_control_vector(vx_set, vy_set, chassis_move_rc_to_vector);
+..\application\chassis_behaviour.c(222): warning:  #177-D: function "chassis_zero_force_control"  was declared but never referenced
+  static void chassis_zero_force_control(float *vx_can_set, float *vy_can_set, float *wz_can_set, chassis_move_t *chassis_move_rc_to_vector)
+..\application\chassis_behaviour.c(242): warning:  #177-D: function "chassis_no_move_control"  was declared but never referenced
+  static void chassis_no_move_control(float *vx_set, float *vy_set, float *wz_set, chassis_move_t *chassis_move_rc_to_vector)
+..\application\chassis_behaviour.c(262): warning:  #177-D: function "chassis_follow_gimbal_yaw_control"  was declared but never referenced
+  static void chassis_follow_gimbal_yaw_control(float *vx_set, float *vy_set, float *angle_set, chassis_move_t *chassis_move_rc_to_vector)
+..\application\chassis_behaviour.c(279): warning:  #177-D: function "chassis_no_follow_yaw_control"  was declared but never referenced
+  static void chassis_no_follow_yaw_control(float *vx_set, float *vy_set, float *wz_set, chassis_move_t *chassis_move_rc_to_vector)
+..\application\chassis_behaviour.c(298): warning:  #177-D: function "chassis_open_set_control"  was declared but never referenced
+  static void chassis_open_set_control(float *vx_set, float *vy_set, float *wz_set, chassis_move_t *chassis_move_rc_to_vector)
+..\application\chassis_behaviour.c(109): warning:  #177-D: function "chassis_Debug_control"  was declared but never referenced
+  static void chassis_Debug_control(float *vx_set, float *vy_set, float *wz_set, chassis_move_t *chassis_move_rc_to_vector);
+..\application\chassis_behaviour.c: 7 warnings, 0 errors
+compiling board_talk.c...
+..\application\board_talk.c(156): warning:  #1-D: last line of file ends without a newline
+  }
+..\application\board_talk.c: 1 warning, 0 errors
+compiling chassis_power_control.c...
+compiling CAN_receive.c...
+..\application\CAN_receive.c(305): warning:  #940-D: missing return statement at end of non-void function "get_6020_motor_measure_point" 
+  }
+..\application\CAN_receive.c(319): warning:  #186-D: pointless comparison of unsigned integer with zero
+  	if (t>4 || t<0)
+..\application\CAN_receive.c(40): warning:  #177-D: variable "motor_trigger"  was declared but never referenced
+  static motor_measure_t motor_trigger;    //²¦µ¯µç»ú
+..\application\CAN_receive.c: 3 warnings, 0 errors
+compiling freertos.c...
+compiling main.c...
+compiling chassis_task.c...
+..\Task\chassis_task.c(210): warning:  #177-D: variable "vx_set"  was declared but never referenced
+  	float vx_set = 0.0f, vy_set = 0.0f , angle_set = 0.0f;
+..\Task\chassis_task.c(210): warning:  #177-D: variable "vy_set"  was declared but never referenced
+  	float vx_set = 0.0f, vy_set = 0.0f , angle_set = 0.0f;
+..\Task\chassis_task.c(210): warning:  #177-D: variable "angle_set"  was declared but never referenced
+  	float vx_set = 0.0f, vy_set = 0.0f , angle_set = 0.0f;
+..\Task\chassis_task.c(211): warning:  #177-D: variable "redball_1_m1"  was declared but never referenced
+  	float redball_1_m1=0;
+..\Task\chassis_task.c(527): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+    wheel_speed[0] = 1.414*vx_set/4 - 1.414*vy_set/4 + 0.41 * wz_set/4;
+..\Task\chassis_task.c(527): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+    wheel_speed[0] = 1.414*vx_set/4 - 1.414*vy_set/4 + 0.41 * wz_set/4;
+..\Task\chassis_task.c(527): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+    wheel_speed[0] = 1.414*vx_set/4 - 1.414*vy_set/4 + 0.41 * wz_set/4;
+..\Task\chassis_task.c(528): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+    wheel_speed[1] = 1.414*vx_set/4 + 1.414*vy_set/4 + 0.41 * wz_set/4;
+..\Task\chassis_task.c(528): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+    wheel_speed[1] = 1.414*vx_set/4 + 1.414*vy_set/4 + 0.41 * wz_set/4;
+..\Task\chassis_task.c(528): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+    wheel_speed[1] = 1.414*vx_set/4 + 1.414*vy_set/4 + 0.41 * wz_set/4;
+..\Task\chassis_task.c(529): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+    wheel_speed[2] = -1.414*vx_set/4 - 1.414*vy_set/4 + 0.41 * wz_set/4;
+..\Task\chassis_task.c(529): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+    wheel_speed[2] = -1.414*vx_set/4 - 1.414*vy_set/4 + 0.41 * wz_set/4;
+..\Task\chassis_task.c(530): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+    wheel_speed[3] = -1.414*vx_set/4 + 1.414*vy_set/4 + 0.41 * wz_set/4;
+..\Task\chassis_task.c(530): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+    wheel_speed[3] = -1.414*vx_set/4 + 1.414*vy_set/4 + 0.41 * wz_set/4;
+..\Task\chassis_task.c(709): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	if ((board_talk_recive_data[t]-0.002 )>end_flag)
+..\Task\chassis_task.c(711): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	else if((board_talk_recive_data[t]+0.002) <end_flag)
+..\Task\chassis_task.c(730): warning:  #223-D: function "abs" declared implicitly
+  	speed_acc_len=abs(start_flag-end_flag);
+..\Task\chassis_task.c(743): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  		S_type_acc_and_dec_i+=0.8;
+..\Task\chassis_task.c(724): warning:  #177-D: function "S_type_acc_and_dec_chassis"  was declared but never referenced
+  static void S_type_acc_and_dec_chassis(chassis_move_t  *chassis_move_test_S_type_acc_and_dec_chassis,float start_flag,float end_flag)   
+..\Task\chassis_task.c: 19 warnings, 0 errors
+=======
+>>>>>>> 2c41832fd7a8e80af134dca81cdc66945e448d26
+compiling gimbal_task.c...
+..\components\algorithm\user_lib.h(54): warning:  #47-D: incompatible redefinition of macro "PI"  (declared at line 326 of "..\components\algorithm\Include\arm_math.h")
+  #define PI 3.14
+..\Task\gimbal_task.c(100): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	S_type_acc_and_dec_gimbal_i+=0.1;
+..\Task\gimbal_task.c(101): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	gimbal_variate +=0.1;
+..\Task\gimbal_task.c(95): warning:  #550-D: variable "median"  was set but never used
+  	float flexible=2,melo,deno,median,coefficient=1;
+..\Task\gimbal_task.c(95): warning:  #177-D: variable "coefficient"  was declared but never referenced
+  	float flexible=2,melo,deno,median,coefficient=1;
+..\Task\gimbal_task.c(313): warning:  #177-D: function "gimbal_tongbulun"  was declared but never referenced
+  static void gimbal_tongbulun(gimbal_control_t *gimbal_tongbulun)
+..\Task\gimbal_task.c(302): warning:  #177-D: function "gimbal_sigang_fashe"  was declared but never referenced
+  static void gimbal_sigang_fashe(gimbal_control_t *gimbal_sigang_fashe)
+..\Task\gimbal_task.c(354): warning:  #177-D: function "gimbal_taisheng"  was declared but never referenced
+  	static void gimbal_taisheng(gimbal_control_t *gimbal_taisheng)
+..\Task\gimbal_task.c(405): warning:  #177-D: function "gimbal_diancifa_auto"  was declared but never referenced
+  static void gimbal_diancifa_auto(gimbal_control_t *gimbal_diancifa_auto)
+..\Task\gimbal_task.c(335): warning:  #177-D: function "gimbal_tongbulun_auto"  was declared but never referenced
+  static void gimbal_tongbulun_auto(gimbal_control_t *gimbal_tongbulun_auto)
+..\Task\gimbal_task.c(295): warning:  #177-D: function "gimbal_sigang_auto"  was declared but never referenced
+  static void gimbal_sigang_auto(gimbal_control_t *gimbal_sigang_auto)
+..\Task\gimbal_task.c(62): warning:  #177-D: variable "yaw_can_set_current"  was declared but never referenced
+  static int16_t yaw_can_set_current = 0,pitch_can_set_current = 0, shoot_can_set_current = 0;
+..\Task\gimbal_task.c(62): warning:  #177-D: variable "pitch_can_set_current"  was declared but never referenced
+  static int16_t yaw_can_set_current = 0,pitch_can_set_current = 0, shoot_can_set_current = 0;
+..\Task\gimbal_task.c(62): warning:  #177-D: variable "shoot_can_set_current"  was declared but never referenced
+  static int16_t yaw_can_set_current = 0,pitch_can_set_current = 0, shoot_can_set_current = 0;
+<<<<<<< HEAD
+..\Task\gimbal_task.c: 14 warnings, 0 errors
+linking...
+Program Size: Code=75888 RO-data=4036 RW-data=620 ZI-data=50932  
+FromELF: creating hex file...
+".\standard\standard.axf" - 0 Error(s), 44 Warning(s).
+=======
+..\Task\gimbal_task.c(421): warning:  #177-D: function "gimbal_diancifa_shenchu"  was declared but never referenced
+  static void gimbal_diancifa_shenchu(gimbal_control_t *gimbal_diancifa)
+..\Task\gimbal_task.c(441): warning:  #177-D: function "gimbal_diancifa_jiaqu"  was declared but never referenced
+  static void gimbal_diancifa_jiaqu(gimbal_control_t *gimbal_diancifa)
+..\Task\gimbal_task.c(461): warning:  #177-D: function "gimbal_duoji"  was declared but never referenced
+  static void gimbal_duoji(gimbal_control_t *gimbal_duoji)
+..\Task\gimbal_task.c: 17 warnings, 0 errors
+linking...
+Program Size: Code=76352 RO-data=4036 RW-data=620 ZI-data=50932  
+FromELF: creating hex file...
+".\standard\standard.axf" - 0 Error(s), 17 Warning(s).
+>>>>>>> 2c41832fd7a8e80af134dca81cdc66945e448d26
+
+<h2>Collection of Component include folders:</h2>
+  .\RTE\_standard
+  C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.15.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include
+
+<h2>Collection of Component Files used:</h2>
+<<<<<<< HEAD
+Build Time Elapsed:  00:00:10
+=======
+Build Time Elapsed:  00:00:05
+>>>>>>> 2c41832fd7a8e80af134dca81cdc66945e448d26
+</pre>
+</body>
+</html>
