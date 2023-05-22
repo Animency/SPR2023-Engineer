@@ -27,3 +27,4 @@
 .\standard\chassis_behaviour.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
 .\standard\chassis_behaviour.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 .\standard\chassis_behaviour.o: ..\application\gimbal_behaviour.h
+.\standard\chassis_behaviour.o: ..\application\Engineer_behaviour.h

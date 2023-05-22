@@ -154,6 +154,8 @@
 #define CHASSIS_AUTO_VY 0.0f
 #define CHASSIS_AUTO_WZ 0.0f
 
+//键盘控制旋转速度值
+#define CHASSIS_KEYBOARD_REVOLVE_SPEED 3.0f
 #ifndef PI
 #define PI 3.1415926535898
 #endif
@@ -166,7 +168,8 @@ typedef enum
 	CHASSIS_RC_CONTROL,                   //遥控器控制
   CHASSIS_VECTOR_DEBUG,                 //Debug模式
 	CHASSIS_STATIC,                        //底盘静止但有力模式
-	CHASSIS_FOLLOW
+	CHASSIS_FOLLOW,
+	CHASSIS_KEYBOARD_CONTROL               //底盘键盘控制
 } chassis_mode_e;
 
 typedef struct

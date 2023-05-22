@@ -1,0 +1,199 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: ¦ÌVision V5.38.0.0
+Copyright (C) 2022 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: Allen Chopin, Microsoft, LIC=KRMW3-A0EUH-PCTJ8-3Z9YQ-DWAZC-H92JV
+ 
+Tool Versions:
+Toolchain:       MDK-ARM Plus  Version: 5.38.0.0
+Toolchain Path:  C:\Keil_v5\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.06 update 7 (build 960)
+Assembler:       Armasm.exe V5.06 update 7 (build 960)
+Linker/Locator:  ArmLink.exe V5.06 update 7 (build 960)
+Library Manager: ArmAr.exe V5.06 update 7 (build 960)
+Hex Converter:   FromElf.exe V5.06 update 7 (build 960)
+CPU DLL:         SARMCM3.DLL V5.38.0.0
+Dialog DLL:      DCM.DLL V1.17.5.0
+Target DLL:      Segger\JL2CM3.dll V2.99.23.0
+Dialog DLL:      TCM.DLL V1.56.4.0
+ 
+<h2>Project:</h2>
+C:\move\STM32\Standard\MDK-ARM\standard.uvprojx
+Project File Date:  05/22/2023
+
+<h2>Output:</h2>
+*** Using Compiler 'V5.06 update 7 (build 960)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
+Build target 'Engineer'
+compiling chassis_behaviour.c...
+..\application\remote_control.h(94): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\remote_control.h(94): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\Engineer_behaviour.h(55): warning:  #1-D: last line of file ends without a newline
+  #define TARGET_BTM_CAN2_208_ANGLE_DOWN 0x00
+..\application\chassis_behaviour.c(322): warning:  #223-D: function "chassis_rc_to_control_vector" declared implicitly
+    chassis_rc_to_control_vector(vx_set, vy_set, chassis_move_rc_to_vector);
+..\application\chassis_behaviour.c(364): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	rc_deadband_limit(*vx_set,*vx_set,0.15);
+..\application\chassis_behaviour.c(365): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	rc_deadband_limit(*vy_set,*vy_set,0.15);
+..\application\chassis_behaviour.c(366): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	rc_deadband_limit(*wz_set,*wz_set,0.15);
+..\application\chassis_behaviour.c(406): warning:  #1-D: last line of file ends without a newline
+  }
+..\application\chassis_behaviour.c(258): warning:  #177-D: function "chassis_zero_force_control"  was declared but never referenced
+  static void chassis_zero_force_control(float *vx_can_set, float *vy_can_set, float *wz_can_set, chassis_move_t *chassis_move_rc_to_vector)
+..\application\chassis_behaviour.c(278): warning:  #177-D: function "chassis_no_move_control"  was declared but never referenced
+  static void chassis_no_move_control(float *vx_set, float *vy_set, float *wz_set, chassis_move_t *chassis_move_rc_to_vector)
+..\application\chassis_behaviour.c(298): warning:  #177-D: function "chassis_follow_gimbal_yaw_control"  was declared but never referenced
+  static void chassis_follow_gimbal_yaw_control(float *vx_set, float *vy_set, float *angle_set, chassis_move_t *chassis_move_rc_to_vector)
+..\application\chassis_behaviour.c(315): warning:  #177-D: function "chassis_no_follow_yaw_control"  was declared but never referenced
+  static void chassis_no_follow_yaw_control(float *vx_set, float *vy_set, float *wz_set, chassis_move_t *chassis_move_rc_to_vector)
+..\application\chassis_behaviour.c(334): warning:  #177-D: function "chassis_open_set_control"  was declared but never referenced
+  static void chassis_open_set_control(float *vx_set, float *vy_set, float *wz_set, chassis_move_t *chassis_move_rc_to_vector)
+..\application\chassis_behaviour.c(129): warning:  #177-D: function "chassis_Debug_control"  was declared but never referenced
+  static void chassis_Debug_control(float *vx_set, float *vy_set, float *wz_set, chassis_move_t *chassis_move_rc_to_vector);
+..\application\chassis_behaviour.c: 14 warnings, 0 errors
+compiling gimbal_behaviour.c...
+..\application\remote_control.h(94): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\components\algorithm\user_lib.h(54): warning:  #47-D: incompatible redefinition of macro "PI"  (declared at line 326 of "..\components\algorithm\Include\arm_math.h")
+  #define PI 3.14
+..\application\gimbal_behaviour.c(679): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+                  gimbal_end_angle = rad_format(gimbal_control_set->gimbal_yaw_motor.absolute_angle + PI);
+..\application\gimbal_behaviour.c: 3 warnings, 0 errors
+compiling board_talk.c...
+..\application\remote_control.h(94): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\remote_control.h(94): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\board_talk.c: 2 warnings, 0 errors
+compiling Engineer_behaviour.c...
+..\application\remote_control.h(94): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\Engineer_behaviour.h(55): warning:  #1-D: last line of file ends without a newline
+  #define TARGET_BTM_CAN2_208_ANGLE_DOWN 0x00
+..\application\remote_control.h(94): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\Engineer_behaviour.c(470): warning:  #223-D: function "fabs" declared implicitly
+  	if(fabs(angle_can2_207_6020) >  TARGET_BTM_CAN2_207_ANGLE_6020_RETURN - 1) //´ýÐÞ¸Ä
+..\application\Engineer_behaviour.c(521): warning:  #1-D: last line of file ends without a newline
+  }
+..\application\Engineer_behaviour.c(49): warning:  #177-D: function "act_BTM_BigResourceIsland_OverTurn"  was declared but never referenced
+  static void act_BTM_BigResourceIsland_OverTurn(void);
+..\application\Engineer_behaviour.c: 6 warnings, 0 errors
+compiling custom_ui_draw.c...
+..\application\remote_control.h(94): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\remote_control.h(94): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\Engineer_behaviour.h(55): warning:  #1-D: last line of file ends without a newline
+  #define TARGET_BTM_CAN2_208_ANGLE_DOWN 0x00
+..\application\custom_ui_draw.c(128): warning:  #223-D: function "osDelay" declared implicitly
+      osDelay(100);
+..\application\custom_ui_draw.c(934): warning:  #1-D: last line of file ends without a newline
+  }
+..\application\custom_ui_draw.c: 5 warnings, 0 errors
+compiling CAN_receive.c...
+..\application\remote_control.h(94): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\remote_control.h(94): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\CAN_receive.c(357): warning:  #940-D: missing return statement at end of non-void function "get_6020_motor_measure_point" 
+  }
+..\application\CAN_receive.c(380): warning:  #940-D: missing return statement at end of non-void function "get_gimbal_motor_measure_value" 
+  }
+..\application\CAN_receive.c(383): warning:  #186-D: pointless comparison of unsigned integer with zero
+  	if (t>7 || t<0)
+..\application\CAN_receive.c(40): warning:  #177-D: variable "motor_trigger"  was declared but never referenced
+  static motor_measure_t motor_trigger;    //²¦µ¯µç»ú
+..\application\CAN_receive.c: 6 warnings, 0 errors
+compiling chassis_power_control.c...
+..\application\remote_control.h(94): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\remote_control.h(94): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\chassis_power_control.c: 2 warnings, 0 errors
+compiling freertos.c...
+..\application\remote_control.h(94): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\remote_control.h(94): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\User\Src\freertos.c: 2 warnings, 0 errors
+compiling gimbal_task.c...
+..\application\remote_control.h(94): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\remote_control.h(94): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\components\algorithm\user_lib.h(54): warning:  #47-D: incompatible redefinition of macro "PI"  (declared at line 326 of "..\components\algorithm\Include\arm_math.h")
+  #define PI 3.14
+..\Task\gimbal_task.c(341): warning:  #177-D: variable "max_vector"  was declared but never referenced
+  	fp32 max_vector = 0.0f, vector_rate = 0.0f;
+..\Task\gimbal_task.c(341): warning:  #177-D: variable "vector_rate"  was declared but never referenced
+  	fp32 max_vector = 0.0f, vector_rate = 0.0f;
+..\Task\gimbal_task.c(342): warning:  #550-D: variable "temp"  was set but never used
+    fp32 temp = 0.0f;
+..\Task\gimbal_task.c(364): warning:  #177-D: variable "max_vector"  was declared but never referenced
+  	 fp32 max_vector = 0.0f, vector_rate = 0.0f;
+..\Task\gimbal_task.c(364): warning:  #177-D: variable "vector_rate"  was declared but never referenced
+  	 fp32 max_vector = 0.0f, vector_rate = 0.0f;
+..\Task\gimbal_task.c(365): warning:  #550-D: variable "temp"  was set but never used
+    fp32 temp = 0.0f;
+..\Task\gimbal_task.c(421): warning:  #177-D: function "gimbal_heng"  was declared but never referenced
+  static void gimbal_heng(gimbal_control_t *gimbal_heng)
+..\Task\gimbal_task.c(430): warning:  #177-D: function "gimbal_shu"  was declared but never referenced
+  static void gimbal_shu(gimbal_control_t *gimbal_shu)
+..\Task\gimbal_task.c(438): warning:  #177-D: function "gimbal_xuan"  was declared but never referenced
+  static void gimbal_xuan(gimbal_control_t *gimbal_xuan)
+..\Task\gimbal_task.c(446): warning:  #177-D: function "gimbal_fan"  was declared but never referenced
+  static void gimbal_fan(gimbal_control_t *gimbal_fan)
+..\Task\gimbal_task.c(110): warning:  #177-D: function "gimbal_ore"  was declared but never referenced
+  static void gimbal_ore(gimbal_control_t *gimbal_ore);
+..\Task\gimbal_task.c: 14 warnings, 0 errors
+compiling chassis_task.c...
+..\application\remote_control.h(94): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\remote_control.h(94): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\Engineer_behaviour.h(55): warning:  #1-D: last line of file ends without a newline
+  #define TARGET_BTM_CAN2_208_ANGLE_DOWN 0x00
+..\Task\chassis_task.c(211): warning:  #177-D: variable "vx_set"  was declared but never referenced
+  	float vx_set = 0.0f, vy_set = 0.0f , angle_set = 0.0f;
+..\Task\chassis_task.c(211): warning:  #177-D: variable "vy_set"  was declared but never referenced
+  	float vx_set = 0.0f, vy_set = 0.0f , angle_set = 0.0f;
+..\Task\chassis_task.c(211): warning:  #177-D: variable "angle_set"  was declared but never referenced
+  	float vx_set = 0.0f, vy_set = 0.0f , angle_set = 0.0f;
+..\Task\chassis_task.c(451): warning:  #1-D: last line of file ends without a newline
+  }
+..\Task\chassis_task.c: 7 warnings, 0 errors
+compiling main.c...
+..\application\remote_control.h(94): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\remote_control.h(94): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\remote_control.h(94): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\User\Src\main.c: 3 warnings, 0 errors
+linking...
+Program Size: Code=82648 RO-data=3696 RW-data=1344 ZI-data=52584  
+FromELF: creating hex file...
+".\standard\Engineer.axf" - 0 Error(s), 64 Warning(s).
+
+<h2>Software Packages used:</h2>
+
+Package Vendor: Keil
+                https://www.keil.com/pack/Keil.STM32F4xx_DFP.2.17.0.pack
+                Keil.STM32F4xx_DFP.2.17.0
+                STMicroelectronics STM32F4 Series Device Support, Drivers and Examples
+
+<h2>Collection of Component include folders:</h2>
+  C:/Users/16569/AppData/Local/Arm/Packs/Keil/STM32F4xx_DFP/2.17.0/Drivers/CMSIS/Device/ST/STM32F4xx/Include
+
+<h2>Collection of Component Files used:</h2>
+Build Time Elapsed:  00:00:03
+</pre>
+</body>
+</html>

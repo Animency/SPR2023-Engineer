@@ -9,23 +9,22 @@
  * 
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __REFEREE_USART_TASK_H__
-#define __REFEREE_USART_TASK_H__
+#ifndef REFEREE_USART_TASK_H
+#define REFEREE_USART_TASK_H
+#include "main.h"
 
-#ifdef __cplusplus
-extern "C" {
+#define USART_RX_BUF_LENGHT     512
+#define REFEREE_FIFO_BUF_LENGTH 1024
+extern uint16_t draw_init_flag;
+/**
+  * @brief          referee task
+  * @param[in]      pvParameters: NULL
+  * @retval         none
+  */
+/**
+  * @brief          裁判系统任务
+  * @param[in]      pvParameters: NULL
+  * @retval         none
+  */
+extern void referee_usart_task(void const * argument);
 #endif
-
-/* Includes ------------------------------------------------------------------*/
-
-
-
-void referee_usart_task(void const *pvParameters);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

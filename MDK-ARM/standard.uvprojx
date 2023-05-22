@@ -7,17 +7,17 @@
 
   <Targets>
     <Target>
-      <TargetName>standard</TargetName>
+      <TargetName>Engineer</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060422::V5.06 update 4 (build 422)::ARMCC</pCCUsed>
+      <pCCUsed>5060960::V5.06 update 7 (build 960)::.\ARMCC</pCCUsed>
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F407IGHx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.15.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32F4xx_DFP.2.17.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) FPU2 CPUTYPE("Cortex-M4")</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -49,7 +49,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\standard\</OutputDirectory>
-          <OutputName>standard</OutputName>
+          <OutputName>Engineer</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -134,7 +134,7 @@
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
-            <DriverSelection>4099</DriverSelection>
+            <DriverSelection>4100</DriverSelection>
           </Flash1>
           <bUseTDR>0</bUseTDR>
           <Flash2>Segger\JL2CM3.dll</Flash2>
@@ -500,14 +500,14 @@
               <FilePath>..\Hardware\Src\rng.c</FilePath>
             </File>
             <File>
-              <FileName>rtc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Hardware\Src\rtc.c</FilePath>
-            </File>
-            <File>
               <FileName>spi.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Hardware\Src\spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\Src\rtc.c</FilePath>
             </File>
             <File>
               <FileName>tim.c</FileName>
@@ -558,6 +558,21 @@
               <FileName>board_talk.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\application\board_talk.c</FilePath>
+            </File>
+            <File>
+              <FileName>Engineer_behaviour.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\application\Engineer_behaviour.c</FilePath>
+            </File>
+            <File>
+              <FileName>Engineer_behaviour.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\application\Engineer_behaviour.h</FilePath>
+            </File>
+            <File>
+              <FileName>custom_ui_draw.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\application\custom_ui_draw.c</FilePath>
             </File>
           </Files>
         </Group>

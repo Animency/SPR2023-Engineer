@@ -80,7 +80,7 @@ typedef __packed struct //0x0103
     uint8_t supply_num;
 } ext_supply_projectile_booking_t;
 
-typedef __packed struct
+typedef __packed struct //0x104
 {
     uint8_t level;
     uint8_t foul_robot_id;
@@ -141,10 +141,35 @@ typedef __packed struct //0x0207
     uint8_t bullet_freq;
     float bullet_speed;
 } ext_shoot_data_t;
-typedef __packed struct
+typedef __packed struct //0x208
 {
-    uint8_t bullet_remaining_num;
+    //uint8_t bullet_remaining_num;
+	uint16_t projectile_allowance_17mm;
+	uint16_t projectile_allowance_42mm;
+	uint16_t remaining_gold_coin;
 } ext_bullet_remaining_t;
+typedef __packed struct //0x20B
+{
+ float hero_x;
+ float hero_y;
+ float engineer_x;
+ float engineer_y;
+ float standard_3_x;
+ float standard_3_y;
+ float standard_4_x;
+ float standard_4_y;
+ float standard_5_x;
+ float standard_5_y;
+}ext_ground_robot_position_t;
+typedef __packed struct //0x20C
+{
+ uint8_t mark_hero_progress;
+uint8_t mark_engineer_progress;
+ uint8_t mark_standard_3_progress;
+ uint8_t mark_standard_4_progress;
+ uint8_t mark_standard_5_progress;
+ uint8_t mark_sentry_progress;
+}radar_mark_data_t;
 typedef __packed struct //0x0301
 {
     uint16_t send_ID;
@@ -154,13 +179,18 @@ typedef __packed struct //0x0301
     uint8_t *data;
 } ext_student_interactive_data_t;
 
-typedef __packed struct
+//typedef __packed struct //0x302
+//{
+//    float data1;
+//    float data2;
+//    float data3;
+//    uint8_t data4;
+//} custom_data_t;  //已修改
+
+typedef __packed struct //0x302 自定义遥控器
 {
-    float data1;
-    float data2;
-    float data3;
-    uint8_t data4;
-} custom_data_t;
+	uint8_t data[4];
+}custom_robot_data_t;
 
 
 typedef __packed struct

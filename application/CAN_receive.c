@@ -36,15 +36,22 @@ extern CAN_HandleTypeDef hcan2;
     (ptr)->temperate = (data)[6];                                  \
   }
  motor_measure_t motor_chassis[4]; //底盘电机
- motor_measure_t motor_gimbal[6];  //云台电机
+ motor_measure_t motor_gimbal[7];  //云台电机
 static motor_measure_t motor_trigger;    //拨弹电机
 static CAN_TxHeaderTypeDef gimbal_tx_message;
 static uint8_t gimbal_can_send_data[8];
 static CAN_TxHeaderTypeDef chassis_tx_message;
 static uint8_t chassis_can_send_data[8];
-
+/************************************定义各电机角度方便调用**********************************************/
+float angle_can2_201;
+float angle_can2_202;
+float angle_can2_204;
+float angle_can2_205;
+float angle_can2_206;
+float angle_can2_207_6020;
+float angle_can2_208;
 /**
- * @brief           计算3508电机累计旋转角度
+ * @brief           计算3508和6020电机累计旋转角度
  * @param[out]      motor:电机结构数据指针
  */
 void Calc_3508_Angle(motor_measure_t *motor)
@@ -71,6 +78,19 @@ void Calc_3508_Angle_Gimbal(motor_measure_t *motor_gimbal)
   }
   motor_gimbal->angle = (motor_gimbal->round * ANGLE_T + motor_gimbal->last_ecd) * 0.002288715f;//轴一圈对应360°
 }
+void Calc_6020_Angle_Gimbal(motor_measure_t *motor_gimbal)
+{
+  if (motor_gimbal->ecd - motor_gimbal->last_ecd > 4095.5)
+  {
+    motor_gimbal->round--;
+  }
+  else if (motor_gimbal->ecd - motor_gimbal->last_ecd < -4095.5)
+  {
+    motor_gimbal->round++;
+  }
+  motor_gimbal->angle = (motor_gimbal->round * ANGLE_T + motor_gimbal->last_ecd) * 0.0439506776f;//轴一圈对应360°
+}
+
 
 /**
  * @brief          hal CAN fifo call back, receive motor data
@@ -142,12 +162,12 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 		Calc_3508_Angle(&motor_gimbal[1]);
     break;
   }
-	case CAN2_3508_GIMBAL_XUAN_ID:
-  {
-    get_motor_measure(&motor_gimbal[2], rx_data);
-		Calc_3508_Angle(&motor_gimbal[2]);
-    break;
-  }
+//	case CAN2_3508_GIMBAL_XUAN_ID:  //后因该电机更换为6020，接收数据方式更改
+//  {
+//    get_motor_measure(&motor_gimbal[2], rx_data);
+//		Calc_3508_Angle(&motor_gimbal[2]);
+//    break;
+//  }
 	case CAN2_3508_GIMBAL_FAN_ID:
   {
     get_motor_measure(&motor_gimbal[3], rx_data);
@@ -166,12 +186,25 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 		Calc_3508_Angle(&motor_gimbal[5]);
     break;
   }
+		case CAN2_6020_XUAN_ID:
+	{
+		get_motor_measure(&motor_gimbal[2], rx_data);
+		Calc_6020_Angle_Gimbal(&motor_gimbal[2]); 
+		break;
+	}
+		case CAN2_3508_ORE_ID:
+  {
+    get_motor_measure(&motor_gimbal[6], rx_data);
+		Calc_3508_Angle(&motor_gimbal[6]);
+    break;
+  }
 	 default:
   {
     break;
   }
 	}
 }
+
 }
 
 
@@ -196,7 +229,7 @@ void CAN2_cmd_gimbal_tai(int16_t yaw, int16_t pitch, int16_t shoot, int16_t rev)
 void CAN2_cmd_gimbal(int16_t yaw, int16_t pitch, int16_t shoot, int16_t rev)
 {
   uint32_t send_mail_box;
-  gimbal_tx_message.StdId = CAN2_3508_TAUSHENG_ALL_ID;
+  gimbal_tx_message.StdId = CAN2_3508_TAISHENG_ALL_ID;
   gimbal_tx_message.IDE = CAN_ID_STD;
   gimbal_tx_message.RTR = CAN_RTR_DATA;
   gimbal_tx_message.DLC = 0x08;
@@ -299,7 +332,7 @@ void CAN_cmd_6020(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4
  * @retval         motor data point
  */
 /**
- * @brief          返回yaw 6020电机数据指针
+ * @brief          返回yaw 6020电机数据指针 //本次工程未使用
  * @param[in]      none
  * @retval         电机数据指针
  */
@@ -314,13 +347,13 @@ const motor_measure_t *get_yaw_gimbal_motor_measure_point(void)
  * @retval         motor data point
  */
 /**
- * @brief          返回pitch 6020电机数据指针
+ * @brief          返回yaw 6020电机数据指针
  * @param[in]      none
  * @retval         电机数据指针
  */
 const motor_measure_t *get_6020_motor_measure_point(void)
 {
-//  return &motor_gimbal[1];
+ // return &motor_gimbal[2];
 }
 
 /**
@@ -329,15 +362,27 @@ const motor_measure_t *get_6020_motor_measure_point(void)
  * @retval         motor data point
  */
 /**
- * @brief          返回拨弹电机 2006电机数据指针
+ * @brief          返回拨弹电机 3508电机数据指针
  * @param[in]      none
  * @retval         电机数据指针
  */
+const void *get_gimbal_motor_measure_value(void)
+{
+/************************************定义各电机角度方便调用**********************************************/
+	angle_can2_201 = motor_gimbal[0].angle;
+	angle_can2_202 = motor_gimbal[1].angle;
+	//203已更换
+	angle_can2_204 = motor_gimbal[3].angle;
+	angle_can2_205 = motor_gimbal[4].angle;
+	angle_can2_206 = motor_gimbal[5].angle;
+	angle_can2_207_6020 = motor_gimbal[2].angle; //此电机为6020
+	angle_can2_208 = motor_gimbal[6].angle;  
+}
 const motor_measure_t *get_gimbal_motor_measure_point(uint8_t t)
 {
-	if (t>5 || t<0)
+	if (t>7 || t<0)
 		return NULL;
-	
+	get_gimbal_motor_measure_value();
   return &motor_gimbal[t];
 }
 
@@ -351,7 +396,9 @@ const motor_measure_t *get_gimbal_motor_measure_point(uint8_t t)
  * @param[in]      i: 电机编号,范围[0,3]
  * @retval         电机数据指针
  */
+
 const motor_measure_t *get_chassis_motor_measure_point(uint8_t i)
 {
   return &motor_chassis[(i & 0x03)];
 }
+

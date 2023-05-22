@@ -22,6 +22,8 @@
 #include "bsp_adc.h"
 #include "board_talk.h"
 #include "detect_task.h"
+#include "usart.h"
+#include "Engineer_behaviour.h"
 float INS_angle_init=0;
 int zhuanwan_flag=0;
 float speed_test = 0;
@@ -43,7 +45,9 @@ pid_type_def speed_pid;
 int speed=0;
 float speed_sj=0;
 float speed_set=300;
-	
+//因云台任务过重，故调整到地盘任务中接收数据
+uint8_t gimbal_sensor_data;
+extern int low_speed;
 /**
  * @brief          初始化"chassis_move"变量，包括pid初始化， 遥控器指针初始化，3508底盘电机指针初始化，云台电机初始化，陀螺仪角度指针初始化
  * @param[out]     chassis_move_init:"chassis_move"变量指针.
@@ -79,9 +83,16 @@ static void chassis_set_contorl(chassis_move_t *chassis_move_control);
  */
 static void chassis_control_loop(chassis_move_t *chassis_move_control_loop);
 
+/**
+ * @brief          更新由uart1传来的云台传感器数值
+ * @param[out]     gimbal_sensor_data_resolve:"gimbal_control"变量指针.
+ * @retval         none
+ */
+static void gimbal_sensor_data_update(gimbal_control_t *gimbal_sensor_data_resolve);
 //底盘运动数据
 chassis_move_t chassis_move;
-
+//云台数据
+extern gimbal_control_t gimbal_control;
 /**
  * @brief          底盘任务，间隔 CHASSIS_CONTROL_TIME_MS 2ms
  * @param[in]      pvParameters: 空
@@ -89,9 +100,6 @@ chassis_move_t chassis_move;
  */
 void chassis_task(void const *pvParameters)
 {
-//调试使用
-//	PID_init(&speed_pid,SPEED_P,SPEED_I,SPEED_D,7000,200);
-//	double du = 0;
   //空闲一段时间
   vTaskDelay(CHASSIS_TASK_INIT_TIME);
   //底盘初始化
@@ -112,6 +120,9 @@ void chassis_task(void const *pvParameters)
 		
     //底盘控制量设置，底盘跟随时PID计算包含在内
     chassis_set_contorl(&chassis_move);
+		
+		//云台传感器数据更新
+		gimbal_sensor_data_update(&gimbal_control);
       //当遥控器掉线的时候，发送给底盘电机零电流.
       if (toe_is_error(DBUS_TOE))
       {
@@ -125,17 +136,6 @@ void chassis_task(void const *pvParameters)
 			}
 		//系统延时
     vTaskDelay(CHASSIS_CONTROL_TIME_MS);
-		
-		//调试使用
-//		if(du >= 360) 
-//		du = 0;
-//	du += 0.7;
-//	
-//		speed_sj  = sin(du * (3.1415926535)/180.0)*4;
-//		speed_set=PID_calc(&speed_pid,chassis_move.motor_chassis[0].speed,speed_sj);
-//		CAN_cmd_chassis(speed_set ,speed_set,speed_set,speed_set);
-//		speed_test=chassis_move.motor_chassis[0].speed;
-//    HAL_Delay(2);
 		
   }
 }
@@ -214,13 +214,16 @@ static void chassis_set_mode(chassis_move_t *chassis_move_mode)
     return;
   }
 	chassis_move_mode->chassis_mode = CHASSIS_VECTOR_DEBUG;
+
 	if (SWITCH_LEFT_IS_MID(chassis_move_mode->chassis_RC->rc.s[CHASSIS_MODE_LEFT_CHANNEL]) && SWITCH_RIGHT_IS_MID(chassis_move_mode->chassis_RC->rc.s[CHASSIS_MODE_RIGHT_CHANNEL]))
 	{
 		chassis_move_mode->chassis_mode = CHASSIS_RC_CONTROL;
 	}
-	else if (SWITCH_LEFT_IS_MID(chassis_move_mode->chassis_RC->rc.s[CHASSIS_MODE_LEFT_CHANNEL]) && SWITCH_RIGHT_IS_DOWN(chassis_move_mode->chassis_RC->rc.s[CHASSIS_MODE_RIGHT_CHANNEL]))
-		{
-		}
+	//左下右下为键盘控制，与状态机启动相同，状态机相应函数卸载Engineer_behaviour中
+	else if (SWITCH_LEFT_IS_DOWN(chassis_move_mode->chassis_RC->rc.s[CHASSIS_MODE_LEFT_CHANNEL]) && SWITCH_RIGHT_IS_DOWN(chassis_move_mode->chassis_RC->rc.s[CHASSIS_MODE_RIGHT_CHANNEL]))
+	{
+		chassis_move_mode->chassis_mode = CHASSIS_KEYBOARD_CONTROL;
+	}
 	
 }
 
@@ -275,7 +278,7 @@ void chassis_rc_to_control_vector(fp32 *vx_set, fp32 *vy_set, chassis_move_t *ch
 	
   vx_set_channel = vx_channel * CHASSIS_VX_RC_SEN;
   vy_set_channel = -vy_channel * CHASSIS_VY_RC_SEN;
-	
+
   // first order low-pass replace ramp function, calculate chassis speed set-point to improve control performance
   //一阶低通滤波代替斜波作为底盘速度输入
   first_order_filter_cali(&chassis_move_rc_to_vector->chassis_cmd_slow_set_vx, vx_set_channel);
@@ -335,18 +338,37 @@ static void chassis_set_contorl(chassis_move_t *chassis_move_control)
 			chassis_move_control->wz_set=-PID_calc(&chassis_move_control->chassis_straighten_pid  , INS_data .angle_yaw   , INS_angle_init );
 		
 		chassis_control_loop(&chassis_move);
-	} 
+	}
+	else if(chassis_move_control->chassis_mode == CHASSIS_KEYBOARD_CONTROL)
+	{
+		chassis_keyboard_behaviour_control_set(&vx_set, &vy_set, &angle_set, chassis_move_control);
+		chassis_move_control->vx_set = vx_set ;
+		chassis_move_control->vy_set = vy_set ;
+		chassis_move_control->wz_set = angle_set ;
+		/*借助C板陀螺仪控制机器走直*/
+		if (angle_set !=0)
+			zhuanwan_flag=1;
+		if (zhuanwan_flag==1&&angle_set==0)
+		{
+			INS_angle_init =INS_data .angle_yaw;
+			zhuanwan_flag=0;
+		}
+		if (angle_set==0)
+			chassis_move_control->wz_set=-PID_calc(&chassis_move_control->chassis_straighten_pid  , INS_data .angle_yaw   , INS_angle_init );
+		
+		chassis_control_loop(&chassis_move);
+	}
 }
 
 /**
- * @brief          四个全向轮速度是通过三个参数计算出来的
+ * @brief          四个麦克纳姆速度是通过三个参数计算出来的
  * @param[in]      vx_set: 纵向速度
  * @param[in]      vy_set: 横向速度
  * @param[in]      wz_set: 旋转速度
  * @param[out]     wheel_speed: 四个全向轮速度
  * @retval         none
  */
-static void chassis_vector_to_omnidirectional_wheel_speed(const fp32 vx_set, const fp32 vy_set, const fp32 wz_set, fp32 wheel_speed[4])
+static void chassis_vector_to_mecanum_wheel_speed(const fp32 vx_set, const fp32 vy_set, const fp32 wz_set, fp32 wheel_speed[4])
 {
 	////////////////电调ID/////////////////
 	/////////1********前*******2///////////
@@ -376,7 +398,7 @@ static void chassis_control_loop(chassis_move_t *chassis_move_control_loop)
   uint8_t i = 0;
 
 	//麦轮运动分解
-  chassis_vector_to_omnidirectional_wheel_speed(chassis_move_control_loop->vx_set,
+  chassis_vector_to_mecanum_wheel_speed(chassis_move_control_loop->vx_set,
                                         chassis_move_control_loop->vy_set, chassis_move_control_loop->wz_set, wheel_speed);
   // calculate the max speed in four wheels, limit the max speed
   //计算轮子控制最大速度，并限制其最大速度
@@ -417,4 +439,13 @@ static void chassis_control_loop(chassis_move_t *chassis_move_control_loop)
     chassis_move_control_loop->motor_chassis[i].give_current = (int16_t)(wheel_out[i]);   //改动前(int16_t)(chassis_move_control_loop->motor_speed_pid[i].out)
   }
 }
-
+//云台传感器解包
+static void gimbal_sensor_data_update(gimbal_control_t *gimbal_sensor_data_resolve)
+{
+	//接受来自外部单片机的数据
+	HAL_UART_Receive(&huart1,&gimbal_sensor_data,sizeof(uint8_t),0);
+	gimbal_sensor_data_resolve->ore_flag.air_pump_flag_left 	= ((gimbal_sensor_data & 0x08) >> 3);
+	gimbal_sensor_data_resolve->ore_flag.air_pump_flag_right 	= ((gimbal_sensor_data & 0x04) >> 2);
+	gimbal_sensor_data_resolve->ore_flag.laser_flag_left 			= ((gimbal_sensor_data & 0x02) >> 1);
+	gimbal_sensor_data_resolve->ore_flag.laser_flag_right 		= ((gimbal_sensor_data & 0x01));
+}

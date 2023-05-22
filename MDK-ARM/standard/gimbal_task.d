@@ -78,3 +78,4 @@
 .\standard\gimbal_task.o: ..\application\remote_control.h
 .\standard\gimbal_task.o: ..\components\algorithm\user_lib.h
 .\standard\gimbal_task.o: ..\application\gimbal_pid.h
+.\standard\gimbal_task.o: ..\Task\detect_task.h

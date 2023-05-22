@@ -88,6 +88,7 @@
 #endif
 
 #define CHASSIS_REMOTE_CONTROL_CHANGE_TO_VEL 0.007f //0.006377f
+#define CHASSIS_MOUSE_CONTROL_CHANGE_TO_VEL 0.001f
 typedef enum
 {
   CHASSIS_ZERO_FORCE,                   //chassis will be like no power,底盘无力, 跟没上电那样
@@ -138,5 +139,5 @@ extern void chassis_behaviour_mode_set(chassis_move_t *chassis_move_mode);
   */
 
 extern void chassis_behaviour_control_set(float *vx_set, float *vy_set, float *angle_set, chassis_move_t *chassis_move_rc_to_vector);
-
+extern void chassis_keyboard_behaviour_control_set(float *vx_set, float *vy_set, float *angle_set, chassis_move_t *chassis_move_keyboard_to_vector);
 #endif

@@ -17,6 +17,7 @@
  * @param[out]      pFsm: 状态机结构数据指针指针
  * @param[in]       pTable: 状态表指针
  */
+ 
 void FSM_Regist(FSM *pFsm, FsmTable *pTable)
 {
     pFsm->pFsmTable = pTable;

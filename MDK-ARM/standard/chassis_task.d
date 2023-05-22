@@ -78,3 +78,5 @@
 .\standard\chassis_task.o: ..\boards\bsp_adc.h
 .\standard\chassis_task.o: ..\application\board_talk.h
 .\standard\chassis_task.o: ..\boards\bsp_usart.h
+.\standard\chassis_task.o: ..\Hardware\Inc\usart.h
+.\standard\chassis_task.o: ..\application\Engineer_behaviour.h

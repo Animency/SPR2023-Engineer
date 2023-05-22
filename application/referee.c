@@ -27,7 +27,7 @@ ext_robot_hurt_t robot_hurt_t;
 ext_shoot_data_t shoot_data_t;
 ext_bullet_remaining_t bullet_remaining_t;
 ext_student_interactive_data_t student_interactive_data_t;
-
+custom_robot_data_t custom_controller_data_t;
 
 
 
@@ -59,7 +59,7 @@ void init_referee_struct_data(void)
 
     memset(&student_interactive_data_t, 0, sizeof(ext_student_interactive_data_t));
 
-
+		memset(&custom_controller_data_t, 0, sizeof(custom_controller_data_t));
 
 }
 
@@ -161,6 +161,11 @@ void referee_data_solve(uint8_t *frame)
             memcpy(&student_interactive_data_t, frame + index, sizeof(student_interactive_data_t));
         }
         break;
+				case CUSTOM_ROBOT_DATA_CMD_ID:
+				{
+					memcpy(&custom_controller_data_t, frame + index, sizeof(custom_robot_data_t));
+				}
+				break;
         default:
         {
             break;

@@ -145,12 +145,15 @@ extern "C" {
 #define GIMBAL_MOTIONLESS_RC_DEADLINE 10
 #define GIMBAL_MOTIONLESS_TIME_MAX    3000
 
-//2006电机编码器转换成齿轮速度
-#define MOTOR_RPM_TO_SPEED 0.000493706f
+//2006电机rpm转换成齿轮速度m/s
+#define MOTOR_RPM_TO_SPEED_2006 0.000493706f
 
 #define GIMBAL_PI 3.1415926535898
 #define GIMBAL_DEC (GIMBAL_PI/180)
-
+//6020电机rpm转换成齿轮速度m/s
+#define GIMBAL_RPM_TO_SPEED_6020 0.003492300f
+//3508电机rpm转换成齿轮速度m/s
+#define GIMBAL_RPM_TO_SPEED_3508 0.00219905f
 //电机编码值转化成角度值
 #ifndef MOTOR_ECD_TO_RAD
 #define MOTOR_ECD_TO_RAD 0.000766990394f //      2*  PI  /8192
@@ -166,6 +169,15 @@ extern "C" {
 //抬升的移动范围（用角度表示）
 #define ANGLE_LIMIT_TAI_1 0
 #define ANGLE_LIMIT_TAI_2 0
+
+//2023工程电子限位角度值
+#define TARGET_CAN2_201_MAX 0
+#define TARGET_CAN2_202_MAX 0
+#define TARGET_CAN2_204_MAX 0
+#define TARGET_CAN2_205_MAX 0
+#define TARGET_CAN2_206_MAX 0
+#define TARGET_CAN2_207_6020_MAX 0
+#define TARGET_CAN2_208_MAX 0
 typedef enum
 {
     GIMBAL_MOTOR_RAW = 0, //电机原始值控制
@@ -234,7 +246,16 @@ typedef struct
     uint16_t min_pitch_ecd;
     uint8_t step;
 } gimbal_step_cali_t;
-
+//用于本次工程所有的四个传感器
+typedef struct
+{
+	//air_pump 是位于爪子吸盘处两个传感器，用于判断是否吸住矿石
+	uint8_t air_pump_flag_left;
+	uint8_t air_pump_flag_right;
+	//laser 是位于爪子两侧的传感器，用于判断是否对准矿石
+	uint8_t laser_flag_left;
+	uint8_t laser_flag_right;
+}ore_flag_t;
 typedef struct
 {
     const RC_ctrl_t *gimbal_rc_ctrl;
@@ -242,11 +263,33 @@ typedef struct
     const float *gimbal_INT_gyro_point;
     gimbal_motor_t gimbal_yaw_motor;
     gimbal_motor_t gimbal_pitch_motor;
-	  gimbal_motor_t horizontal_scroll_motor[6];
+	  gimbal_motor_t horizontal_scroll_motor[7];
 	  gimbal_motor_t gimbal_6020_motor;
     gimbal_step_cali_t gimbal_cali;
+		ore_flag_t ore_flag;
 } gimbal_control_t;
-
+typedef struct
+{
+		uint8_t flag_can2_201_control_loop;
+		uint8_t flag_can2_202_control_loop;
+		uint8_t flag_can2_204_control_loop;
+		uint8_t flag_can2_205_control_loop;
+		uint8_t flag_can2_206_control_loop;
+		uint8_t flag_can2_207_6020control_loop;
+	  uint8_t flag_can2_208_control_loop;
+}gimbal_control_loop_flag_t;
+//增加电子限位
+#define electric_limit(input, output, dealine)    \
+  {                                                  \
+    if ((input) > (dealine) || (input) < -(dealine)) \
+    {                                                \
+      (output) = (dealine);                          \
+    }                                                \
+    else                                             \
+    {                                                \
+      (output) = (input);                            \
+    }                                                \
+  }
 /**
   * @brief          返回yaw 电机数据指针
   * @param[in]      none

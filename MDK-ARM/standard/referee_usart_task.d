@@ -61,6 +61,7 @@
 .\standard\referee_usart_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
 .\standard\referee_usart_task.o: ..\boards\bsp_usart.h
 .\standard\referee_usart_task.o: ..\application\struct_typedef.h
+.\standard\referee_usart_task.o: ..\Task\detect_task.h
 .\standard\referee_usart_task.o: ..\components\support\CRC8_CRC16.h
 .\standard\referee_usart_task.o: ..\components\support\fifo.h
 .\standard\referee_usart_task.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
@@ -68,3 +69,4 @@
 .\standard\referee_usart_task.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\standard\referee_usart_task.o: ..\application\protocol\protocol.h
 .\standard\referee_usart_task.o: ..\application\referee.h
+.\standard\referee_usart_task.o: ..\application\custom_ui_draw.h

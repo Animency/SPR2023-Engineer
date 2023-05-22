@@ -33,6 +33,7 @@ typedef enum
     SHOOT_DATA_CMD_ID                 = 0x0207,
     BULLET_REMAINING_CMD_ID           = 0x0208,
     STUDENT_INTERACTIVE_DATA_CMD_ID   = 0x0301,
+		CUSTOM_ROBOT_DATA_CMD_ID          = 0x0302,
     IDCustomData,
 }referee_cmd_id_t;
 typedef  struct

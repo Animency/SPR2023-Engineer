@@ -47,6 +47,7 @@
 #include "math.h"
 #include "gimbal_behaviour.h"
 #include "gimbal_task.h"
+#include "Engineer_behaviour.h"
 #define rc_deadband_limit(input, output, dealine)    \
   {                                                  \
     if ((input) > (dealine) || (input) < -(dealine)) \
@@ -58,6 +59,7 @@
       (output) = 0;                                  \
     }                                                \
   }
+
 /**
  * @brief          底盘无力的行为状态机下，底盘模式是raw，故而设定值会直接发送到can总线上故而将设定值都设置为0
  * @author         RM
@@ -112,12 +114,21 @@ static void chassis_no_follow_yaw_control(float *vx_set, float *vy_set, float *w
  */
 
 static void chassis_open_set_control(float *vx_set, float *vy_set, float *wz_set, chassis_move_t *chassis_move_rc_to_vector);
-
+/**
+ * @brief          底盘开环的行为状态机下，底盘模式是raw原生状态，故而设定值会直接发送到can总线上
+ * @param[in]      vx_set前进的速度,正值 前进速度， 负值 后退速度
+ * @param[in]      vy_set左右的速度，正值 左移速度， 负值 右移速度
+ * @param[in]      wz_set 旋转速度， 正值 逆时针旋转，负值 顺时针旋转
+ * @param[in]      chassis_move_rc_to_vector底盘数据
+ * @retval         none
+ */
+static void chassis_keyboard_control_normal(float *vx_set, float *vy_set, float *wz_set, chassis_move_t *chassis_move_rc_to_vector);
 // highlight, the variable chassis behaviour mode
 //留意，这个底盘行为模式变量
 //chassis_behaviour_e chassis_behaviour_mode = CHASSIS_ZERO_FORCE;
 static void chassis_Debug_control(float *vx_set, float *vy_set, float *wz_set, chassis_move_t *chassis_move_rc_to_vector);
 static void chassis_remote_control_normal(float *vx_set, float *vy_set, float *wz_set, chassis_move_t *chassis_move_rc_to_vector);
+extern int low_speed;
 /**
  * @brief          通过逻辑判断，赋值"chassis_behaviour_mode"成哪种模式
  * @param[in]      chassis_move_mode: 底盘数据
@@ -179,7 +190,22 @@ void chassis_behaviour_mode_set(chassis_move_t *chassis_move_mode)
     
 		
 }
-
+/**
+ * @brief          设置控制量.根据不同底盘控制模式，三个参数会控制不同运动.在这个函数里面，会调用不同的控制函数.
+ * @param[out]     vx_set, 通常控制纵向移动.
+ * @param[out]     vy_set, 通常控制横向移动.
+ * @param[out]     wz_set, 通常控制旋转运动.
+ * @param[in]      chassis_move_keyboard_to_vector,  包括底盘所有信息.
+ * @retval         none
+ */
+void chassis_keyboard_behaviour_control_set(float *vx_set, float *vy_set, float *angle_set, chassis_move_t *chassis_move_keyboard_to_vector)
+{
+	if (vx_set == NULL || vy_set == NULL || angle_set == NULL || chassis_move_keyboard_to_vector == NULL)
+  {
+    return;
+  }
+	chassis_keyboard_control_normal(vx_set,vy_set,angle_set,chassis_move_keyboard_to_vector);
+}
 /**
  * @brief          设置控制量.根据不同底盘控制模式，三个参数会控制不同运动.在这个函数里面，会调用不同的控制函数.
  * @param[out]     vx_set, 通常控制纵向移动.
@@ -338,5 +364,43 @@ static void chassis_remote_control_normal(float *vx_set, float *vy_set, float *w
 	rc_deadband_limit(*vx_set,*vx_set,0.15);
 	rc_deadband_limit(*vy_set,*vy_set,0.15);
 	rc_deadband_limit(*wz_set,*wz_set,0.15);
+	return;
+}
+/**
+ * @brief          底盘开环的行为状态机下，底盘模式是raw原生状态，故而设定值会直接发送到can总线上
+ * @param[in]      vx_set前进的速度,正值 前进速度， 负值 后退速度
+ * @param[in]      vy_set左右的速度，正值 左移速度， 负值 右移速度
+ * @param[in]      wz_set 旋转速度， 正值 逆时针旋转，负值 顺时针旋转
+ * @param[in]      chassis_move_rc_to_vector底盘数据
+ * @retval         none
+ */
+static void chassis_keyboard_control_normal(float *vx_set, float *vy_set, float *wz_set, chassis_move_t *chassis_move_keyboard_to_vector)
+{
+  if (vx_set == NULL || vy_set == NULL || wz_set == NULL || chassis_move_keyboard_to_vector == NULL)
+  {
+    return;
+  }
+	//键盘控制设定值
+	if((chassis_move_keyboard_to_vector->chassis_RC->key.v & KEY_PRESSED_OFFSET_W) && low_speed == 0) //处于高速模式时
+	{
+		*vy_set = chassis_move_keyboard_to_vector->vy_max_speed;
+	}
+	else if((chassis_move_keyboard_to_vector->chassis_RC->key.v & KEY_PRESSED_OFFSET_S) && low_speed == 0)
+	{
+		*vy_set = chassis_move_keyboard_to_vector->vy_min_speed;
+	}
+	if((chassis_move_keyboard_to_vector->chassis_RC->key.v & KEY_PRESSED_OFFSET_A) && low_speed == 0)
+	{
+		*vx_set = chassis_move_keyboard_to_vector->vx_min_speed;
+	}
+	else if((chassis_move_keyboard_to_vector->chassis_RC->key.v & KEY_PRESSED_OFFSET_S) && low_speed == 0)
+	{
+		*vx_set = chassis_move_keyboard_to_vector->vx_max_speed;
+	}
+	//键盘x轴移动速度控制底盘旋转
+	if(chassis_move_keyboard_to_vector->chassis_RC->mouse.x | 0x00)
+	{
+		*wz_set = chassis_move_keyboard_to_vector->chassis_RC->mouse.x * CHASSIS_MOUSE_CONTROL_CHANGE_TO_VEL;
+	}
 	return;
 }
