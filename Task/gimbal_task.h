@@ -162,22 +162,23 @@ extern "C" {
 #define GIMBAL_VEL 0.001
 #define GIMBAL_ZHUAN_VEL 0.0005
 
-//机械臂的移动范围（用角度表示）
-#define ANGLE_LIMIT_PING 0
-#define ANGLE_LIMIT_ZHUAN 0
-
-//抬升的移动范围（用角度表示）
-#define ANGLE_LIMIT_TAI_1 0
-#define ANGLE_LIMIT_TAI_2 0
 
 //2023工程电子限位角度值
-#define TARGET_CAN2_201_MAX 0
-#define TARGET_CAN2_202_MAX 0
-#define TARGET_CAN2_204_MAX 0
-#define TARGET_CAN2_205_MAX 0
-#define TARGET_CAN2_206_MAX 0
-#define TARGET_CAN2_207_6020_MAX 0
+#define TARGET_CAN2_201_MAX 480
+#define TARGET_CAN2_202_MAX -10
+#define TARGET_CAN2_204_MAX 110
+#define TARGET_CAN2_205_MAX 1100
+#define TARGET_CAN2_206_MAX -20
+#define TARGET_CAN2_207_6020_MAX 720
 #define TARGET_CAN2_208_MAX 0
+
+#define TARGET_CAN2_201_MIN -480
+#define TARGET_CAN2_202_MIN -720
+#define TARGET_CAN2_204_MIN -110
+#define TARGET_CAN2_205_MIN -20
+#define TARGET_CAN2_206_MIN -1100
+#define TARGET_CAN2_207_6020_MIN -720
+#define TARGET_CAN2_208_MIN 0
 typedef enum
 {
     GIMBAL_MOTOR_RAW = 0, //电机原始值控制
@@ -268,28 +269,23 @@ typedef struct
     gimbal_step_cali_t gimbal_cali;
 		ore_flag_t ore_flag;
 } gimbal_control_t;
-typedef struct
-{
-		uint8_t flag_can2_201_control_loop;
-		uint8_t flag_can2_202_control_loop;
-		uint8_t flag_can2_204_control_loop;
-		uint8_t flag_can2_205_control_loop;
-		uint8_t flag_can2_206_control_loop;
-		uint8_t flag_can2_207_6020control_loop;
-	  uint8_t flag_can2_208_control_loop;
-}gimbal_control_loop_flag_t;
+
 //增加电子限位
-#define electric_limit(input, output, dealine)    \
-  {                                                  \
-    if ((input) > (dealine) || (input) < -(dealine)) \
-    {                                                \
-      (output) = (dealine);                          \
-    }                                                \
-    else                                             \
-    {                                                \
-      (output) = (input);                            \
-    }                                                \
-  }
+#define electric_limit(input, output, maxdealine, mindealine)   \
+  {                                                  						\
+    if (((input) >= (mindealine)) && ((input) <= (maxdealine))) \
+    {                                                						\
+      (output) = (input);                          							\
+    }                                                						\
+    else if ((input) > (maxdealine))                            \
+    {                                                						\
+      (output) = (maxdealine);                            			\
+    }                                                						\
+		else if((input) < (mindealine))                             \
+		{                                                           \
+			(output) = (mindealine);                                  \
+		}                                                           \
+  }                                                             \
 /**
   * @brief          返回yaw 电机数据指针
   * @param[in]      none
@@ -310,6 +306,7 @@ extern const gimbal_motor_t *get_yaw_motor_point(void);
 extern const gimbal_motor_t *get_pitch_motor_point(void);
 
 extern void gimbal_task(void const *pvParameters);
+
 
 #ifdef __cplusplus
 }

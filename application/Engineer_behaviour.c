@@ -231,6 +231,7 @@ void PID_All_Cal(void)
 	pid_test_can2_205 = gimbal_control.horizontal_scroll_motor[4].give_current;
 	pid_test_can2_206 = gimbal_control.horizontal_scroll_motor[5].give_current;
 }
+
 void engineer_gimbal_behaviour_keyboard_control(void)
 {
 	//云台机械臂水平电机键盘控制
@@ -238,13 +239,13 @@ void engineer_gimbal_behaviour_keyboard_control(void)
 	{
 		target_can2_207_angle_6020 += KEYBOARD_CONTROL_ANGLE_CAN2_207_6020_CHANGE;
 		//增加电子限位功能防止设定值超出物理限位无法及时响应
-		electric_limit(target_can2_207_angle_6020,target_can2_207_angle_6020,TARGET_CAN2_207_6020_MAX);
+		electric_limit(target_can2_207_angle_6020,target_can2_207_angle_6020,TARGET_CAN2_207_6020_MAX,TARGET_CAN2_207_6020_MIN);
 	}
 	else if(gimbal_control.gimbal_rc_ctrl->key.v & KEY_PRESSED_OFFSET_E) 								//键盘按下E时机械臂水平向右移动
 	{
 		target_can2_207_angle_6020 -= KEYBOARD_CONTROL_ANGLE_CAN2_207_6020_CHANGE;
 		//增加电子限位功能防止设定值超出物理限位无法及时响应
-		electric_limit(target_can2_207_angle_6020,target_can2_207_angle_6020,TARGET_CAN2_207_6020_MAX);
+		electric_limit(target_can2_207_angle_6020,target_can2_207_angle_6020,TARGET_CAN2_207_6020_MAX,TARGET_CAN2_207_6020_MIN);
 	}
 	
 	//云台机械臂竖直键盘控制
@@ -252,13 +253,13 @@ void engineer_gimbal_behaviour_keyboard_control(void)
 	{
 		target_can2_204_angle += KEYBOARD_CONTROL_ANGLE_CAN2_204_CHANGE;
 		//增加电子限位功能防止设定值超出物理限位无法及时响应
-		electric_limit(target_can2_204_angle,target_can2_204_angle,TARGET_CAN2_204_MAX);
+		electric_limit(target_can2_204_angle,target_can2_204_angle,TARGET_CAN2_204_MAX,TARGET_CAN2_204_MIN);
 	}
 	else if(gimbal_control.gimbal_rc_ctrl->key.v & KEY_PRESSED_OFFSET_F) 		 						//键盘按下R时前伸电机向后移动
 	{
 		target_can2_204_angle -= KEYBOARD_CONTROL_ANGLE_CAN2_204_CHANGE;
 		//增加电子限位功能防止设定值超出物理限位无法及时响应
-		electric_limit(target_can2_204_angle,target_can2_204_angle,TARGET_CAN2_204_MAX);
+		electric_limit(target_can2_204_angle,target_can2_204_angle,TARGET_CAN2_204_MAX,TARGET_CAN2_204_MIN);
 	}
 	
 	//云台抬升键盘控制
@@ -267,16 +268,16 @@ void engineer_gimbal_behaviour_keyboard_control(void)
 		target_can2_205_angle += KEYBOARD_CONTROL_ANGLE_CAN2_205_206_CHANGE;
 		target_can2_206_angle -= KEYBOARD_CONTROL_ANGLE_CAN2_205_206_CHANGE;
 		//增加电子限位功能防止设定值超出物理限位无法及时响应
-		electric_limit(target_can2_205_angle,target_can2_205_angle,TARGET_CAN2_205_MAX);
-		electric_limit(target_can2_206_angle,target_can2_206_angle,TARGET_CAN2_206_MAX);
+		electric_limit(target_can2_205_angle,target_can2_205_angle,TARGET_CAN2_205_MAX,TARGET_CAN2_205_MIN);
+		electric_limit(target_can2_206_angle,target_can2_206_angle,TARGET_CAN2_206_MAX,TARGET_CAN2_205_MIN);
 	}
 	else if(gimbal_control.gimbal_rc_ctrl->key.v & KEY_PRESSED_OFFSET_V) 		 						//鼠标按下V时抬升电机向下移动
 	{
 		target_can2_205_angle -= KEYBOARD_CONTROL_ANGLE_CAN2_205_206_CHANGE;
 		target_can2_206_angle += KEYBOARD_CONTROL_ANGLE_CAN2_205_206_CHANGE;
 		//增加电子限位功能防止设定值超出物理限位无法及时响应
-		electric_limit(target_can2_205_angle,target_can2_205_angle,TARGET_CAN2_205_MAX);
-		electric_limit(target_can2_206_angle,target_can2_206_angle,TARGET_CAN2_206_MAX);
+		electric_limit(target_can2_205_angle,target_can2_205_angle,TARGET_CAN2_205_MAX,TARGET_CAN2_205_MIN);
+		electric_limit(target_can2_206_angle,target_can2_206_angle,TARGET_CAN2_206_MAX,TARGET_CAN2_206_MIN);
 	}
 	
 	//云台横移电机键盘控制
@@ -284,13 +285,13 @@ void engineer_gimbal_behaviour_keyboard_control(void)
 	{
 		target_can2_201_angle += MOUSE_CONTROL_ANGLE_CAN2_201_CHANGE;
 		//增加电子限位功能防止设定值超出物理限位无法及时响应
-		electric_limit(target_can2_201_angle,target_can2_201_angle,TARGET_CAN2_201_MAX);
+		electric_limit(target_can2_201_angle,target_can2_201_angle,TARGET_CAN2_201_MAX,TARGET_CAN2_201_MIN);
 	}
 	else if(gimbal_control.gimbal_rc_ctrl->mouse.press_r & 0x01) 		 										//鼠标按下右键时横移电机向右移动
 	{
 		target_can2_201_angle -= MOUSE_CONTROL_ANGLE_CAN2_201_CHANGE;
 		//增加电子限位功能防止设定值超出物理限位无法及时响应
-		electric_limit(target_can2_201_angle,target_can2_201_angle,TARGET_CAN2_201_MAX);
+		electric_limit(target_can2_201_angle,target_can2_201_angle,TARGET_CAN2_201_MAX,TARGET_CAN2_201_MIN);
 	}
 	
 	//云台竖直电机键盘控制
@@ -298,7 +299,7 @@ void engineer_gimbal_behaviour_keyboard_control(void)
 	{
 		target_can2_202_angle += gimbal_control.gimbal_rc_ctrl->mouse.y * MOUSE_CONTROL_ANGLE_CAN2_202_CHANGE;
 		//增加电子限位功能防止设定值超出物理限位无法及时响应
-		electric_limit(target_can2_202_angle,target_can2_202_angle,TARGET_CAN2_202_MAX);
+		electric_limit(target_can2_202_angle,target_can2_202_angle,TARGET_CAN2_202_MAX,TARGET_CAN2_202_MIN);
 	}
 }
 //暂空

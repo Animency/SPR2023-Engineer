@@ -187,7 +187,7 @@ static void chassis_init(chassis_move_t *chassis_move_init)
   //first_order_filter_init(&chassis_move.chassis_cmd_slow_set_vy, CHASSIS_CONTROL_TIME, chassis_y_order_filter);
 
 	//初始化机器人走直PID
-	PID_init(&chassis_move_init->chassis_straighten_pid, 200, 0, 0, 0, 0);
+	PID_init(&chassis_move_init->chassis_straighten_pid, 0.7, 0, 0, 2.0, 0);
 	
   //最大 最小速度
   chassis_move_init->vx_max_speed = NORMAL_MAX_CHASSIS_SPEED_X;
@@ -335,7 +335,8 @@ static void chassis_set_contorl(chassis_move_t *chassis_move_control)
 			zhuanwan_flag=0;
 		}
 		if (angle_set==0)
-			chassis_move_control->wz_set=-PID_calc(&chassis_move_control->chassis_straighten_pid  , INS_data .angle_yaw   , INS_angle_init );
+			chassis_move_control->wz_set=PID_calc(&chassis_move_control->chassis_straighten_pid  , INS_data .angle_yaw   , INS_angle_init );
+		speed_sj = INS_data .angle_yaw;
 		
 		chassis_control_loop(&chassis_move);
 	}
@@ -430,9 +431,6 @@ static void chassis_control_loop(chassis_move_t *chassis_move_control_loop)
 	//PID_calc(&chassis_move_control_loop->chassis_straighten_pid, chassis_move_control_loop->motor_chassis[i].speed  , chassis_move_control_loop->motor_chassis[i].speed_set);
 		wheel_out[i]=chassis_move_control_loop->motor_speed_pid[i].out;
   }
-	speed_sj=chassis_move_control_loop->motor_chassis[0].speed_set;
-	speed_test=chassis_move_control_loop->motor_chassis[0].speed;
-	speed_set=chassis_move_control_loop->motor_chassis[2].speed;
   //赋值电流值
   for (i = 0; i < 4; i++)
   {

@@ -80,6 +80,49 @@ float PID_calc(pid_type_def *pid, float ref, float set)
 	return pid->out;
 }
 
+
+inline char SameSign(float a, float b)
+{
+	if( (a >= 0 && b >= 0) || (a <= 0 && b <= 0) )
+			return 1;
+	return 0;
+}
+
+/**
+ * @brief          pid计算
+ * @param[out]     pid: PID结构数据指针
+ * @param[in]      ref: 反馈数据
+ * @param[in]      set: 设定值
+ * @return         pid输出
+ */
+
+float PIID_calc(pid_type_def *pid, float ref, float set)
+{
+	if (pid == NULL)
+	{
+		return 0.0f;
+	}
+	pid->error[1] = pid->error[0];
+	pid->set = set;
+	pid->fdb = ref;
+	pid->error[0] = set - ref;
+	pid->Pout = pid->Kp * pid->error[0];
+	if(SameSign(pid->Iout, pid->error[0]))
+			pid->Iout += pid->Ki * pid->error[0];
+	else
+			pid->Iout += pid->Ki * pid->error[0] * 1.3f;
+	pid->Dbuf[2] = pid->Dbuf[1];
+	pid->Dbuf[1] = pid->Dbuf[0];
+	pid->Dbuf[0] = (pid->error[0] - pid->error[1]);
+	pid->Dout = pid->Kd * pid->Dbuf[0];
+	LimitMax(pid->Iout, pid->max_iout);
+	pid->out = pid->Pout + pid->Iout + pid->Dout;
+	LimitMax(pid->out, pid->max_out);
+
+	return pid->out;
+}
+
+
 /**
  * @brief 云台PID计算函数
  *

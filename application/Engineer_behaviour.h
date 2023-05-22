@@ -16,7 +16,7 @@
   /*-----------------------------------------------------键盘控制宏定义--------------------------------------------------------*/
 #define KEYBOARD_CONTROL_ANGLE_CAN2_201_CHANGE  0
 #define KEYBOARD_CONTROL_ANGLE_CAN2_207_6020_CHANGE 0
-#define KEYBOARD_CONTROL_ANGLE_CAN2_204_CHANGE 0
+#define KEYBOARD_CONTROL_ANGLE_CAN2_204_CHANGE 1
 #define KEYBOARD_CONTROL_ANGLE_CAN2_205_206_CHANGE 0
 
 #define MOUSE_CONTROL_ANGLE_CAN2_201_CHANGE  0
@@ -53,3 +53,6 @@
 #define TARGET_BTM_CAN2_202_ANGLE_RETRACR 0x00
 /**********存矿下降宏定义***********/
 #define TARGET_BTM_CAN2_208_ANGLE_DOWN 0x00
+
+ /*-----------------------------------------------------函数取回--------------------------------------------------------*/
+extern void engineer_gimbal_behaviour_keyboard_control(void);

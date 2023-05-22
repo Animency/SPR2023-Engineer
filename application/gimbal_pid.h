@@ -24,5 +24,5 @@ float p_arm_horizon_angle = 0.2		,d_arm_horizon_angle = 0.00/*0.0015*/		,i_arm_h
 float p_arm_vertical = 3200				,d_arm_vertical = 14						,max_out_arm_vertical = 8000						,max_i_out_arm_vertical = 3000;
 float p_arm_vertical_angle = 0.1	,d_arm_vertical_angle = 0.01		,max_out_arm_vertical_angle = 4.0				,max_i_out_arm_vertical_angle = 0.2;
 /*定义存矿上升下降电机pid变量*/
-float p_ore_vertical = 2000				,d_ore_vertical = 0						,max_out_ore_vertical = 8000						,max_i_ore_arm_vertical = 0;
+float p_ore_vertical = 3000				,d_ore_vertical = 150					,max_out_ore_vertical = 18000						,max_i_ore_arm_vertical = 0;
 float p_ore_vertical_angle = 0		,d_ore_vertical_angle = 0			,max_ore_arm_vertical_angle = 0.0				,max_i_ore_arm_vertical_angle = 0.0;
