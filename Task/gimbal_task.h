@@ -151,7 +151,7 @@ extern "C" {
 #define GIMBAL_PI 3.1415926535898
 #define GIMBAL_DEC (GIMBAL_PI/180)
 //6020电机rpm转换成齿轮速度m/s
-#define GIMBAL_RPM_TO_SPEED_6020 0.003492300f
+#define GIMBAL_RPM_TO_SPEED_6020  0.003492400f
 //3508电机rpm转换成齿轮速度m/s
 #define GIMBAL_RPM_TO_SPEED_3508 0.00219905f
 //电机编码值转化成角度值
@@ -170,7 +170,8 @@ extern "C" {
 #define TARGET_CAN2_205_MAX 1100
 #define TARGET_CAN2_206_MAX -20
 #define TARGET_CAN2_207_6020_MAX 720
-#define TARGET_CAN2_208_MAX 0
+#define TARGET_CAN2_208_MAX 600
+#define PWM_SERVO_MAX 2500
 
 #define TARGET_CAN2_201_MIN -480
 #define TARGET_CAN2_202_MIN -720
@@ -178,7 +179,9 @@ extern "C" {
 #define TARGET_CAN2_205_MIN -20
 #define TARGET_CAN2_206_MIN -1100
 #define TARGET_CAN2_207_6020_MIN -720
-#define TARGET_CAN2_208_MIN 0
+#define TARGET_CAN2_208_MIN -8
+#define PWM_SERVO_MIN	500
+
 typedef enum
 {
     GIMBAL_MOTOR_RAW = 0, //电机原始值控制

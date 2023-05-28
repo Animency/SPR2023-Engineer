@@ -57,6 +57,24 @@
 #define KEY_PRESSED_OFFSET_C            ((uint16_t)1 << 13)
 #define KEY_PRESSED_OFFSET_V            ((uint16_t)1 << 14)
 #define KEY_PRESSED_OFFSET_B            ((uint16_t)1 << 15)
+
+#define KEY_PRESSED_SHIFT_W							((uint16_t) 17		)
+#define KEY_PRESSED_SHIFT_A							((uint16_t) 20		)
+#define KEY_PRESSED_SHIFT_S							((uint16_t) 18		)
+#define KEY_PRESSED_SHIFT_D							((uint16_t) 24		)
+#define KEY_PRESSED_SHIFT_Q							((uint16_t) 80		)
+#define KEY_PRESSED_SHIFT_E							((uint16_t) 144		)
+#define KEY_PRESSED_SHIFT_Z							((uint16_t) 2064	)
+#define KEY_PRESSED_SHIFT_X							((uint16_t) 4112	)
+#define KEY_PRESSED_SHIFT_R							((uint16_t) 272		)
+#define KEY_PRESSED_SHIFT_F							((uint16_t) 528		)
+#define KEY_PRESSED_CTRL_I              ((uint16_t) 100 	)
+#define KEY_PRESSED_CTRL_B              ((uint16_t) 32800	)
+#define KEY_PRESSED_CTRL_V							((uint16_t)	20000 )
+/* ----------------------- PC Mouse Definition-------------------------------- */ //在2023版工程中与Engineer_behaviour配合使用
+#define MOUSE_PRESSED_OFFSET_RIGHT      ((uint8_t)1 << 0)
+#define MOUSE_PRESSED_OFFSET_LEFT       ((uint8_t)1 << 1)
+
 /* ----------------------- Data Struct ------------------------------------- */
 typedef __packed struct
 {

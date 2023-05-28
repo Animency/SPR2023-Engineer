@@ -454,11 +454,6 @@
               <FileType>1</FileType>
               <FilePath>..\Task\INS_task.c</FilePath>
             </File>
-            <File>
-              <FileName>gimbal_pid.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\application\gimbal_pid.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>

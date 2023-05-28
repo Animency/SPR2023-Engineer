@@ -59,4 +59,5 @@
 .\standard\custom_ui_draw.o: ..\application\remote_control.h
 .\standard\custom_ui_draw.o: ..\components\algorithm\user_lib.h
 .\standard\custom_ui_draw.o: ..\application\Engineer_behaviour.h
+.\standard\custom_ui_draw.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 .\standard\custom_ui_draw.o: ..\application\referee.h

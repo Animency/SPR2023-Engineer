@@ -5,7 +5,6 @@
 .\standard\engineer_behaviour.o: ..\boards\bsp_rc.h
 .\standard\engineer_behaviour.o: ..\application\CAN_receive.h
 .\standard\engineer_behaviour.o: ..\application\Engineer_behaviour.h
-.\standard\engineer_behaviour.o: ..\Hardware\Inc\tim.h
 .\standard\engineer_behaviour.o: ..\User\Inc\main.h
 .\standard\engineer_behaviour.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h
 .\standard\engineer_behaviour.o: ..\User\Inc\stm32f4xx_hal_conf.h
@@ -51,8 +50,11 @@
 .\standard\engineer_behaviour.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd.h
 .\standard\engineer_behaviour.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usb.h
 .\standard\engineer_behaviour.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h
+.\standard\engineer_behaviour.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\standard\engineer_behaviour.o: ..\Hardware\Inc\tim.h
 .\standard\engineer_behaviour.o: ..\Task\INS_task.h
 .\standard\engineer_behaviour.o: ..\application\referee_usart_task.h
 .\standard\engineer_behaviour.o: ..\Task\gimbal_task.h
 .\standard\engineer_behaviour.o: ..\application\remote_control.h
 .\standard\engineer_behaviour.o: ..\components\controller\fsm.h
+.\standard\engineer_behaviour.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h

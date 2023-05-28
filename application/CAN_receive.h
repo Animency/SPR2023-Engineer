@@ -70,7 +70,7 @@ typedef struct
     uint8_t temperate;
     int16_t last_ecd;
     int16_t round;
-    long long angle;
+    double angle; //long long
 } motor_measure_t;
 
 

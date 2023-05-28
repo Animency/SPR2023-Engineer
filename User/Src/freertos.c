@@ -136,8 +136,8 @@ void MX_FREERTOS_Init(void) {
     osThreadDef(referee_usartTask, referee_usart_task, osPriorityHigh, 0, 256);
     referee_usartTaskHandle = osThreadCreate(osThread(referee_usartTask), NULL);
 		
-    osThreadDef(servoTask, servo_task, osPriorityHigh, 0, 512);
-    servoTaskHandle = osThreadCreate(osThread(servoTask), NULL);
+    osThreadDef(keyboardReadTask, keyboardReadTask, osPriorityHigh, 0, 512);
+    servoTaskHandle = osThreadCreate(osThread(keyboardReadTask), NULL);
 		
 		osThreadDef(detectTask, detect_task, osPriorityHigh, 0, 256);
     detectTaskHandle = osThreadCreate(osThread(detectTask), NULL);

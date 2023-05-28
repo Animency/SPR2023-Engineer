@@ -13,17 +13,34 @@
  /******    3:逆时针角度增加    ********/
  /******       4:电机正装       *******/
  /******       5:电机反装       *******/
-  /*-----------------------------------------------------键盘控制宏定义--------------------------------------------------------*/
-#define KEYBOARD_CONTROL_ANGLE_CAN2_201_CHANGE  0
-#define KEYBOARD_CONTROL_ANGLE_CAN2_207_6020_CHANGE 0
-#define KEYBOARD_CONTROL_ANGLE_CAN2_204_CHANGE 1
-#define KEYBOARD_CONTROL_ANGLE_CAN2_205_206_CHANGE 0
+#ifndef __ENGINEER_HEHAVIOR_H__
+#define __ENGINEER_HEHAVIOR_H__
 
-#define MOUSE_CONTROL_ANGLE_CAN2_201_CHANGE  0
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "main.h"
+#include "stdio.h"
+  /*-----------------------------------------------------键盘控制灵敏度宏定义--------------------------------------------------------*/
+#define KEYBOARD_CONTROL_ANGLE_CAN2_201_CHANGE 5
+#define KEYBOARD_CONTROL_ANGLE_CAN2_202_CHANGE 5
+#define KEYBOARD_CONTROL_ANGLE_CAN2_204_CHANGE 3
+#define KEYBOARD_CONTROL_ANGLE_CAN2_205_206_CHANGE 8
+#define KEYBOARD_CONTROL_ANGLE_CAN2_207_6020_CHANGE 2
+
+#define KEYBOARD_CONTROL_ANGLE_MECHANICAL_ARM_COORDINATES_CHANGE 3
+
+#define MOUSE_CONTROL_ANGLE_CAN2_201_CHANGE  0.4 /*按键为4*/
 #define MOUSE_CONTROL_ANGLE_CAN2_202_CHANGE  0
 
  
  /*-----------------------------------------------------空接宏定义--------------------------------------------------------*/
+/**********初始化宏定义**************/
+#define TARGET_CAN2_205_206_ANGLE_FORMATTING 2
+#define TARGET_CAN2_207_6020_ANGLE_FORMATTING 3
+#define TARGET_CAN2_208_ANGLE_FORMATTING 2
+
 /**********初始化宏定义**************/
 #define TARGET_AG_CAN2_202_ANGLE_INIT 1
 #define TARGET_AG_CAN2_204_ANGLE_INIT 4
@@ -34,7 +51,7 @@
 #define TARGET_AG_CAN2_205_ANGLE_RISING 1061
 #define TARGET_AG_CAN2_206_ANGLE_RISING 1061
 /**********中置宏定义**************/
-#define TARGET_AG_CAN2_207_ANGLE_6020_CENTER 85
+#define TARGET_AG_CAN2_207_ANGLE_6020_CENTER -149
 /**********前伸宏定义**************/
 #define TARGET_AG_CAN2_202_ANGLE_PROTRACTING 360
 /**********翻转宏定义**************/
@@ -44,6 +61,12 @@
 #define TARGET_AG_CAN2_206_ANGLE 0x00
 
  /*-----------------------------------------------------槽内取矿宏定义--------------------------------------------------------*/
+/**********初始化宏定义**************/
+#define TARGET_BTM_CAN2_202_ANGLE_INIT 0
+#define TARGET_BTM_CAN2_204_ANGLE_INIT 0
+#define TARGET_BTM_CAN2_205_ANGLE_INIT 0
+#define TARGET_BTM_CAN2_206_ANGLE_INIT 0
+#define TARGET_BTM_CAN2_207_ANGLE_6020_INIT 0
 /**********抬升宏定义**************/
 #define TARGET_BTM_CAN2_205_ANGLE_RISING 0x00
 #define TARGET_BTM_CAN2_206_ANGLE_RISING 0x00
@@ -51,8 +74,38 @@
 #define TARGET_BTM_CAN2_207_ANGLE_6020_RETURN 0x00
 /**********前伸收回宏定义***********/
 #define TARGET_BTM_CAN2_202_ANGLE_RETRACR 0x00
-/**********存矿下降宏定义***********/
+/**********存矿与机械臂回正下降宏定义***********/
 #define TARGET_BTM_CAN2_208_ANGLE_DOWN 0x00
+#define TARGET_BTM_CAN2_207_6020_ARMTURNAROUND 0
 
- /*-----------------------------------------------------函数取回--------------------------------------------------------*/
+/*-----------------------------------------------------自动存矿宏定义--------------------------------------------------------*/
+/**********抬升宏定义**************/
+#define TARGET_AOS_CAN2_205_ANGLE_RISING 0
+#define TARGET_AOS_CAN2_206_ANGLE_RISING 0
+/**********翻转宏定义**************/
+#define TARGET_AOS_CAN2_204_ARM_OVERTURN 0
+/**********机械臂回正宏定义**************/
+#define TARGET_AOS_CAN2_207_6020_ARM_TURNAROUND 0
+/**********存矿宏定义**************/
+#define TARGET_AOS_CAN2_208_STORAGE_UP 0
+/*-----------------------------------------------------相关结构体定义--------------------------------------------------------*/
+typedef struct
+{
+	uint8_t former_state;
+	uint8_t current_state;
+}keyboard_state_flag_t;
+//用于确定与键盘状态
+typedef struct
+{
+	keyboard_state_flag_t		key_F;
+	keyboard_state_flag_t		key_C;
+	keyboard_state_flag_t		key_B;
+	uint8_t 				former_mouse_state;
+	uint8_t 				current_mouse_state;
+
+}mouse_keyboard_state_flag_t;
+/*-----------------------------------------------------函数取回--------------------------------------------------------*/
 extern void engineer_gimbal_behaviour_keyboard_control(void);
+
+
+#endif 

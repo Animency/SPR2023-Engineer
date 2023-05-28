@@ -123,6 +123,17 @@ static void chassis_open_set_control(float *vx_set, float *vy_set, float *wz_set
  * @retval         none
  */
 static void chassis_keyboard_control_normal(float *vx_set, float *vy_set, float *wz_set, chassis_move_t *chassis_move_rc_to_vector);
+
+static void chassis_keyboard_control_low(float *vx_set, float *vy_set, float *wz_set, chassis_move_t *chassis_keyboard_control_low);
+/**
+ * @brief          底盘开环的行为状态机下，底盘模式是raw原生状态，故而设定值会直接发送到can总线上 
+ * @brief					 此为键盘控制低速模式
+ * @param[in]      vx_set前进的速度,正值 前进速度， 负值 后退速度
+ * @param[in]      vy_set左右的速度，正值 左移速度， 负值 右移速度
+ * @param[in]      wz_set 旋转速度， 正值 逆时针旋转，负值 顺时针旋转
+ * @param[in]      chassis_move_rc_to_vector底盘数据
+ * @retval         none
+ */
 // highlight, the variable chassis behaviour mode
 //留意，这个底盘行为模式变量
 //chassis_behaviour_e chassis_behaviour_mode = CHASSIS_ZERO_FORCE;
@@ -357,8 +368,33 @@ static void chassis_remote_control_normal(float *vx_set, float *vy_set, float *w
   {
     return;
   }
-  *vx_set = chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_X_CHANNEL] * CHASSIS_REMOTE_CONTROL_CHANGE_TO_VEL;
-  *vy_set = -chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_Y_CHANNEL] * CHASSIS_REMOTE_CONTROL_CHANGE_TO_VEL;//-chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_Y_CHANNEL] * CHASSIS_REMOTE_CONTROL_CHANGE_TO_VEL
+	if(chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_X_CHANNEL] > 100 )
+	{
+		*vx_set = CHASSIS_STATIC_VEL;
+	}
+	else if(chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_X_CHANNEL] < -100 )
+	{
+		*vx_set = -CHASSIS_STATIC_VEL;
+	}
+	else
+	{
+		*vx_set = 0;
+	}
+	if(-chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_Y_CHANNEL] > 100 )
+	{
+		*vy_set = CHASSIS_STATIC_VEL;
+	}
+	else if(-chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_Y_CHANNEL] < -100 )
+	{
+		*vy_set = -CHASSIS_STATIC_VEL;
+	}
+	else
+	{
+		*vy_set = 0;
+	}
+	
+//  *vx_set = chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_X_CHANNEL] * CHASSIS_REMOTE_CONTROL_CHANGE_TO_VEL;
+//  *vy_set = -chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_Y_CHANNEL] * CHASSIS_REMOTE_CONTROL_CHANGE_TO_VEL;//-chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_Y_CHANNEL] * CHASSIS_REMOTE_CONTROL_CHANGE_TO_VEL
   *wz_set = -chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_WZ_CHANNEL] * CHASSIS_REMOTE_CONTROL_CHANGE_TO_VEL;
 	
 	rc_deadband_limit(*vx_set,*vx_set,0.15);
@@ -380,27 +416,54 @@ static void chassis_keyboard_control_normal(float *vx_set, float *vy_set, float 
   {
     return;
   }
+	switch(low_speed)
+	{
+		case 2:
+			chassis_keyboard_control_low(vx_set, vy_set, wz_set, chassis_move_keyboard_to_vector);
+			break;
+		default:
+			break;
+	}
+}
+/**
+ * @brief          底盘开环的行为状态机下，底盘模式是raw原生状态，故而设定值会直接发送到can总线上 
+ * @brief					 此为键盘控制低速模式
+ * @param[in]      vx_set前进的速度,正值 前进速度， 负值 后退速度
+ * @param[in]      vy_set左右的速度，正值 左移速度， 负值 右移速度
+ * @param[in]      wz_set 旋转速度， 正值 逆时针旋转，负值 顺时针旋转
+ * @param[in]      chassis_move_rc_to_vector底盘数据
+ * @retval         none
+ */
+static void chassis_keyboard_control_low(float *vx_set, float *vy_set, float *wz_set, chassis_move_t *chassis_keyboard_control_low)
+{
 	//键盘控制设定值
-	if((chassis_move_keyboard_to_vector->chassis_RC->key.v & KEY_PRESSED_OFFSET_W) && low_speed == 0) //处于高速模式时
+	if(chassis_keyboard_control_low->chassis_RC->key.v == KEY_PRESSED_OFFSET_W) //处于低速模式时
 	{
-		*vy_set = chassis_move_keyboard_to_vector->vy_max_speed;
+		*vy_set = -chassis_keyboard_control_low->vy_max_speed / 30.0;
 	}
-	else if((chassis_move_keyboard_to_vector->chassis_RC->key.v & KEY_PRESSED_OFFSET_S) && low_speed == 0)
+	else if(chassis_keyboard_control_low->chassis_RC->key.v == KEY_PRESSED_OFFSET_S)
 	{
-		*vy_set = chassis_move_keyboard_to_vector->vy_min_speed;
+		*vy_set = -chassis_keyboard_control_low->vy_min_speed / 30.0;
 	}
-	if((chassis_move_keyboard_to_vector->chassis_RC->key.v & KEY_PRESSED_OFFSET_A) && low_speed == 0)
+	if(chassis_keyboard_control_low->chassis_RC->key.v == KEY_PRESSED_OFFSET_A)
 	{
-		*vx_set = chassis_move_keyboard_to_vector->vx_min_speed;
+		*vx_set = chassis_keyboard_control_low->vx_min_speed / 30.0;
 	}
-	else if((chassis_move_keyboard_to_vector->chassis_RC->key.v & KEY_PRESSED_OFFSET_S) && low_speed == 0)
+	else if(chassis_keyboard_control_low->chassis_RC->key.v == KEY_PRESSED_OFFSET_D)
 	{
-		*vx_set = chassis_move_keyboard_to_vector->vx_max_speed;
+		*vx_set = chassis_keyboard_control_low->vx_max_speed / 30.0;
 	}
 	//键盘x轴移动速度控制底盘旋转
-	if(chassis_move_keyboard_to_vector->chassis_RC->mouse.x | 0x00)
+//	if(chassis_move_keyboard_to_vector->chassis_RC->mouse.x | 0x00)
+//	{
+//		*wz_set = chassis_move_keyboard_to_vector->chassis_RC->mouse.x * CHASSIS_MOUSE_CONTROL_CHANGE_TO_VEL;
+//	}
+	if(chassis_keyboard_control_low->chassis_RC->key.v == KEY_PRESSED_OFFSET_Q)
 	{
-		*wz_set = chassis_move_keyboard_to_vector->chassis_RC->mouse.x * CHASSIS_MOUSE_CONTROL_CHANGE_TO_VEL;
+		*wz_set = 1.0;
 	}
-	return;
+	else if(chassis_keyboard_control_low->chassis_RC->key.v == KEY_PRESSED_OFFSET_E)
+	{
+		*wz_set = -1.0;
+	}
 }

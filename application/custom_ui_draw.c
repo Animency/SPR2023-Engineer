@@ -20,6 +20,8 @@ uint32_t FONT_SIZE = 15;
 //当前模式
 #define CURRENT_MODE_X 450 // SPEED
 #define CURRENT_MODE_Y 800
+#define CURRENT_MODE_GIMBAL_X 300
+#define CURRENT_MODE_GIMBAL_Y 300
 //辅助瞄准
 #define AIM_CATCH_ASS_CENTER_X 960
 #define AIM_CATCH_ASS_DX 40
@@ -55,6 +57,7 @@ extern int servo_angle[7];
 extern RC_ctrl_t rc_ctrl;
 extern int low_speed;
 extern int target_can2_205_angle;
+extern uint8_t coordinates_control_flag;
 //extern int target_can1_angle_07;
 extern ext_game_robot_state_t robot_state;
 uint16_t card_data=0;
@@ -157,6 +160,7 @@ void draw_init_all(uint16_t sender_id, uint16_t receiver_id)
 void draw_current_mode(uint16_t sender_id, uint16_t receiver_id, uint16_t op_type)
 {
     ext_client_custom_character_t draw_init;
+		uint8_t end_angle_flag;
     draw_init.header_data_t.data_cmd_id = 0x0110;
     draw_init.header_data_t.sender_ID = sender_id;
     draw_init.header_data_t.receiver_ID = receiver_id;
@@ -186,17 +190,17 @@ void draw_current_mode(uint16_t sender_id, uint16_t receiver_id, uint16_t op_typ
     draw_init.data[4] = 'D';
     draw_init.data[5] = ':';
 
-    if (rc_ctrl.rc.s[0] == 1 && low_speed == 0)
+    if (low_speed == 0)
     {
-        draw_init.grapic_data_struct.end_angle = 10;
+        end_angle_flag = 10;
         draw_init.data[6] = 'H';
         draw_init.data[7] = 'I';
         draw_init.data[8] = 'G';
         draw_init.data[9] = 'H';
     }
-    else if (rc_ctrl.rc.s[0] == 3 && low_speed == 0)
+    else if (low_speed == 1)
     {
-        draw_init.grapic_data_struct.end_angle = 12;
+        end_angle_flag = 12;
         draw_init.data[6] = 'M';
         draw_init.data[7] = 'E';
         draw_init.data[8] = 'D';
@@ -204,19 +208,46 @@ void draw_current_mode(uint16_t sender_id, uint16_t receiver_id, uint16_t op_typ
         draw_init.data[10] = 'U';
         draw_init.data[11] = 'M';
     }
-    else if (rc_ctrl.rc.s[0] == 2 || low_speed)
+    else if (low_speed == 2)
     {
-        draw_init.grapic_data_struct.end_angle = 9;
+        end_angle_flag = 9;
         draw_init.data[6] = 'L';
         draw_init.data[7] = 'O';
         draw_init.data[8] = 'W';
     }
     else
     {
-        draw_init.grapic_data_struct.end_angle = 7;
+        end_angle_flag = 7;
         draw_init.data[6] = ' ';
     }
+		
+		//用于显示当前云台控制模式是以哪个为坐标 当你看到这个地方时 恭喜你已经是一个成功的RmEngineerER了 听我一句劝 没有两个电控 不要干这个活
+		draw_init.data[end_angle_flag++] = 'G';
+    draw_init.data[end_angle_flag++] = 'I';
+    draw_init.data[end_angle_flag++] = 'M';
+	  draw_init.data[end_angle_flag++] = ':';
+		draw_init.data[end_angle_flag++]  = 'M';
+    draw_init.data[end_angle_flag++]  = 'O';
+    draw_init.data[end_angle_flag++]  = 'D';
+		draw_init.data[end_angle_flag++]  = 'E';
+		
+		if(coordinates_control_flag == 0)
+		{
 
+				draw_init.data[end_angle_flag++]  = '1';
+				draw_init.grapic_data_struct.end_angle = end_angle_flag;
+		}
+		else if(coordinates_control_flag == 1)
+		{
+				draw_init.data[end_angle_flag++]  = '2';
+				draw_init.grapic_data_struct.end_angle = end_angle_flag;
+		}
+		else if(coordinates_control_flag == 2)
+		{
+				draw_init.data[end_angle_flag++]  = '3';
+				draw_init.grapic_data_struct.end_angle = end_angle_flag;
+		}
+		
     referee_data_pack_handle(0xA5, 0x0301, (uint8_t *)&draw_init, sizeof(draw_init));
 }
 

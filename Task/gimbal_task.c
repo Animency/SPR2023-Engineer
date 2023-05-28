@@ -79,13 +79,14 @@
   }
 
 	//从Engineer_behaviour中取回各电机角度控制变量
-extern int target_can2_201_angle;
-extern int target_can2_202_angle;
-extern int target_can2_204_angle;
-extern int target_can2_205_angle;
-extern int target_can2_206_angle;
-extern int target_can2_207_angle_6020;
+extern float target_can2_201_angle;
+extern float target_can2_202_angle;
+extern float target_can2_204_angle;
+extern float target_can2_205_angle;
+extern float target_can2_206_angle;
+extern float target_can2_207_angle_6020;
 extern int target_can2_208_angle;	
+extern float relative_angle_to_mechanical_arm;
 /**
  * @brief          初始化"gimbal_control"变量，包括pid初始化，遥控器指针初始化，云台电机指针初始化，执行云台数据更新
  * @retval         none
@@ -123,7 +124,7 @@ static void gimbal_jiaoduhuan(gimbal_control_t *gimbal_jiaoduhuan);
 //static void gimbal_control_loop_flag(uint16_t flag_location, *gimbal_control_loop_flag_t control_flag_1);
 
 /*定义舵机控制变量*/
-int duoji=1000; //2000为最大值	
+int duoji=1500; //2000为最大值	
 /*定义存矿控制变量*/
 
 //云台控制所有相关数据
@@ -150,7 +151,9 @@ void gimbal_task(void const *pvParameters)
 		gimbal_feedback_update(&gimbal_control);
 		if (toe_is_error(DBUS_TOE))
     {
-        CAN_cmd_chassis(0,0,0,0);
+      CAN_cmd_chassis(0,0,0,0);
+			CAN2_cmd_gimbal(0,0,0,0);
+			CAN2_cmd_gimbal_tai(0,0,0,0);
     }
 		else
 		{
@@ -188,6 +191,7 @@ void gimbal_init(gimbal_control_t *gimbal_init)
 			gimbal_init->gimbal_6020_motor.gimbal_motor_measure = get_gimbal_motor_measure_point(2);
 			gimbal_init->gimbal_6020_motor.speed_max =NORMAL_MAX_GIMBAL_SPEED;
 			gimbal_init->gimbal_6020_motor.speed_min =-NORMAL_MAX_GIMBAL_SPEED;
+			
 		}
 			
 		
@@ -224,8 +228,7 @@ void gimbal_set_mode(gimbal_control_t *gimbal_move_mode)
 	//左下右上控制舵机
 	else if (SWITCH_LEFT_IS_DOWN(gimbal_move_mode->gimbal_rc_ctrl->rc.s[GIMBAL_MODE_LEFT_CHANNEL])&&SWITCH_RIGHT_IS_UP(gimbal_move_mode->gimbal_rc_ctrl->rc.s[GIMBAL_MODE_RIGHT_CHANNEL]))
 	{
-			//gimbal_ore_convert(&gimbal_control);
-		// fsm_run();
+		 fsm_run();
 		 __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, duoji);
 		Pump_Flag = 0;
 	}
@@ -271,6 +274,8 @@ void gimbal_feedback_update(gimbal_control_t *gimbal_move_update)
 		//gimbal_move_update->horizontal_scroll_motor[i] .motor_speed_current  = MOTOR_RPM_TO_SPEED * gimbal_move_update ->horizontal_scroll_motor[i] .gimbal_motor_measure->speed_rpm;
 	}
 	gimbal_move_update->gimbal_6020_motor.motor_speed_current = GIMBAL_RPM_TO_SPEED_6020 * gimbal_move_update->gimbal_6020_motor.gimbal_motor_measure->speed_rpm;
+	
+	//relative_angle_to_mechanical_arm = gimbal_move_update->gimbal_6020_motor.gimbal_motor_measure->angle;
 }
 /**
 *@brief         控制循环，根据速度控制设定值，计算电机电流值，进行控制
@@ -325,9 +330,10 @@ static void gimbal_6020_angle_control_loop(gimbal_control_t *gimbal_6020_angle_c
 
   // calculate pid
   //计算pid
-	  angle_out = PIID_calc(&gimbal_6020_angle_control_loop->gimbal_6020_motor.gimbal_motor_angle_pid,gimbal_6020_angle_control_loop->gimbal_6020_motor.gimbal_motor_measure->angle,current_target);
-    PID_calc(&gimbal_6020_angle_control_loop->gimbal_6020_motor.gimbal_motor_speed_pid , gimbal_6020_angle_control_loop->gimbal_6020_motor.motor_speed_current, angle_out );
-		pid_test_1=gimbal_6020_angle_control_loop->gimbal_6020_motor.gimbal_motor_measure->angle;
+	angle_out = PIID_calc(&gimbal_6020_angle_control_loop->gimbal_6020_motor.gimbal_motor_angle_pid,gimbal_6020_angle_control_loop->gimbal_6020_motor.gimbal_motor_measure->angle,current_target);
+  PID_calc(&gimbal_6020_angle_control_loop->gimbal_6020_motor.gimbal_motor_speed_pid , gimbal_6020_angle_control_loop->gimbal_6020_motor.motor_speed_current, angle_out );
+	//PID_calc(&gimbal_6020_angle_control_loop->gimbal_6020_motor.gimbal_motor_speed_pid , gimbal_6020_angle_control_loop->gimbal_6020_motor.motor_speed_current, current_target );
+	pid_test_1=gimbal_6020_angle_control_loop->gimbal_6020_motor.gimbal_motor_measure->angle;
 	//工程不需要功率限制
   //赋值电流值
     gimbal_6020_angle_control_loop->gimbal_6020_motor.give_current  = (int16_t)(gimbal_6020_angle_control_loop->gimbal_6020_motor.gimbal_motor_speed_pid .out );   //改动前(int16_t)(chassis_move_control_loop->motor_speed_pid[i].out)
@@ -378,7 +384,7 @@ static void gimbal_jiaodubihuan_mechanical_arm(gimbal_control_t *gimbal_jiaodubi
 	gimbal_3508_angle_control_loop(&gimbal_control,3,target_can2_204_angle);
 	gimbal_3508_angle_control_loop(&gimbal_control,4,target_can2_205_angle);
 	gimbal_3508_angle_control_loop(&gimbal_control,5,target_can2_206_angle);
-	//gimbal_3508_angle_control_loop(&gimbal_control,6,target_can2_208_angle);
+	gimbal_3508_angle_control_loop(&gimbal_control,6,target_can2_208_angle);
 
 }
 
@@ -394,7 +400,7 @@ static void gimbal_jiaoduhuan(gimbal_control_t *gimbal_jiaoduhuan)
 	//电子限位防止位置溢出
 	electric_limit(target_can2_205_angle,target_can2_205_angle,TARGET_CAN2_205_MAX,TARGET_CAN2_205_MIN);
 	electric_limit(target_can2_206_angle,target_can2_206_angle,TARGET_CAN2_206_MAX,TARGET_CAN2_206_MIN);
-	//electric_limit(target_can2_208_angle,target_can2_208_angle,TARGET_CAN2_208_MAX,TARGET_CAN2_208_MIN);
+	electric_limit(target_can2_208_angle,target_can2_208_angle,TARGET_CAN2_208_MAX,TARGET_CAN2_208_MIN);
 	
 	gimbal_3508_angle_control_loop(&gimbal_control,0,target_can2_201_angle);
 	gimbal_3508_angle_control_loop(&gimbal_control,1,target_can2_202_angle);
@@ -426,6 +432,7 @@ static void gimbal_shu(gimbal_control_t *gimbal_shu)
 static void gimbal_xuan(gimbal_control_t *gimbal_xuan)
 {
 	gimbal_xuan_set=-gimbal_xuan->gimbal_rc_ctrl ->rc .ch [YAW_CHANNEL]*GIMBAL_VEL*0.8;
+	pid_test_2 = gimbal_xuan_set;
 	gimbal_6020_angle_control_loop(&gimbal_control,2,gimbal_xuan_set);
 	gimbal_xuan_set=0;
 }
@@ -483,17 +490,19 @@ static void gimbal_pid_init(gimbal_control_t *gimbal_pid_init)
 	//云台电机速度环PID初始化
   PID_init(&gimbal_pid_init->horizontal_scroll_motor[0] .gimbal_motor_speed_pid ,3000.0		, 0			,130.0	, 8000.0	, 3000.0);
   PID_init(&gimbal_pid_init->horizontal_scroll_motor[1] .gimbal_motor_speed_pid ,3000.0		, 200.0	,135.0	, 8000.0	, 3000.0);
-	PID_init(&gimbal_pid_init->gimbal_6020_motor.gimbal_motor_speed_pid 					,2300.0		, 0			,15.0		, 20000.0	, 3000.0);
+	PID_init(&gimbal_pid_init->gimbal_6020_motor.gimbal_motor_speed_pid 					,15000.0	, 0			,0.0		, 20000.0	, 3000.0);
 	PID_init(&gimbal_pid_init->horizontal_scroll_motor[3] .gimbal_motor_speed_pid ,3200.0		, 0			,14.0		, 8000.0	, 3000.0);
 	PID_init(&gimbal_pid_init->horizontal_scroll_motor[4] .gimbal_motor_speed_pid ,2700.0		, 0			,11.3		, 8000.0	, 3000.0);
 	PID_init(&gimbal_pid_init->horizontal_scroll_motor[5] .gimbal_motor_speed_pid ,2700.0		, 0			,11.3		, 8000.0	, 3000.0);
-	PID_init(&gimbal_pid_init->horizontal_scroll_motor[6] .gimbal_motor_speed_pid ,3000.0		, 100.0	,50.0		, 18000.0	, 5000.0);
+	PID_init(&gimbal_pid_init->horizontal_scroll_motor[6] .gimbal_motor_speed_pid ,3000.0		, 100.0	,50.0		, 3000.0	, 1000.0);
 	//云台电机角度环PID初始化
 	PID_init(&gimbal_pid_init->horizontal_scroll_motor[0] .gimbal_motor_angle_pid ,0.08		, 0			,0.012	, 6.0		, 0.2 );
 	PID_init(&gimbal_pid_init->horizontal_scroll_motor[1] .gimbal_motor_angle_pid ,0.1 		, 0			,0.012	, 6.0		, 0.2 );
-	PID_init(&gimbal_pid_init->gimbal_6020_motor.gimbal_motor_angle_pid 					,0.07 	, 0.002		, 0.004,  2.0		, 0.3	);
+	PID_init(&gimbal_pid_init->gimbal_6020_motor.gimbal_motor_angle_pid 					,0.15 	, 0.0		, 0.14	, 10.0	, 0.3	);
 	PID_init(&gimbal_pid_init->horizontal_scroll_motor[3] .gimbal_motor_angle_pid ,0.1 		, 0			,0.01		, 4.0		, 0.2 );
 	PID_init(&gimbal_pid_init->horizontal_scroll_motor[4] .gimbal_motor_angle_pid ,0.035	, 0			,0.0035	, 6.0		, 0.2 );
 	PID_init(&gimbal_pid_init->horizontal_scroll_motor[5] .gimbal_motor_angle_pid ,0.035	, 0			,0.0035	, 6.0		, 0.2 );
 	PID_init(&gimbal_pid_init->horizontal_scroll_motor[6] .gimbal_motor_angle_pid ,0.2		, 0			,0.0		, 8.0		, 0.0 );
+	
+	target_can2_207_angle_6020 = gimbal_pid_init->gimbal_6020_motor.gimbal_motor_measure->angle;
 }

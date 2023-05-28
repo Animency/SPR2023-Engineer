@@ -80,3 +80,4 @@
 .\standard\chassis_task.o: ..\boards\bsp_usart.h
 .\standard\chassis_task.o: ..\Hardware\Inc\usart.h
 .\standard\chassis_task.o: ..\application\Engineer_behaviour.h
+.\standard\chassis_task.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h

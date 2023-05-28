@@ -22,47 +22,65 @@ Dialog DLL:      TCM.DLL V1.56.4.0
  
 <h2>Project:</h2>
 C:\move\STM32\Standard\MDK-ARM\standard.uvprojx
-Project File Date:  05/22/2023
+Project File Date:  05/28/2023
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'Engineer'
-compiling gimbal_task.c...
-..\application\remote_control.h(94): warning:  #1-D: last line of file ends without a newline
+compiling servo_task.c...
+..\application\remote_control.h(112): warning:  #1-D: last line of file ends without a newline
   //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
-..\application\remote_control.h(94): warning:  #1-D: last line of file ends without a newline
+..\application\Engineer_behaviour.h(111): warning:  #1-D: last line of file ends without a newline
+  #endif 
+..\Task\servo_task.c: 2 warnings, 0 errors
+compiling Engineer_behaviour.c...
+..\application\remote_control.h(112): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\Engineer_behaviour.h(111): warning:  #1-D: last line of file ends without a newline
+  #endif 
+..\application\remote_control.h(112): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\Engineer_behaviour.c(51): warning:  #177-D: function "act_STM_BigResourceIsland_OverTurn"  was declared but never referenced
+  static void act_STM_BigResourceIsland_OverTurn(void);
+..\application\Engineer_behaviour.c(729): warning:  #177-D: function "act_STM_BigResourceIsland_ArmTurnAround"  was declared but never referenced
+  static void act_STM_BigResourceIsland_ArmTurnAround(void);
+..\application\Engineer_behaviour.c: 5 warnings, 0 errors
+compiling gimbal_task.c...
+..\application\remote_control.h(112): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\remote_control.h(112): warning:  #1-D: last line of file ends without a newline
   //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
 ..\components\algorithm\user_lib.h(54): warning:  #47-D: incompatible redefinition of macro "PI"  (declared at line 326 of "..\components\algorithm\Include\arm_math.h")
   #define PI 3.14
-..\Task\gimbal_task.c(320): warning:  #177-D: variable "max_vector"  was declared but never referenced
+..\Task\gimbal_task.c(325): warning:  #177-D: variable "max_vector"  was declared but never referenced
   	fp32 max_vector = 0.0f, vector_rate = 0.0f;
-..\Task\gimbal_task.c(320): warning:  #177-D: variable "vector_rate"  was declared but never referenced
+..\Task\gimbal_task.c(325): warning:  #177-D: variable "vector_rate"  was declared but never referenced
   	fp32 max_vector = 0.0f, vector_rate = 0.0f;
-..\Task\gimbal_task.c(321): warning:  #550-D: variable "temp"  was set but never used
+..\Task\gimbal_task.c(326): warning:  #550-D: variable "temp"  was set but never used
     fp32 temp = 0.0f;
-..\Task\gimbal_task.c(343): warning:  #177-D: variable "max_vector"  was declared but never referenced
+..\Task\gimbal_task.c(349): warning:  #177-D: variable "max_vector"  was declared but never referenced
   	 fp32 max_vector = 0.0f, vector_rate = 0.0f;
-..\Task\gimbal_task.c(343): warning:  #177-D: variable "vector_rate"  was declared but never referenced
+..\Task\gimbal_task.c(349): warning:  #177-D: variable "vector_rate"  was declared but never referenced
   	 fp32 max_vector = 0.0f, vector_rate = 0.0f;
-..\Task\gimbal_task.c(344): warning:  #550-D: variable "temp"  was set but never used
+..\Task\gimbal_task.c(350): warning:  #550-D: variable "temp"  was set but never used
     fp32 temp = 0.0f;
-..\Task\gimbal_task.c(499): warning:  #1-D: last line of file ends without a newline
+..\Task\gimbal_task.c(508): warning:  #1-D: last line of file ends without a newline
   }
-..\Task\gimbal_task.c(409): warning:  #177-D: function "gimbal_heng"  was declared but never referenced
+..\Task\gimbal_task.c(415): warning:  #177-D: function "gimbal_heng"  was declared but never referenced
   static void gimbal_heng(gimbal_control_t *gimbal_heng)
-..\Task\gimbal_task.c(418): warning:  #177-D: function "gimbal_shu"  was declared but never referenced
+..\Task\gimbal_task.c(424): warning:  #177-D: function "gimbal_shu"  was declared but never referenced
   static void gimbal_shu(gimbal_control_t *gimbal_shu)
-..\Task\gimbal_task.c(426): warning:  #177-D: function "gimbal_xuan"  was declared but never referenced
+..\Task\gimbal_task.c(432): warning:  #177-D: function "gimbal_xuan"  was declared but never referenced
   static void gimbal_xuan(gimbal_control_t *gimbal_xuan)
-..\Task\gimbal_task.c(434): warning:  #177-D: function "gimbal_fan"  was declared but never referenced
+..\Task\gimbal_task.c(441): warning:  #177-D: function "gimbal_fan"  was declared but never referenced
   static void gimbal_fan(gimbal_control_t *gimbal_fan)
-..\Task\gimbal_task.c(111): warning:  #177-D: function "gimbal_ore"  was declared but never referenced
+..\Task\gimbal_task.c(112): warning:  #177-D: function "gimbal_ore"  was declared but never referenced
   static void gimbal_ore(gimbal_control_t *gimbal_ore);
 ..\Task\gimbal_task.c: 15 warnings, 0 errors
 linking...
-Program Size: Code=80780 RO-data=3696 RW-data=1336 ZI-data=52584  
+Program Size: Code=91288 RO-data=3996 RW-data=1444 ZI-data=52596  
 FromELF: creating hex file...
-".\standard\Engineer.axf" - 0 Error(s), 15 Warning(s).
+".\standard\Engineer.axf" - 0 Error(s), 22 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -75,7 +93,7 @@ Package Vendor: Keil
   C:/Users/16569/AppData/Local/Arm/Packs/Keil/STM32F4xx_DFP/2.17.0/Drivers/CMSIS/Device/ST/STM32F4xx/Include
 
 <h2>Collection of Component Files used:</h2>
-Build Time Elapsed:  00:00:01
+Build Time Elapsed:  00:00:02
 </pre>
 </body>
 </html>

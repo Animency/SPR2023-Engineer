@@ -98,7 +98,7 @@
 
 //m3508 rmp change to chassis speed,
 //m3508转化成底盘速度(m/s)的比例，
-#define M3508_MOTOR_RPM_TO_VECTOR 0.000415809748903494517209f
+#define M3508_MOTOR_RPM_TO_VECTOR 0.000415809748903494517209f //0.007984881191666f
 #define CHASSIS_MOTOR_RPM_TO_VECTOR_SEN M3508_MOTOR_RPM_TO_VECTOR
 
 //single chassis motor max speed
@@ -106,10 +106,10 @@
 #define MAX_WHEEL_SPEED 10.0f
 //chassis forward or back max speed
 //底盘运动过程最大前进速度
-#define NORMAL_MAX_CHASSIS_SPEED_X 10.0f
+#define NORMAL_MAX_CHASSIS_SPEED_X 10.0f //10.0f
 //chassis left or right max speed
 //底盘运动过程最大平移速度
-#define NORMAL_MAX_CHASSIS_SPEED_Y 10.0f
+#define NORMAL_MAX_CHASSIS_SPEED_Y 10.0f  //10.0f
 
 #define CHASSIS_WZ_SET_SCALE 0.1f
 

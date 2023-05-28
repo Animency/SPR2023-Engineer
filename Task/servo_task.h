@@ -11,7 +11,7 @@ extern "C" {
 
 
 
-void servo_task(void const *pvParameters);
+void keyboardReadTask(void const *pvParameters);
 
 #ifdef __cplusplus
 }

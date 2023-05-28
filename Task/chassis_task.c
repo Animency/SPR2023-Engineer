@@ -127,12 +127,14 @@ void chassis_task(void const *pvParameters)
       if (toe_is_error(DBUS_TOE))
       {
         CAN_cmd_chassis(0,0,0,0);
+				CAN2_cmd_gimbal(0,0,0,0);
+				CAN2_cmd_gimbal_tai(0,0,0,0);
       }
       else
       {
         //发送控制电流
         CAN_cmd_chassis(chassis_move.motor_chassis[0].give_current, chassis_move.motor_chassis[1].give_current,
-                        chassis_move.motor_chassis[2].give_current, chassis_move.motor_chassis[3].give_current);
+                       chassis_move.motor_chassis[2].give_current, chassis_move.motor_chassis[3].give_current);
 			}
 		//系统延时
     vTaskDelay(CHASSIS_CONTROL_TIME_MS);
@@ -172,13 +174,13 @@ static void chassis_init(chassis_move_t *chassis_move_init)
   {
     chassis_move_init->motor_chassis[i].chassis_motor_measure = get_chassis_motor_measure_point(i);
 		//修修改前为27300，1900，7000，6500，2000
-    PID_init(&chassis_move_init->motor_speed_pid[i], SPEED_P_FRONT, SPEED_I_FRONT, SPEED_D_FRONT, 13000, 3000);//13000  3000
+    PID_init(&chassis_move_init->motor_speed_pid[i], SPEED_P_FRONT, SPEED_I_FRONT, SPEED_D_FRONT, 20000, 3000);//13000  3000
   }
 	for (i = 2; i < 4; i++)
   {
     chassis_move_init->motor_chassis[i].chassis_motor_measure = get_chassis_motor_measure_point(i);
 		//修修改前为27300，1900，7000，6500，2000
-    PID_init(&chassis_move_init->motor_speed_pid[i], SPEED_P_BEHIND, SPEED_I_BEHIND, SPEED_D_BEHIND, 13000, 3000);
+    PID_init(&chassis_move_init->motor_speed_pid[i], SPEED_P_BEHIND, SPEED_I_BEHIND, SPEED_D_BEHIND, 20000, 3000);
   }
   //初始化角度PID(旋转跟随云台)
  // PID_init(&chassis_move_init->chassis_angle_pid, 0, 0, 0, 10000, 3000);//0.015
@@ -187,7 +189,7 @@ static void chassis_init(chassis_move_t *chassis_move_init)
   //first_order_filter_init(&chassis_move.chassis_cmd_slow_set_vy, CHASSIS_CONTROL_TIME, chassis_y_order_filter);
 
 	//初始化机器人走直PID
-	PID_init(&chassis_move_init->chassis_straighten_pid, 0.7, 0, 0, 2.0, 0);
+	PID_init(&chassis_move_init->chassis_straighten_pid, 0.7, 0, 0, 0.0, 0);
 	
   //最大 最小速度
   chassis_move_init->vx_max_speed = NORMAL_MAX_CHASSIS_SPEED_X;
@@ -220,7 +222,7 @@ static void chassis_set_mode(chassis_move_t *chassis_move_mode)
 		chassis_move_mode->chassis_mode = CHASSIS_RC_CONTROL;
 	}
 	//左下右下为键盘控制，与状态机启动相同，状态机相应函数卸载Engineer_behaviour中
-	else if (SWITCH_LEFT_IS_DOWN(chassis_move_mode->chassis_RC->rc.s[CHASSIS_MODE_LEFT_CHANNEL]) && SWITCH_RIGHT_IS_DOWN(chassis_move_mode->chassis_RC->rc.s[CHASSIS_MODE_RIGHT_CHANNEL]))
+	else if (SWITCH_LEFT_IS_DOWN(chassis_move_mode->chassis_RC->rc.s[CHASSIS_MODE_LEFT_CHANNEL]) && SWITCH_RIGHT_IS_UP(chassis_move_mode->chassis_RC->rc.s[CHASSIS_MODE_RIGHT_CHANNEL]))
 	{
 		chassis_move_mode->chassis_mode = CHASSIS_KEYBOARD_CONTROL;
 	}
