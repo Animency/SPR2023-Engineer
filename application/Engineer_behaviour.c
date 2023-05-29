@@ -60,8 +60,10 @@ static void act_AOS_storage_ore_up(void);
 //键盘鼠标控制云台函数声明如下:
 void engineer_gimbal_behaviour_keyboard_control(void);
 void engineer_keyboard_control_ordinal_coordinates(void);
+void engineer_keyboard_control_except_coordinates(void);
 void engineer_keyboard_control_mechanical_arm_coordinates(void);
 void engineer_mouse_control(void);
+
 //************************************************************PID计算参数定义/声明区*******************************************//
 float target_can2_201_angle = 0;
 float target_can2_202_angle = 0;
@@ -84,6 +86,7 @@ float pid_test_can2_208;
 float give_angle_test = 0;
 float give_angle_error_test = 40;
 float relative_angle_to_mechanical_arm = 0;
+float relative_angle_to_servo = 0;
 //************************************************************其它.C文件变量取回区及便捷变量区*********************************************//
 extern float angle_can2_201;
 extern float angle_can2_202;
@@ -319,83 +322,15 @@ void engineer_gimbal_behaviour_keyboard_control(void)
 		case 1: //以机械臂为坐标控制
 			engineer_keyboard_control_mechanical_arm_coordinates();
 			break;
+		case 2: //以舵机所在位置为坐标控制
+		  engineer_keyboard_control_ordinal_coordinates();
 		default:
 			break;
 	}
+	engineer_keyboard_control_except_coordinates();
 }
-void engineer_keyboard_control_mechanical_arm_coordinates(void)
+void engineer_keyboard_control_except_coordinates(void) //除坐标系转换外的电机控制
 {
-	//W+S 前后
-	if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_W)               //键盘按下[SHIFT+W]时竖轴电机向前移动
-	{
-		target_can2_202_angle -= KEYBOARD_CONTROL_ANGLE_MECHANICAL_ARM_COORDINATES_CHANGE	*	sin(	relative_angle_to_mechanical_arm	) ;
-		target_can2_201_angle -= KEYBOARD_CONTROL_ANGLE_MECHANICAL_ARM_COORDINATES_CHANGE * cos(	relative_angle_to_mechanical_arm	)	;
-	}
-	else if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_S)					//键盘按下[SHIFT+S]时竖轴电机向后移动
-	{
-		target_can2_202_angle += KEYBOARD_CONTROL_ANGLE_MECHANICAL_ARM_COORDINATES_CHANGE *	sin(	relative_angle_to_mechanical_arm	) ;
-		target_can2_201_angle += KEYBOARD_CONTROL_ANGLE_MECHANICAL_ARM_COORDINATES_CHANGE * cos(	relative_angle_to_mechanical_arm	)	;
-	}
-	//A+D 左右
-	if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_A)               //键盘按下[SHIFT+A]时横轴电机向左移动
-	{
-		target_can2_202_angle += (-KEYBOARD_CONTROL_ANGLE_MECHANICAL_ARM_COORDINATES_CHANGE * cos(	relative_angle_to_mechanical_arm	));
-		target_can2_201_angle += ( KEYBOARD_CONTROL_ANGLE_MECHANICAL_ARM_COORDINATES_CHANGE * sin(	relative_angle_to_mechanical_arm	));
-	}
-	else if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_D)					//键盘按下[SHIFT+S]时横轴电机向右移动
-	{
-		target_can2_202_angle -= (-KEYBOARD_CONTROL_ANGLE_MECHANICAL_ARM_COORDINATES_CHANGE * cos(	relative_angle_to_mechanical_arm	));
-		target_can2_201_angle -= ( KEYBOARD_CONTROL_ANGLE_MECHANICAL_ARM_COORDINATES_CHANGE * sin(	relative_angle_to_mechanical_arm	));
-	}
-	
-	//云台抬升键盘控制
-	if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_R) 		 								//键盘按下[SHIFT+R]时抬升电机向上移动
-	{
-		target_can2_205_angle += KEYBOARD_CONTROL_ANGLE_CAN2_205_206_CHANGE;
-		target_can2_206_angle -= KEYBOARD_CONTROL_ANGLE_CAN2_205_206_CHANGE;
-	}
-	else if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_F) 		 						//键盘按下[SHIFT+F]时抬升电机向下移动
-	{
-		target_can2_205_angle -= KEYBOARD_CONTROL_ANGLE_CAN2_205_206_CHANGE;
-		target_can2_206_angle += KEYBOARD_CONTROL_ANGLE_CAN2_205_206_CHANGE;
-	}
-	
-	//键盘控制行走已写在chassis_task中
-	
-	//云台舵机气泵控制
-	if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_OFFSET_G) 		 								//键盘按下G时开泵
-	{
-		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,19999);
-		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_3,19999);
-	}
-	else if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_OFFSET_V)               //键盘按下V时关泵
-	{
-		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,0);
-		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_3,0);
-	}
-}
-void engineer_keyboard_control_ordinal_coordinates(void)   //以图传为坐标的控制 第一人称
-{
-	//竖轴电机键盘控制
-	if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_W)               //键盘按下[SHIFT+W]时竖轴电机向前移动
-	{
-		target_can2_202_angle -= KEYBOARD_CONTROL_ANGLE_CAN2_202_CHANGE ;
-	}
-	else if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_S)					//键盘按下[SHIFT+S]时竖轴电机向后移动
-	{
-		target_can2_202_angle += KEYBOARD_CONTROL_ANGLE_CAN2_202_CHANGE ;
-	}
-	
-	//横轴电机键盘控制
-	if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_A)               //键盘按下[SHIFT+A]时横轴电机向左移动
-	{
-		target_can2_201_angle += KEYBOARD_CONTROL_ANGLE_CAN2_201_CHANGE ;
-	}
-	else if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_D)					//键盘按下[SHIFT+S]时横轴电机向右移动
-	{
-		target_can2_201_angle -= KEYBOARD_CONTROL_ANGLE_CAN2_201_CHANGE ;
-	}
-	
 	//云台机械臂水平电机键盘控制
 	if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_Q) 		 							//键盘按下[SHIFT+Q]时机械臂水平电机向左移动
 	{
@@ -442,24 +377,100 @@ void engineer_keyboard_control_ordinal_coordinates(void)   //以图传为坐标的控制 
 		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_3,0);
 	}
 }
+void engineer_keyboard_control_mechanical_servo_coordinates(void)
+{
+	//W+S 前后
+	if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_W)               //键盘按下[SHIFT+W]时竖轴电机向前移动
+	{
+		target_can2_202_angle -= KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE * sin(	relative_angle_to_mechanical_arm 	* ANGLE_TO_ECD) * cos( relative_angle_to_servo * ANGLE_TO_ECD);
+		target_can2_201_angle -= KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE * cos(	relative_angle_to_mechanical_arm	* ANGLE_TO_ECD)	* cos( relative_angle_to_servo * ANGLE_TO_ECD);
+		target_can2_204_angle -= KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE * sin( relative_angle_to_servo * ANGLE_TO_ECD);
+		target_can2_205_angle += KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE * sin( relative_angle_to_servo * ANGLE_TO_ECD);
+	}
+	else if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_S)					//键盘按下[SHIFT+S]时竖轴电机向后移动
+	{
+		target_can2_202_angle += KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE * sin(	relative_angle_to_mechanical_arm 	* ANGLE_TO_ECD) * cos( relative_angle_to_servo * ANGLE_TO_ECD);
+		target_can2_201_angle += KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE * cos(	relative_angle_to_mechanical_arm	* ANGLE_TO_ECD)	* cos( relative_angle_to_servo * ANGLE_TO_ECD);
+		target_can2_204_angle += KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE * sin( relative_angle_to_servo * ANGLE_TO_ECD);
+		target_can2_205_angle -= KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE * sin( relative_angle_to_servo * ANGLE_TO_ECD);
+	}
+	//A+D 左右
+	if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_A)               //键盘按下[SHIFT+A]时横轴电机向左移动
+	{
+		target_can2_202_angle += (-KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE * cos(	relative_angle_to_mechanical_arm	*ANGLE_TO_ECD));
+		target_can2_201_angle += ( KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE * sin(	relative_angle_to_mechanical_arm	*ANGLE_TO_ECD));
+	}
+	else if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_D)					//键盘按下[SHIFT+S]时横轴电机向右移动
+	{
+		target_can2_202_angle -= (-KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE * cos(	relative_angle_to_mechanical_arm	*ANGLE_TO_ECD));
+		target_can2_201_angle -= ( KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE * sin(	relative_angle_to_mechanical_arm	*ANGLE_TO_ECD));
+	}
+}
+void engineer_keyboard_control_mechanical_arm_coordinates(void)
+{
+	//W+S 前后
+	if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_W)               //键盘按下[SHIFT+W]时竖轴电机向前移动
+	{
+		target_can2_202_angle -= KEYBOARD_CONTROL_ANGLE_MECHANICAL_ARM_COORDINATES_CHANGE	*	sin(	relative_angle_to_mechanical_arm 	* ANGLE_TO_ECD) ;
+		target_can2_201_angle -= KEYBOARD_CONTROL_ANGLE_MECHANICAL_ARM_COORDINATES_CHANGE * cos(	relative_angle_to_mechanical_arm	* ANGLE_TO_ECD)	;
+	}
+	else if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_S)					//键盘按下[SHIFT+S]时竖轴电机向后移动
+	{
+		target_can2_202_angle += KEYBOARD_CONTROL_ANGLE_MECHANICAL_ARM_COORDINATES_CHANGE *	sin(	relative_angle_to_mechanical_arm	*ANGLE_TO_ECD) ;
+		target_can2_201_angle += KEYBOARD_CONTROL_ANGLE_MECHANICAL_ARM_COORDINATES_CHANGE * cos(	relative_angle_to_mechanical_arm	*ANGLE_TO_ECD) ;
+	}
+	//A+D 左右
+	if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_A)               //键盘按下[SHIFT+A]时横轴电机向左移动
+	{
+		target_can2_202_angle += (-KEYBOARD_CONTROL_ANGLE_MECHANICAL_ARM_COORDINATES_CHANGE * cos(	relative_angle_to_mechanical_arm	*ANGLE_TO_ECD));
+		target_can2_201_angle += ( KEYBOARD_CONTROL_ANGLE_MECHANICAL_ARM_COORDINATES_CHANGE * sin(	relative_angle_to_mechanical_arm	*ANGLE_TO_ECD));
+	}
+	else if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_D)					//键盘按下[SHIFT+S]时横轴电机向右移动
+	{
+		target_can2_202_angle -= (-KEYBOARD_CONTROL_ANGLE_MECHANICAL_ARM_COORDINATES_CHANGE * cos(	relative_angle_to_mechanical_arm	*ANGLE_TO_ECD));
+		target_can2_201_angle -= ( KEYBOARD_CONTROL_ANGLE_MECHANICAL_ARM_COORDINATES_CHANGE * sin(	relative_angle_to_mechanical_arm	*ANGLE_TO_ECD));
+	}
+}
+void engineer_keyboard_control_ordinal_coordinates(void)   //以图传为坐标的控制 第一人称
+{
+	//竖轴电机键盘控制
+	if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_W)               //键盘按下[SHIFT+W]时竖轴电机向前移动
+	{
+		target_can2_202_angle -= KEYBOARD_CONTROL_ANGLE_CAN2_202_CHANGE ;
+	}
+	else if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_S)					//键盘按下[SHIFT+S]时竖轴电机向后移动
+	{
+		target_can2_202_angle += KEYBOARD_CONTROL_ANGLE_CAN2_202_CHANGE ;
+	}
+	
+	//横轴电机键盘控制
+	if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_A)               //键盘按下[SHIFT+A]时横轴电机向左移动
+	{
+		target_can2_201_angle += KEYBOARD_CONTROL_ANGLE_CAN2_201_CHANGE ;
+	}
+	else if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_D)					//键盘按下[SHIFT+S]时横轴电机向右移动
+	{
+		target_can2_201_angle -= KEYBOARD_CONTROL_ANGLE_CAN2_201_CHANGE ;
+	}
+}
 void engineer_mouse_control(void)
 {
 	//当鼠标左键按下时暂设定为控制舵机
 	if(mouse_keyboard_state_flag.current_mouse_state & MOUSE_PRESSED_OFFSET_LEFT)
 	{
 		//上一次状态为松开时
-		if(!mouse_keyboard_state_flag.former_mouse_state & MOUSE_PRESSED_OFFSET_LEFT)
+		if(!(mouse_keyboard_state_flag.former_mouse_state & MOUSE_PRESSED_OFFSET_LEFT))
 		{
-			duoji += 100;
+			duoji += 200;
 		}
 	}
 	//当鼠标右键按下时
 	if(mouse_keyboard_state_flag.current_mouse_state & MOUSE_PRESSED_OFFSET_RIGHT)
 	{
 		//上一次状态为松开时
-		if(!mouse_keyboard_state_flag.former_mouse_state & MOUSE_PRESSED_OFFSET_RIGHT)
+		if(!(mouse_keyboard_state_flag.former_mouse_state & MOUSE_PRESSED_OFFSET_RIGHT))
 		{
-			duoji -= 100;
+			duoji -= 200;
 		}
 	}
 }
@@ -477,7 +488,7 @@ int start_flag=0;
 //大资源岛空接连招按键shift+f即可运行
 static void act_AG_Formatting(void)
 {
-	if(rc_ctrl.key.v == KEY_PRESSED_SHIFT_R)//shift+r强制初始化
+	if(rc_ctrl.key.v == KEY_PRESSED_CTRL_R)//shift+r强制初始化
 	{
 		act_Formatting();
 		Ag_Event = FORMATTING;
@@ -541,7 +552,7 @@ static void act_AG_BigResourceIsland_Center(void)
 	{
 		target_can2_207_angle_6020 = TARGET_AG_CAN2_207_ANGLE_6020_CENTER; //机械臂中置
 	}
-	if(angle_can2_207_6020 < TARGET_AG_CAN2_207_ANGLE_6020_CENTER + 20) //待修改
+	if(angle_can2_207_6020 < TARGET_AG_CAN2_207_ANGLE_6020_CENTER - 20) //待修改
 	{
 		return;
 	}

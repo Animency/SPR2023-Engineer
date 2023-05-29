@@ -154,8 +154,8 @@ static void chassis_init(chassis_move_t *chassis_move_init)
     return;
   }
 
-//   const static float chassis_x_order_filter[1] = {CHASSIS_ACCEL_X_NUM};
-//  const static float chassis_y_order_filter[1] = {CHASSIS_ACCEL_Y_NUM};
+  const static float chassis_x_order_filter[1] = {CHASSIS_ACCEL_X_NUM};
+  const static float chassis_y_order_filter[1] = {CHASSIS_ACCEL_Y_NUM};
   uint8_t i;
 	
   //底盘开机状态
@@ -185,8 +185,8 @@ static void chassis_init(chassis_move_t *chassis_move_init)
   //初始化角度PID(旋转跟随云台)
  // PID_init(&chassis_move_init->chassis_angle_pid, 0, 0, 0, 10000, 3000);//0.015
 	 //用一阶滤波代替斜波函数生成
-  //first_order_filter_init(&chassis_move.chassis_cmd_slow_set_vx, CHASSIS_CONTROL_TIME, chassis_x_order_filter);
-  //first_order_filter_init(&chassis_move.chassis_cmd_slow_set_vy, CHASSIS_CONTROL_TIME, chassis_y_order_filter);
+  first_order_filter_init(&chassis_move.chassis_cmd_slow_set_vx, CHASSIS_CONTROL_TIME, chassis_x_order_filter);
+  first_order_filter_init(&chassis_move.chassis_cmd_slow_set_vy, CHASSIS_CONTROL_TIME, chassis_y_order_filter);
 
 	//初始化机器人走直PID
 	PID_init(&chassis_move_init->chassis_straighten_pid, 0.7, 0, 0, 0.0, 0);

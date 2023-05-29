@@ -66,6 +66,7 @@
 #include "chassis_task.h"
 #include "gimbal_pid.h"
 #include "detect_task.h"
+#include "Engineer_behaviour.h"
 #define rc_deadband_limit(input, output, dealine)    \
   {                                                  \
     if ((input) > (dealine) || (input) < -(dealine)) \
@@ -87,6 +88,10 @@ extern float target_can2_206_angle;
 extern float target_can2_207_angle_6020;
 extern int target_can2_208_angle;	
 extern float relative_angle_to_mechanical_arm;
+extern mouse_keyboard_state_flag_t mouse_keyboard_state_flag;
+extern RC_ctrl_t rc_ctrl;
+extern uint8_t coordinates_control_flag;
+extern int low_speed;
 /**
  * @brief          初始化"gimbal_control"变量，包括pid初始化，遥控器指针初始化，云台电机指针初始化，执行云台数据更新
  * @retval         none
@@ -95,9 +100,9 @@ void gimbal_init(gimbal_control_t *gimbal_init);
 	//电机pid初始化
 static void gimbal_pid_init(gimbal_control_t *gimbal_pid_init);
 void gimbal_feedback_update(gimbal_control_t *gimbal_move_update);
-
+void gimbal_mouse_keyboard_identify(void);
 static void gimbal_3508_control_loop(gimbal_control_t *gimbal_move_control_loop,int16_t i,float current_target_transfer);
-
+extern float PIID_calc(pid_type_def *pid, float ref, float set);
 static void gimbal_3508_angle_control_loop(gimbal_control_t *gimbal_move_control_loop,int16_t i,int angle_target_transfer);
 static void gimbal_6020_angle_control_loop(gimbal_control_t *gimbal_6020_control_loop,int16_t i,float current_target_transfer);
 /*云台模式设置*/
@@ -132,7 +137,8 @@ gimbal_control_t gimbal_control;
 /*气泵控制*/
 uint8_t Pump_Flag,Pump_Control_Flag;
 uint16_t Pump_Value[2] = {0,19999};
-
+uint8_t key_c_flag;
+uint8_t key_b_flag;
 /*pid测试用变量*/
 float pid_test_1 = 0;  //输入数据
 float pid_test_2 = 0;  //输出数据
@@ -274,8 +280,15 @@ void gimbal_feedback_update(gimbal_control_t *gimbal_move_update)
 		//gimbal_move_update->horizontal_scroll_motor[i] .motor_speed_current  = MOTOR_RPM_TO_SPEED * gimbal_move_update ->horizontal_scroll_motor[i] .gimbal_motor_measure->speed_rpm;
 	}
 	gimbal_move_update->gimbal_6020_motor.motor_speed_current = GIMBAL_RPM_TO_SPEED_6020 * gimbal_move_update->gimbal_6020_motor.gimbal_motor_measure->speed_rpm;
-	
-	//relative_angle_to_mechanical_arm = gimbal_move_update->gimbal_6020_motor.gimbal_motor_measure->angle;
+	gimbal_mouse_keyboard_identify();
+	relative_angle_to_mechanical_arm = gimbal_move_update->gimbal_6020_motor.gimbal_motor_measure->angle - 118;
+	for(int i = 0;i < 4; i++)
+	{
+		if((int)fabs(relative_angle_to_mechanical_arm) == i*360)
+		{
+			relative_angle_to_mechanical_arm = 0;
+		}
+	}
 }
 /**
 *@brief         控制循环，根据速度控制设定值，计算电机电流值，进行控制
@@ -313,7 +326,7 @@ static void gimbal_3508_control_loop(gimbal_control_t *gimbal_move_control_loop,
   //赋值电流值
     gimbal_move_control_loop->horizontal_scroll_motor[i] .give_current  = (int16_t)(gimbal_move_control_loop->horizontal_scroll_motor[i] .gimbal_motor_speed_pid .out );   //改动前(int16_t)(chassis_move_control_loop->motor_speed_pid[i].out)
 }
-extern float PIID_calc(pid_type_def *pid, float ref, float set);
+
 /**
 *@brief         控制循环，根据速度控制设定值，计算电机电流值，进行控制
 *@param[in]			*gimbal_move_control_loop: 云台电机数据指针
@@ -346,7 +359,7 @@ static void gimbal_6020_angle_control_loop(gimbal_control_t *gimbal_6020_angle_c
 **/
 static void gimbal_3508_angle_control_loop(gimbal_control_t *gimbal_move_control_loop,int16_t i,int angle_target_transfer)
 {
-	 fp32 max_vector = 0.0f, vector_rate = 0.0f;
+	fp32 max_vector = 0.0f, vector_rate = 0.0f;
   fp32 temp = 0.0f;
 	float current_target=0,angle_out=0;
     temp = fabs(gimbal_move_control_loop->horizontal_scroll_motor[i] .speed_set);
@@ -505,4 +518,37 @@ static void gimbal_pid_init(gimbal_control_t *gimbal_pid_init)
 	PID_init(&gimbal_pid_init->horizontal_scroll_motor[6] .gimbal_motor_angle_pid ,0.2		, 0			,0.0		, 8.0		, 0.0 );
 	
 	target_can2_207_angle_6020 = gimbal_pid_init->gimbal_6020_motor.gimbal_motor_measure->angle;
+}
+void gimbal_mouse_keyboard_identify(void)
+{
+	
+	mouse_keyboard_state_flag.key_C.former_state = mouse_keyboard_state_flag.key_C.current_state;
+	mouse_keyboard_state_flag.key_B.former_state = mouse_keyboard_state_flag.key_B.current_state;
+	mouse_keyboard_state_flag.former_mouse_state	= mouse_keyboard_state_flag.current_mouse_state;
+	
+	mouse_keyboard_state_flag.key_C.current_state 	= ((rc_ctrl.key.v & KEY_PRESSED_OFFSET_C) >> 13);	//位移为了使数据变成1变为标识符
+	mouse_keyboard_state_flag.key_B.current_state  = ((rc_ctrl.key.v & KEY_PRESSED_OFFSET_B) >> 15);
+	//读取鼠标状态 用于判断当且仅当按下鼠标时 改变舵机状态
+	mouse_keyboard_state_flag.current_mouse_state	=	(rc_ctrl.mouse.press_l	<< 1);
+	mouse_keyboard_state_flag.current_mouse_state = (rc_ctrl.mouse.press_r | mouse_keyboard_state_flag.current_mouse_state);
+	
+			//切换键盘控制方式标识符更新 B用来控制云台控制模式
+	if(mouse_keyboard_state_flag.key_B.current_state == 1 && mouse_keyboard_state_flag.key_B.former_state == 0) //当按下时
+	{
+		coordinates_control_flag++;
+		if(coordinates_control_flag > 1)
+		{
+			coordinates_control_flag = 0;
+		}
+	}
+			
+			//切换键盘控制方式标识符更新 C用来控制底盘控制模式
+	if(mouse_keyboard_state_flag.key_C.current_state == 1 && mouse_keyboard_state_flag.key_C.former_state == 0)
+	{
+		low_speed++;
+		if(low_speed > 2)
+		{
+			low_speed = 0;
+		}
+	}
 }

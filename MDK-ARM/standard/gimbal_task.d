@@ -79,3 +79,5 @@
 .\standard\gimbal_task.o: ..\components\algorithm\user_lib.h
 .\standard\gimbal_task.o: ..\application\gimbal_pid.h
 .\standard\gimbal_task.o: ..\Task\detect_task.h
+.\standard\gimbal_task.o: ..\application\Engineer_behaviour.h
+.\standard\gimbal_task.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
