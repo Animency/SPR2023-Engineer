@@ -267,7 +267,7 @@ typedef struct
     const float *gimbal_INT_gyro_point;
     gimbal_motor_t gimbal_yaw_motor;
     gimbal_motor_t gimbal_pitch_motor;
-	  gimbal_motor_t horizontal_scroll_motor[7];
+	  gimbal_motor_t horizontal_scroll_motor[8];
 	  gimbal_motor_t gimbal_6020_motor;
     gimbal_step_cali_t gimbal_cali;
 		ore_flag_t ore_flag;

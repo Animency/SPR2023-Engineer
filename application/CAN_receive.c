@@ -36,7 +36,7 @@ extern CAN_HandleTypeDef hcan2;
     (ptr)->temperate = (data)[6];                                  \
   }
  motor_measure_t motor_chassis[4]; //底盘电机
- motor_measure_t motor_gimbal[7];  //云台电机
+ motor_measure_t motor_gimbal[8];  //云台电机
 static motor_measure_t motor_trigger;    //拨弹电机
 static CAN_TxHeaderTypeDef gimbal_tx_message;
 static uint8_t gimbal_can_send_data[8];
@@ -45,6 +45,7 @@ static uint8_t chassis_can_send_data[8];
 /************************************定义各电机角度方便调用**********************************************/
 float angle_can2_201;
 float angle_can2_202;
+float angle_can2_203;
 float angle_can2_204;
 float angle_can2_205;
 float angle_can2_206;
@@ -162,12 +163,12 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 		Calc_3508_Angle(&motor_gimbal[1]);
     break;
   }
-//	case CAN2_3508_GIMBAL_XUAN_ID:  //后因该电机更换为6020，接收数据方式更改
-//  {
-//    get_motor_measure(&motor_gimbal[2], rx_data);
-//		Calc_3508_Angle(&motor_gimbal[2]);
-//    break;
-//  }
+	case CAN2_3508_GIMBAL_YAW_ID:  //后该电机更换为2006，接收数据方式更改
+  {
+    get_motor_measure(&motor_gimbal[7], rx_data);
+		Calc_3508_Angle(&motor_gimbal[7]);
+    break;
+  }
 	case CAN2_3508_GIMBAL_FAN_ID:
   {
     get_motor_measure(&motor_gimbal[3], rx_data);
@@ -372,6 +373,7 @@ const void *get_gimbal_motor_measure_value(void)
 	angle_can2_201 = motor_gimbal[0].angle;
 	angle_can2_202 = motor_gimbal[1].angle;
 	//203已更换
+	angle_can2_203 = motor_gimbal[7].angle;  //此电机为2006
 	angle_can2_204 = motor_gimbal[3].angle;
 	angle_can2_205 = motor_gimbal[4].angle;
 	angle_can2_206 = motor_gimbal[5].angle;
@@ -380,7 +382,7 @@ const void *get_gimbal_motor_measure_value(void)
 }
 const motor_measure_t *get_gimbal_motor_measure_point(uint8_t t)
 {
-	if (t>7 || t<0)
+	if (t>8 || t<0)
 		return NULL;
 	get_gimbal_motor_measure_value();
   return &motor_gimbal[t];

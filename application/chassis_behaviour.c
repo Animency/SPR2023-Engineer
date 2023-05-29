@@ -378,33 +378,33 @@ static void chassis_remote_control_normal(float *vx_set, float *vy_set, float *w
   {
     return;
   }
-	if(chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_X_CHANNEL] > 100 )
-	{
-		*vx_set = CHASSIS_STATIC_VEL;
-	}
-	else if(chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_X_CHANNEL] < -100 )
-	{
-		*vx_set = -CHASSIS_STATIC_VEL;
-	}
-	else
-	{
-		*vx_set = 0;
-	}
-	if(-chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_Y_CHANNEL] > 100 )
-	{
-		*vy_set = CHASSIS_STATIC_VEL;
-	}
-	else if(-chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_Y_CHANNEL] < -100 )
-	{
-		*vy_set = -CHASSIS_STATIC_VEL;
-	}
-	else
-	{
-		*vy_set = 0;
-	}
+//	if(chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_X_CHANNEL] > 100 )
+//	{
+//		*vx_set = CHASSIS_STATIC_VEL;
+//	}
+//	else if(chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_X_CHANNEL] < -100 )
+//	{
+//		*vx_set = -CHASSIS_STATIC_VEL;
+//	}
+//	else
+//	{
+//		*vx_set = 0;
+//	}
+//	if(-chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_Y_CHANNEL] > 100 )
+//	{
+//		*vy_set = CHASSIS_STATIC_VEL;
+//	}
+//	else if(-chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_Y_CHANNEL] < -100 )
+//	{
+//		*vy_set = -CHASSIS_STATIC_VEL;
+//	}
+//	else
+//	{
+//		*vy_set = 0;
+//	}
 	
-//  *vx_set = chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_X_CHANNEL] * CHASSIS_REMOTE_CONTROL_CHANGE_TO_VEL;
-//  *vy_set = -chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_Y_CHANNEL] * CHASSIS_REMOTE_CONTROL_CHANGE_TO_VEL;//-chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_Y_CHANNEL] * CHASSIS_REMOTE_CONTROL_CHANGE_TO_VEL
+  *vx_set = chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_X_CHANNEL] * CHASSIS_REMOTE_CONTROL_CHANGE_TO_VEL;
+  *vy_set = -chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_Y_CHANNEL] * CHASSIS_REMOTE_CONTROL_CHANGE_TO_VEL;//-chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_Y_CHANNEL] * CHASSIS_REMOTE_CONTROL_CHANGE_TO_VEL
   *wz_set = -chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_WZ_CHANNEL] * CHASSIS_REMOTE_CONTROL_CHANGE_TO_VEL;
 	
 	rc_deadband_limit(*vx_set,*vx_set,0.15);

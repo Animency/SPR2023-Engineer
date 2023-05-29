@@ -79,7 +79,7 @@ void first_order_filter_cali(first_order_filter_type_t *first_order_filter_type,
 {
     first_order_filter_type->input = input;
     first_order_filter_type->out =
-        first_order_filter_type->num[0] / (first_order_filter_type->num[0] + first_order_filter_type->frame_period) * first_order_filter_type->out + first_order_filter_type->frame_period / (first_order_filter_type->num[0] + first_order_filter_type->frame_period) * first_order_filter_type->input;
+     first_order_filter_type->num[0] / (first_order_filter_type->num[0] + first_order_filter_type->frame_period) * first_order_filter_type->out + first_order_filter_type->frame_period / (first_order_filter_type->num[0] + first_order_filter_type->frame_period) * first_order_filter_type->input;
 }
 
 //¾ø¶ÔÏŞÖÆ

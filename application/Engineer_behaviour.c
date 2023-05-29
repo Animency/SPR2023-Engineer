@@ -75,6 +75,7 @@ void engineer_mouse_control(void);
 //************************************************************PID计算参数定义/声明区*******************************************//
 float target_can2_201_angle = 0;
 float target_can2_202_angle = 0;
+float target_can2_203_angle = 0;
 float target_can2_204_angle = 0;
 float target_can2_205_angle;
 float target_can2_206_angle;
@@ -466,20 +467,22 @@ void engineer_mouse_control(void)
 	//当鼠标左键按下时暂设定为控制舵机
 	if(mouse_keyboard_state_flag.current_mouse_state & MOUSE_PRESSED_OFFSET_LEFT)
 	{
-		//上一次状态为松开时
-		if(!(mouse_keyboard_state_flag.former_mouse_state & MOUSE_PRESSED_OFFSET_LEFT))
-		{
-			duoji += 200;
-		}
+		duoji += 20;
+//		//上一次状态为松开时
+//		if(!(mouse_keyboard_state_flag.former_mouse_state & MOUSE_PRESSED_OFFSET_LEFT))
+//		{
+//			duoji += 500;
+//		}
 	}
 	//当鼠标右键按下时
 	if(mouse_keyboard_state_flag.current_mouse_state & MOUSE_PRESSED_OFFSET_RIGHT)
 	{
+		duoji -= 20;
 		//上一次状态为松开时
-		if(!(mouse_keyboard_state_flag.former_mouse_state & MOUSE_PRESSED_OFFSET_RIGHT))
-		{
-			duoji -= 200;
-		}
+//		if(!(mouse_keyboard_state_flag.former_mouse_state & MOUSE_PRESSED_OFFSET_RIGHT))
+//		{
+//			duoji -= 500;
+//		}
 	}
 }
 

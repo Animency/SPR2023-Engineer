@@ -26,7 +26,6 @@
 #include "Engineer_behaviour.h"
 float INS_angle_init=0;
 int zhuanwan_flag=0;
-float speed_test = 0;
 #define rc_deadband_limit(input, output, dealine)    \
   {                                                  \
     if ((input) > (dealine) || (input) < -(dealine)) \
@@ -45,6 +44,7 @@ pid_type_def speed_pid;
 int speed=0;
 float speed_sj=0;
 float speed_set=300;
+float speed_test;
 //因云台任务过重，故调整到地盘任务中接收数据
 uint8_t gimbal_sensor_data;
 extern int low_speed;
@@ -89,6 +89,9 @@ static void chassis_control_loop(chassis_move_t *chassis_move_control_loop);
  * @retval         none
  */
 static void gimbal_sensor_data_update(gimbal_control_t *gimbal_sensor_data_resolve);
+
+
+void chassis_rc_to_control_vector(fp32 *vx_set, fp32 *vy_set, chassis_move_t *chassis_move_rc_to_vector);
 //底盘运动数据
 chassis_move_t chassis_move;
 //云台数据
@@ -185,11 +188,11 @@ static void chassis_init(chassis_move_t *chassis_move_init)
   //初始化角度PID(旋转跟随云台)
  // PID_init(&chassis_move_init->chassis_angle_pid, 0, 0, 0, 10000, 3000);//0.015
 	 //用一阶滤波代替斜波函数生成
-  first_order_filter_init(&chassis_move.chassis_cmd_slow_set_vx, CHASSIS_CONTROL_TIME, chassis_x_order_filter);
-  first_order_filter_init(&chassis_move.chassis_cmd_slow_set_vy, CHASSIS_CONTROL_TIME, chassis_y_order_filter);
+//  first_order_filter_init(&chassis_move.chassis_cmd_slow_set_vx, CHASSIS_CONTROL_TIME, chassis_x_order_filter);
+//  first_order_filter_init(&chassis_move.chassis_cmd_slow_set_vy, CHASSIS_CONTROL_TIME, chassis_y_order_filter);
 
 	//初始化机器人走直PID
-	PID_init(&chassis_move_init->chassis_straighten_pid, 0.7, 0, 0, 0.0, 0);
+	PID_init(&chassis_move_init->chassis_straighten_pid, 0.7, 0, 0, 1.0, 0);
 	
   //最大 最小速度
   chassis_move_init->vx_max_speed = NORMAL_MAX_CHASSIS_SPEED_X;
@@ -283,8 +286,9 @@ void chassis_rc_to_control_vector(fp32 *vx_set, fp32 *vy_set, chassis_move_t *ch
 
   // first order low-pass replace ramp function, calculate chassis speed set-point to improve control performance
   //一阶低通滤波代替斜波作为底盘速度输入
-  first_order_filter_cali(&chassis_move_rc_to_vector->chassis_cmd_slow_set_vx, vx_set_channel);
-  first_order_filter_cali(&chassis_move_rc_to_vector->chassis_cmd_slow_set_vy, vy_set_channel);
+//  first_order_filter_cali(&chassis_move_rc_to_vector->chassis_cmd_slow_set_vx, vx_set_channel);
+//  first_order_filter_cali(&chassis_move_rc_to_vector->chassis_cmd_slow_set_vy, vy_set_channel);
+	speed_test = vx_set_channel;
   // stop command, need not slow change, set zero derectly
   //停止信号，不需要缓慢加速，直接减速到零
   if (vx_set_channel < CHASSIS_RC_DEADLINE * CHASSIS_VX_RC_SEN && vx_set_channel > -CHASSIS_RC_DEADLINE * CHASSIS_VX_RC_SEN)
@@ -299,6 +303,8 @@ void chassis_rc_to_control_vector(fp32 *vx_set, fp32 *vy_set, chassis_move_t *ch
 	
   *vx_set = chassis_move_rc_to_vector->chassis_cmd_slow_set_vx.out;
   *vy_set = chassis_move_rc_to_vector->chassis_cmd_slow_set_vy.out;
+	
+	speed_sj = chassis_move_rc_to_vector->chassis_cmd_slow_set_vx.out;
 }
 
 /**
@@ -338,7 +344,6 @@ static void chassis_set_contorl(chassis_move_t *chassis_move_control)
 		}
 		if (angle_set==0)
 			chassis_move_control->wz_set=PID_calc(&chassis_move_control->chassis_straighten_pid  , INS_data .angle_yaw   , INS_angle_init );
-		speed_sj = INS_data .angle_yaw;
 		
 		chassis_control_loop(&chassis_move);
 	}

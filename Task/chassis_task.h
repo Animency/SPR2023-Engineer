@@ -230,4 +230,5 @@ typedef struct
 } chassis_move_t;
 
 void chassis_task(void const *pvParameters);
+extern void chassis_rc_to_control_vector(fp32 *vx_set, fp32 *vy_set, chassis_move_t *chassis_move_rc_to_vector);
 #endif
