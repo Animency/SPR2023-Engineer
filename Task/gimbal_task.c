@@ -92,6 +92,7 @@ extern mouse_keyboard_state_flag_t mouse_keyboard_state_flag;
 extern RC_ctrl_t rc_ctrl;
 extern uint8_t coordinates_control_flag;
 extern int low_speed;
+extern float relative_angle_to_servo;
 /**
  * @brief          初始化"gimbal_control"变量，包括pid初始化，遥控器指针初始化，云台电机指针初始化，执行云台数据更新
  * @retval         none
@@ -155,6 +156,7 @@ void gimbal_task(void const *pvParameters)
 		gimbal_init(&gimbal_control);
 		gimbal_set_mode(&gimbal_control);
 		gimbal_feedback_update(&gimbal_control);
+		//用遥控器离线方便制止疯车
 		if (toe_is_error(DBUS_TOE))
     {
       CAN_cmd_chassis(0,0,0,0);
@@ -282,6 +284,7 @@ void gimbal_feedback_update(gimbal_control_t *gimbal_move_update)
 	gimbal_move_update->gimbal_6020_motor.motor_speed_current = GIMBAL_RPM_TO_SPEED_6020 * gimbal_move_update->gimbal_6020_motor.gimbal_motor_measure->speed_rpm;
 	gimbal_mouse_keyboard_identify();
 	relative_angle_to_mechanical_arm = gimbal_move_update->gimbal_6020_motor.gimbal_motor_measure->angle - 118;
+	relative_angle_to_servo = gimbal_move_update->horizontal_scroll_motor[3].gimbal_motor_measure->angle ;
 	for(int i = 0;i < 4; i++)
 	{
 		if((int)fabs(relative_angle_to_mechanical_arm) == i*360)

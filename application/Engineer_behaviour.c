@@ -57,6 +57,14 @@ static void act_AOS_arm_overturn(void);
 static void act_AOS_arm_turnaround(void);
 static void act_AOS_servo_init(void);
 static void act_AOS_storage_ore_up(void);
+static void act_AOS_retract(void);
+static void act_AOS_cylinder_off(void);
+static void act_AOS_arm_vertical_dowm(void);
+static void act_AOS_arm_vertical_down_horizon(void);
+static void act_AOS_retract_ore_in(void);
+static void act_AOS_protract(void);
+static void act_AOS_storage_ore_down(void);
+static void act_AOS_arm_return(void);
 //键盘鼠标控制云台函数声明如下:
 void engineer_gimbal_behaviour_keyboard_control(void);
 void engineer_keyboard_control_ordinal_coordinates(void);
@@ -508,13 +516,13 @@ static void act_AG_BigResourceIsland_Init(void)
 	}
 	if(start_flag) 
 	{
-		if(angle_can2_202>20) //此10待修改 用于判断是否达到初始化位置
+		if(angle_can2_202>20) // 用于判断是否达到初始化位置
 				return;
 		else //当达到预设值时
 		{
 			target_can2_205_angle = TARGET_AG_CAN2_205_ANGLE_INIT; //抬升下降
 			target_can2_206_angle = -TARGET_AG_CAN2_206_ANGLE_INIT; //抬升下降
-			if(angle_can2_205 < 10) //待修改 用于判断是否下降充分
+			if(angle_can2_205 < 10) // 用于判断是否下降充分
 			{
 				target_can2_207_angle_6020 = TARGET_AG_CAN2_207_ANGLE_6020_INIT;
 				servo_angle[0] = 1500; //舵机中心值
@@ -742,6 +750,15 @@ static void act_STM_BigResourceIsland_ArmTurnAround(void);
 
 //--------------------------------------------------------自动存矿连招函数-------------------------------------------------//
 int AOS_flag;
+static void act_AOS_formatting(void)
+{
+	if(rc_ctrl.key.v == 1000) //待修改
+	{
+		act_Formatting();
+		Aos_Event = FORMATTING;
+		Auto_Ore_Storage.transfer_flag = 1;
+	}
+}
 static void act_AOS_rising(void)
 {
 	AOS_flag = 1;
@@ -762,6 +779,7 @@ static void act_AOS_rising(void)
 }
 static void act_AOS_arm_overturn(void)
 {
+	act_AOS_formatting();
 	if(AOS_flag)
 	{
 		target_can2_204_angle = TARGET_AOS_CAN2_204_ARM_OVERTURN; //小臂翻转
@@ -778,6 +796,7 @@ static void act_AOS_arm_overturn(void)
 }
 static void act_AOS_arm_turnaround(void)
 {
+	act_AOS_formatting();
 	if(AOS_flag)
 	{
 		target_can2_207_angle_6020 = TARGET_AOS_CAN2_207_6020_ARM_TURNAROUND; //小臂翻转
@@ -794,6 +813,7 @@ static void act_AOS_arm_turnaround(void)
 }
 static void act_AOS_servo_init(void)
 {
+	act_AOS_formatting();
 	if(AOS_flag)
 	{
 		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_1,1500);
@@ -803,11 +823,29 @@ static void act_AOS_servo_init(void)
 }
 static void act_AOS_storage_ore_up(void)
 {
+	act_AOS_formatting();
 	if(AOS_flag)
 	{
 		target_can2_208_angle = TARGET_AOS_CAN2_208_STORAGE_UP; //小臂翻转
 	}
 	if(angle_can2_207_6020 > TARGET_AOS_CAN2_208_STORAGE_UP - 10) //待修改
+	{
+		return;
+	}
+	else
+	{
+		Aos_Event = AOS_RETRACT;
+		Auto_Ore_Storage.transfer_flag = 1;
+	}
+}
+static void act_AOS_retract(void)
+{
+	act_AOS_formatting();
+	if(AOS_flag)
+	{
+		target_can2_202_angle = TARGET_AOS_CAN2_202_RETRACT; //前伸收回
+	}
+	if(angle_can2_202 > TARGET_AOS_CAN2_202_RETRACT - 10) //待修改
 	{
 		return;
 	}
