@@ -35,6 +35,7 @@ extern "C" {
 #define MOUSE_CONTROL_ANGLE_CAN2_202_CHANGE  0
 
 #define ANGLE_TO_ECD 0.017453292519943f
+#define RM_2023_ENGINEER_LIFTING_TO_HENG_SCALE 1.255813953488f
  /*-----------------------------------------------------空接宏定义--------------------------------------------------------*/
 /**********初始化宏定义**************/
 #define TARGET_CAN2_205_206_ANGLE_FORMATTING 2

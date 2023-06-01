@@ -61,7 +61,7 @@
 #define CHASSIS_WZ_RC_SEN 0.01f
 
 #define CHASSIS_ACCEL_X_NUM 0.1666666667f
-#define CHASSIS_ACCEL_Y_NUM 0.3333333333f
+#define CHASSIS_ACCEL_Y_NUM 0.1666666667f //0.3333333333f
 
 //rocker value deadline
 //Ò¡¸ËËÀÇø

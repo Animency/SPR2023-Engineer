@@ -170,7 +170,10 @@ void gimbal_task(void const *pvParameters)
 		CAN2_cmd_gimbal(gimbal_control .horizontal_scroll_motor[0].give_current ,gimbal_control .horizontal_scroll_motor[1].give_current,
 		gimbal_control.horizontal_scroll_motor[7].give_current,gimbal_control.horizontal_scroll_motor[3].give_current); //gimbal_control .horizontal_scroll_motor .give_current
 		CAN2_cmd_gimbal_tai(gimbal_control .horizontal_scroll_motor[4].give_current ,gimbal_control .horizontal_scroll_motor[5].give_current,gimbal_control.gimbal_6020_motor.give_current,gimbal_control .horizontal_scroll_motor[6].give_current);
-    }
+//			CAN_cmd_chassis(0,0,0,0);
+//			CAN2_cmd_gimbal(0,0,0,0);
+//			CAN2_cmd_gimbal_tai(0,0,0,0);
+		}
 			vTaskDelay(20);
   }
 }	
@@ -224,8 +227,6 @@ void gimbal_set_mode(gimbal_control_t *gimbal_move_mode)
 //			gimbal_xuan(&gimbal_control); 
 //			gimbal_fan(&gimbal_control);
 			gimbal_jiaodubihuan_mechanical_arm(&gimbal_control);
-			 __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, duoji);
-			 __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_4, duoji);
 			Pump_Flag = 0;
     }
 		//左中右上操作抬升与舵机
@@ -235,12 +236,10 @@ void gimbal_set_mode(gimbal_control_t *gimbal_move_mode)
 		  gimbal_duoji(&gimbal_control);
 			Pump_Flag = 0;
 	}
-	//左下右上控制舵机
+	//左下右上为键盘控制
 	else if (SWITCH_LEFT_IS_DOWN(gimbal_move_mode->gimbal_rc_ctrl->rc.s[GIMBAL_MODE_LEFT_CHANNEL])&&SWITCH_RIGHT_IS_UP(gimbal_move_mode->gimbal_rc_ctrl->rc.s[GIMBAL_MODE_RIGHT_CHANNEL]))
 	{
-		 fsm_run();
-		 __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, duoji);
-		 __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_4, duoji);
+		fsm_run();
 		Pump_Flag = 0;
 	}
 	//左上右中控制气泵
@@ -267,8 +266,6 @@ void gimbal_set_mode(gimbal_control_t *gimbal_move_mode)
 	else if (SWITCH_LEFT_IS_MID(gimbal_move_mode->gimbal_rc_ctrl->rc.s[GIMBAL_MODE_LEFT_CHANNEL]) && SWITCH_RIGHT_IS_MID(gimbal_move_mode->gimbal_rc_ctrl->rc.s[GIMBAL_MODE_RIGHT_CHANNEL]))
 	{
 		gimbal_keep(&gimbal_control);
-		 __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, duoji);
-		__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_4, duoji);
 		Pump_Flag = 0;
 	}
 }
@@ -292,7 +289,7 @@ void gimbal_feedback_update(gimbal_control_t *gimbal_move_update)
 	//键盘控制数据更新
 	gimbal_mouse_keyboard_identify();
 	relative_angle_to_mechanical_arm = gimbal_move_update->gimbal_6020_motor.gimbal_motor_measure->angle - 118;
-	relative_angle_to_servo = gimbal_move_update->horizontal_scroll_motor[3].gimbal_motor_measure->angle ;
+	relative_angle_to_servo = gimbal_move_update->horizontal_scroll_motor[3].gimbal_motor_measure->angle - 90 ;
 	for(int i = 0;i < 4; i++)
 	{
 		if((int)fabs(relative_angle_to_mechanical_arm) == i*360)
@@ -329,7 +326,7 @@ static void gimbal_3508_control_loop(gimbal_control_t *gimbal_move_control_loop,
   // calculate pid
   //计算pid
     PID_calc(&gimbal_move_control_loop->horizontal_scroll_motor[i].gimbal_motor_speed_pid , gimbal_move_control_loop->horizontal_scroll_motor[i] .motor_speed_current     , current_target );
-	//	pid_test_1=gimbal_move_control_loop->horizontal_scroll_motor[6].motor_speed_current;
+	//	pid_test_1=gimbal_move_control_loop->horizontal_scroll_motor[7].motor_speed_current;
 
   //功率控制
   // chassis_power_control(chassis_move_control_loop);
@@ -357,7 +354,7 @@ static void gimbal_6020_angle_control_loop(gimbal_control_t *gimbal_6020_angle_c
 	angle_out = PIID_calc(&gimbal_6020_angle_control_loop->gimbal_6020_motor.gimbal_motor_angle_pid,gimbal_6020_angle_control_loop->gimbal_6020_motor.gimbal_motor_measure->angle,current_target);
   PID_calc(&gimbal_6020_angle_control_loop->gimbal_6020_motor.gimbal_motor_speed_pid , gimbal_6020_angle_control_loop->gimbal_6020_motor.motor_speed_current, angle_out );
 	//PID_calc(&gimbal_6020_angle_control_loop->gimbal_6020_motor.gimbal_motor_speed_pid , gimbal_6020_angle_control_loop->gimbal_6020_motor.motor_speed_current, current_target );
-	pid_test_1=gimbal_6020_angle_control_loop->gimbal_6020_motor.gimbal_motor_measure->angle;
+	//pid_test_1=gimbal_6020_angle_control_loop->gimbal_6020_motor.gimbal_motor_measure->angle;
 	//工程不需要功率限制
   //赋值电流值
     gimbal_6020_angle_control_loop->gimbal_6020_motor.give_current  = (int16_t)(gimbal_6020_angle_control_loop->gimbal_6020_motor.gimbal_motor_speed_pid .out );   //改动前(int16_t)(chassis_move_control_loop->motor_speed_pid[i].out)
@@ -379,6 +376,7 @@ static void gimbal_3508_angle_control_loop(gimbal_control_t *gimbal_move_control
   //计算pid
 	  angle_out=PID_calc(&gimbal_move_control_loop->horizontal_scroll_motor[i].gimbal_motor_angle_pid , gimbal_move_control_loop->horizontal_scroll_motor[i] .gimbal_motor_measure->angle , current_target );
     PID_calc(&gimbal_move_control_loop->horizontal_scroll_motor[i].gimbal_motor_speed_pid , gimbal_move_control_loop->horizontal_scroll_motor[i] .motor_speed_current, angle_out );
+	pid_test_1 = gimbal_move_control_loop->horizontal_scroll_motor[7].gimbal_motor_measure->angle;
 	//功率控制
   // chassis_power_control(chassis_move_control_loop);
 
@@ -485,9 +483,9 @@ static void gimbal_tai(gimbal_control_t *gimbal_tai)
 //舵机控制 现已更换为2006电机
 static void gimbal_duoji(gimbal_control_t *gimbal_duoji)
 {
-	target_can2_203_angle = gimbal_duoji->gimbal_rc_ctrl->rc.ch[GIMBAL_MODE_RIGHT_CHANNEL]*GIMBAL_VEL*0.8;
-	gimbal_3508_control_loop(&gimbal_control,7,target_can2_203_angle);
-	target_can2_203_angle = 0;
+	target_can2_203_angle += gimbal_duoji->gimbal_rc_ctrl->rc.ch[GIMBAL_MODE_RIGHT_CHANNEL]/(REMOTE_CONTROL_CHANNEL_LONG-600);
+	gimbal_3508_angle_control_loop(&gimbal_control,7,target_can2_203_angle);
+//	target_can2_203_angle = 0;
 //	if(gimbal_duoji->gimbal_rc_ctrl->rc.ch[GIMBAL_MODE_RIGHT_CHANNEL] == 0)
 //	{
 //		duoji = 1500;
@@ -523,7 +521,7 @@ static void gimbal_pid_init(gimbal_control_t *gimbal_pid_init)
 	PID_init(&gimbal_pid_init->horizontal_scroll_motor[4] .gimbal_motor_speed_pid ,2700.0		, 0			,11.3		, 8000.0	, 3000.0);
 	PID_init(&gimbal_pid_init->horizontal_scroll_motor[5] .gimbal_motor_speed_pid ,2700.0		, 0			,11.3		, 8000.0	, 3000.0);
 	PID_init(&gimbal_pid_init->horizontal_scroll_motor[6] .gimbal_motor_speed_pid ,3000.0		, 100.0	,50.0		, 3000.0	, 1000.0);
-	PID_init(&gimbal_pid_init->horizontal_scroll_motor[7] .gimbal_motor_speed_pid ,0.0		, 0.0	,0.0		, 0.0	, 0.0);
+	PID_init(&gimbal_pid_init->horizontal_scroll_motor[7] .gimbal_motor_speed_pid ,3500.0		, 200.0	,100.0	, 8000.0	, 3000.0);
 	//云台电机角度环PID初始化
 	PID_init(&gimbal_pid_init->horizontal_scroll_motor[0] .gimbal_motor_angle_pid ,0.08		, 0			,0.012	, 6.0		, 0.2 );
 	PID_init(&gimbal_pid_init->horizontal_scroll_motor[1] .gimbal_motor_angle_pid ,0.1 		, 0			,0.012	, 6.0		, 0.2 );
@@ -532,7 +530,7 @@ static void gimbal_pid_init(gimbal_control_t *gimbal_pid_init)
 	PID_init(&gimbal_pid_init->horizontal_scroll_motor[4] .gimbal_motor_angle_pid ,0.035	, 0			,0.0035	, 6.0		, 0.2 );
 	PID_init(&gimbal_pid_init->horizontal_scroll_motor[5] .gimbal_motor_angle_pid ,0.035	, 0			,0.0035	, 6.0		, 0.2 );
 	PID_init(&gimbal_pid_init->horizontal_scroll_motor[6] .gimbal_motor_angle_pid ,0.2		, 0			,0.0		, 8.0		, 0.0 );
-	PID_init(&gimbal_pid_init->horizontal_scroll_motor[7] .gimbal_motor_angle_pid ,0.0		, 0.0	,0.0		, 0.0	, 0.0);
+	PID_init(&gimbal_pid_init->horizontal_scroll_motor[7] .gimbal_motor_angle_pid ,0.04		, 0.0		,0.0		, 5.0		, 0.0);
 	
 	target_can2_207_angle_6020 = gimbal_pid_init->gimbal_6020_motor.gimbal_motor_measure->angle;
 }
@@ -553,7 +551,7 @@ void gimbal_mouse_keyboard_identify(void)
 	if(mouse_keyboard_state_flag.key_B.current_state == 1 && mouse_keyboard_state_flag.key_B.former_state == 0) //当按下时
 	{
 		coordinates_control_flag++;
-		if(coordinates_control_flag > 1)
+		if(coordinates_control_flag > 2)
 		{
 			coordinates_control_flag = 0;
 		}

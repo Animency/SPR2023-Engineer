@@ -59,7 +59,8 @@
       (output) = 0;                                  \
     }                                                \
   }
-
+extern float vx_test;
+extern float vy_test;
 /**
  * @brief          底盘无力的行为状态机下，底盘模式是raw，故而设定值会直接发送到can总线上故而将设定值都设置为0
  * @author         RM
@@ -433,8 +434,8 @@ static void chassis_keyboard_control_normal(float *vx_set, float *vy_set, float 
 			break;
 		case 1:
 			chassis_keyboard_control_low(vx_set, vy_set, wz_set, chassis_move_keyboard_to_vector);  //在低速模式下成倍更改速度值
-			*vx_set *= 5;
-			*vy_set *= 5;
+			*vx_set *= 2;
+			*vy_set *= 2;
 			*wz_set *= 2;
 			break;
 		case 2:
@@ -457,35 +458,39 @@ static void chassis_keyboard_control_normal(float *vx_set, float *vy_set, float 
 static void chassis_keyboard_control_low(float *vx_set, float *vy_set, float *wz_set, chassis_move_t *chassis_keyboard_control_low)
 {
 	//键盘控制设定值
-	if(chassis_keyboard_control_low->chassis_RC->key.v == KEY_PRESSED_OFFSET_W) //处于低速模式时
+	if(!(chassis_keyboard_control_low->chassis_RC->key.v & KEY_PRESSED_OFFSET_SHIFT))
 	{
-		*vy_set = -chassis_keyboard_control_low->vy_max_speed / 30.0;
-	}
-	else if(chassis_keyboard_control_low->chassis_RC->key.v == KEY_PRESSED_OFFSET_S)
-	{
-		*vy_set = -chassis_keyboard_control_low->vy_min_speed / 30.0;
-	}
-	if(chassis_keyboard_control_low->chassis_RC->key.v == KEY_PRESSED_OFFSET_A)
-	{
-		*vx_set = chassis_keyboard_control_low->vx_min_speed / 30.0;
-	}
-	else if(chassis_keyboard_control_low->chassis_RC->key.v == KEY_PRESSED_OFFSET_D)
-	{
-		*vx_set = chassis_keyboard_control_low->vx_max_speed / 30.0;
-	}
-	//键盘x轴移动速度控制底盘旋转
+		if(chassis_keyboard_control_low->chassis_RC->key.v == KEY_PRESSED_OFFSET_W) //处于低速模式时
+		{
+			*vy_set = -chassis_keyboard_control_low->vy_max_speed / 30.0;
+		}
+		else if(chassis_keyboard_control_low->chassis_RC->key.v == KEY_PRESSED_OFFSET_S)
+		{
+			*vy_set = -chassis_keyboard_control_low->vy_min_speed / 30.0;
+		}
+		if(chassis_keyboard_control_low->chassis_RC->key.v == KEY_PRESSED_OFFSET_A)
+		{
+			*vx_set = chassis_keyboard_control_low->vx_min_speed / 30.0;
+		}
+		else if(chassis_keyboard_control_low->chassis_RC->key.v == KEY_PRESSED_OFFSET_D)
+		{
+			*vx_set = chassis_keyboard_control_low->vx_max_speed / 30.0;
+		}
+		//键盘x轴移动速度控制底盘旋转
 //	if(chassis_move_keyboard_to_vector->chassis_RC->mouse.x | 0x00)
 //	{
 //		*wz_set = chassis_move_keyboard_to_vector->chassis_RC->mouse.x * CHASSIS_MOUSE_CONTROL_CHANGE_TO_VEL;
 //	}
-	if(chassis_keyboard_control_low->chassis_RC->key.v == KEY_PRESSED_OFFSET_Q)
-	{
-		*wz_set = 1.0;
+		if(chassis_keyboard_control_low->chassis_RC->key.v == KEY_PRESSED_OFFSET_Q)
+		{
+			*wz_set = 1.0;
+		}
+		else if(chassis_keyboard_control_low->chassis_RC->key.v == KEY_PRESSED_OFFSET_E)
+		{
+			*wz_set = -1.0;
+		}
 	}
-	else if(chassis_keyboard_control_low->chassis_RC->key.v == KEY_PRESSED_OFFSET_E)
-	{
-		*wz_set = -1.0;
-	}
+	
 }
 /**
  * @brief          底盘开环的行为状态机下，底盘模式是raw原生状态，故而设定值会直接发送到can总线上 
@@ -498,53 +503,60 @@ static void chassis_keyboard_control_low(float *vx_set, float *vy_set, float *wz
  */
 static void chassis_keyboard_control_heigh(float *vx_set, float *vy_set, float *wz_set, chassis_move_t *chassis_keyboard_control_heigh)
 {
-	//键盘控制设定值
-	if(chassis_keyboard_control_heigh->chassis_RC->key.v == KEY_PRESSED_OFFSET_W) //处于高速模式时
+	if(!(chassis_keyboard_control_heigh->chassis_RC->key.v & KEY_PRESSED_OFFSET_SHIFT)) //当没有点按SHIFT时 因点按SHIFT会触发云台运动 故此处理
 	{
-		*vy_set = -chassis_keyboard_control_heigh->vy_max_speed;
-	}
-	else if(chassis_keyboard_control_heigh->chassis_RC->key.v == KEY_PRESSED_OFFSET_S)
-	{
-		*vy_set = -chassis_keyboard_control_heigh->vy_min_speed;
-	}
-	if(chassis_keyboard_control_heigh->chassis_RC->key.v == KEY_PRESSED_OFFSET_A)
-	{
-		*vx_set = chassis_keyboard_control_heigh->vx_min_speed;
-	}
-	else if(chassis_keyboard_control_heigh->chassis_RC->key.v == KEY_PRESSED_OFFSET_D)
-	{
-		*vx_set = chassis_keyboard_control_heigh->vx_max_speed;
-	}
+			//键盘控制设定值
+		if(chassis_keyboard_control_heigh->chassis_RC->key.v & KEY_PRESSED_OFFSET_W) //处于高速模式时
+		{
+			*vy_set = -chassis_keyboard_control_heigh->vy_max_speed;
+		}
+		else if(chassis_keyboard_control_heigh->chassis_RC->key.v & KEY_PRESSED_OFFSET_S)
+		{
+			*vy_set = -chassis_keyboard_control_heigh->vy_min_speed;
+		}
+		if(chassis_keyboard_control_heigh->chassis_RC->key.v & KEY_PRESSED_OFFSET_A)
+		{
+			*vx_set = chassis_keyboard_control_heigh->vx_min_speed;
+		}
+		else if(chassis_keyboard_control_heigh->chassis_RC->key.v & KEY_PRESSED_OFFSET_D)
+		{
+			*vx_set = chassis_keyboard_control_heigh->vx_max_speed;
+		}
 	//键盘x轴移动速度控制底盘旋转
 //	if(chassis_move_keyboard_to_vector->chassis_RC->mouse.x | 0x00)
 //	{
 //		*wz_set = chassis_move_keyboard_to_vector->chassis_RC->mouse.x * CHASSIS_MOUSE_CONTROL_CHANGE_TO_VEL;
 //	}
-	if(chassis_keyboard_control_heigh->chassis_RC->key.v == KEY_PRESSED_OFFSET_Q)
-	{
-		*wz_set = 5.0;
+		if(chassis_keyboard_control_heigh->chassis_RC->key.v & KEY_PRESSED_OFFSET_Q)
+		{
+			*wz_set = 5.0;
+		}
+		else if(chassis_keyboard_control_heigh->chassis_RC->key.v & KEY_PRESSED_OFFSET_E)
+		{
+			*wz_set = -5.0;
+		}
+	
+		// first order low-pass replace ramp function, calculate chassis speed set-point to improve control performance
+		//一阶低通滤波代替斜波作为底盘速度输入
+		first_order_filter_cali(&chassis_keyboard_control_heigh->chassis_cmd_slow_set_vx, *vx_set);
+		first_order_filter_cali(&chassis_keyboard_control_heigh->chassis_cmd_slow_set_vy, *vy_set);
+		// stop command, need not slow change, set zero derectly
+		//停止信号，不需要缓慢加速，直接减速到零
+		if (*vx_set < CHASSIS_RC_DEADLINE * CHASSIS_VX_RC_SEN && *vx_set > -CHASSIS_RC_DEADLINE * CHASSIS_VX_RC_SEN)
+		{
+			chassis_keyboard_control_heigh->chassis_cmd_slow_set_vx.out = 0.0f;
+		}
+	
+		if (*vy_set < CHASSIS_RC_DEADLINE * CHASSIS_VY_RC_SEN && *vy_set > -CHASSIS_RC_DEADLINE * CHASSIS_VY_RC_SEN)
+		{
+			chassis_keyboard_control_heigh->chassis_cmd_slow_set_vy.out = 0.0f;
+		}
+		
+		*vx_set = chassis_keyboard_control_heigh->chassis_cmd_slow_set_vx.out;
+		*vy_set = chassis_keyboard_control_heigh->chassis_cmd_slow_set_vy.out;
+	
 	}
-	else if(chassis_keyboard_control_heigh->chassis_RC->key.v == KEY_PRESSED_OFFSET_E)
-	{
-		*wz_set = -5.0;
-	}
 	
-	// first order low-pass replace ramp function, calculate chassis speed set-point to improve control performance
-  //一阶低通滤波代替斜波作为底盘速度输入
-  first_order_filter_cali(&chassis_keyboard_control_heigh->chassis_cmd_slow_set_vx, *vx_set);
-  first_order_filter_cali(&chassis_keyboard_control_heigh->chassis_cmd_slow_set_vy, *vy_set);
-  // stop command, need not slow change, set zero derectly
-  //停止信号，不需要缓慢加速，直接减速到零
-  if (*vx_set < CHASSIS_RC_DEADLINE * CHASSIS_VX_RC_SEN && *vx_set > -CHASSIS_RC_DEADLINE * CHASSIS_VX_RC_SEN)
-  {
-    chassis_keyboard_control_heigh->chassis_cmd_slow_set_vx.out = 0.0f;
-  }
-	
-  if (*vy_set < CHASSIS_RC_DEADLINE * CHASSIS_VY_RC_SEN && *vy_set > -CHASSIS_RC_DEADLINE * CHASSIS_VY_RC_SEN)
-  {
-    chassis_keyboard_control_heigh->chassis_cmd_slow_set_vy.out = 0.0f;
-  }
-	
-  *vx_set = chassis_keyboard_control_heigh->chassis_cmd_slow_set_vx.out;
-  *vy_set = chassis_keyboard_control_heigh->chassis_cmd_slow_set_vy.out;
+	vx_test = *vx_set;
+	vy_test = *vy_set;
 }

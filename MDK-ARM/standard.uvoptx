@@ -145,7 +145,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>JL2CM3</Key>
-          <Name>-U20090928 -O78 -S2 -ZTIFSpeedSel5000 -A0 -C0 -JU1 -JI127.0.0.1 -JP0 -RST0 -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -TB1 -TFE0 -FO15 -FD20000000 -FC1000 -FN1 -FF0STM32F4xx_1024.FLM -FS08000000 -FL0100000 -FP0($$Device:STM32F407IGHx$CMSIS\Flash\STM32F4xx_1024.FLM)</Name>
+          <Name>-U20090928 -O78 -S2 -ZTIFSpeedSel5000 -A0 -C0 -JU1 -JI127.0.0.1 -JP0 -RST0 -N00("ARM CoreSight SW-DP") -D00(2BA01477) -L00(0) -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -TB1 -TFE0 -FO15 -FD20000000 -FC1000 -FN1 -FF0STM32F4xx_1024.FLM -FS08000000 -FL0100000 -FP0($$Device:STM32F407IGHx$CMSIS\Flash\STM32F4xx_1024.FLM)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -414,6 +414,51 @@
           <count>51</count>
           <WinNumber>1</WinNumber>
           <ItemText>mouse_keyboard_state_flag.key_B.former_state,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>52</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>angle_can2_203</ItemText>
+        </Ww>
+        <Ww>
+          <count>53</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>cmd_id</ItemText>
+        </Ww>
+        <Ww>
+          <count>54</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>test_id,0x10</ItemText>
+        </Ww>
+        <Ww>
+          <count>55</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>send_id</ItemText>
+        </Ww>
+        <Ww>
+          <count>56</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>vx_set,0x10</ItemText>
+        </Ww>
+        <Ww>
+          <count>57</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>vw_test</ItemText>
+        </Ww>
+        <Ww>
+          <count>58</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>relative_angle_to_servo</ItemText>
+        </Ww>
+        <Ww>
+          <count>59</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>engineer_keyboard_control_ordinal_coordinates,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>60</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>coordinates_control_flag,0x0A</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>

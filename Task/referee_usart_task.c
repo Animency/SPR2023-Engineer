@@ -62,7 +62,7 @@ void referee_usart_task(void const *argument)
     fifo_s_init(&referee_fifo, referee_fifo_buf, REFEREE_FIFO_BUF_LENGTH);
     usart6_init(usart6_buf[0], usart6_buf[1], USART_RX_BUF_LENGHT);
 
-    // draw_init_all(send_id, reveive_id);
+    draw_init_all(send_id, receive_id);
     while (1)
     {
 			draw_get_robot_id();

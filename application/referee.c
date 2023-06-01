@@ -29,7 +29,7 @@ ext_bullet_remaining_t bullet_remaining_t;
 ext_student_interactive_data_t student_interactive_data_t;
 custom_robot_data_t custom_controller_data_t;
 
-
+int test_id;
 
 void init_referee_struct_data(void)
 {
@@ -75,7 +75,8 @@ void referee_data_solve(uint8_t *frame)
 
     memcpy(&cmd_id, frame + index, sizeof(uint16_t));
     index += sizeof(uint16_t);
-
+		
+	  test_id = cmd_id;
     switch (cmd_id)
     {
         case GAME_STATE_CMD_ID:
