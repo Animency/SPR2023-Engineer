@@ -93,7 +93,6 @@ void MX_FREERTOS_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
   /* USER CODE END 1 */
   
 
@@ -102,7 +101,7 @@ int main(void)
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
    HAL_Init();
 
-  /* USER CODE BEGIN Init */
+  /* USEWWR CODE BEGIN Init */
 
   /* USER CODE END Init */
 
@@ -190,6 +189,7 @@ int main(void)
 //		speed_set=PID_calc(&speed_pid,speed_sj,speed_set);
 //		CAN_cmd_chassis(speed_set,speed_set,speed_set,speed_set);
 //    HAL_Delay(2);
+
   }
   /* USER CODE END 3 */
 }

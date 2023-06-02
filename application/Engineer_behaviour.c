@@ -28,6 +28,7 @@
 #include "gimbal_task.h"
 #include "fsm.h"
 #include "math.h"
+#include "cmsis_armcc.h"  //此头文件包含软件复位操作函数
 //*****************************************************************结构体取回区************************************************//
 extern gimbal_control_t gimbal_control;
 extern RC_ctrl_t rc_ctrl;
@@ -46,8 +47,11 @@ static void act_AG_BigResourceIsland_Cylinder_On(void);
 static void act_STM_Formatting(void);  //强制初始化
 static void act_STM_BigResourceIsland_Init(void);
 static void act_STM_BigResourceIsland_Rising(void);
+static void act_STM_BigResourceIsland_Protract(void);
 static void act_STM_BigResourceIsland_ArmReturn(void);
+static void act_STM_BigResourceIsland_Rising_Step_2(void);
 static void act_STM_BigResourceIsland_Retract(void);
+static void act_STM_BigResourceIsland_Falling(void);
 static void act_STM_BigResourceIsland_OverTurn(void);
 static void act_STM_BigResourceIsland_Servo_Center(void);
 static void act_STM_BigResourceIsland_Storage_Down(void);
@@ -72,7 +76,9 @@ void engineer_keyboard_control_except_coordinates(void);
 void engineer_keyboard_control_mechanical_servo_coordinates(void);
 void engineer_keyboard_control_mechanical_arm_coordinates(void);
 void engineer_mouse_control(void);
-
+//软件复位函数声明如下
+__STATIC_INLINE void __set_FAULTMASK(uint32_t faultMask);
+void SoftReset(void);
 //************************************************************PID计算参数定义/声明区*******************************************//
 float target_can2_201_angle = 0;
 float target_can2_202_angle = 0;
@@ -141,9 +147,11 @@ typedef enum{
 	//小资源岛槽内取矿事件
 	STM_INIT,
 	STM_START_RISING, //抬升事件
+	STM_ARM_PROTRACT, //前伸事件
 	STM_ARM_RETURN,   //机械臂回正
+	STM_RISING_STEP_2, //再次抬升
 	STM_RETRACT,      //收回事件
-	STM_OVERTURN,     //翻转事件
+	STM_FALLING,      //下降事件
 	STM_SERVO_INIT,   //舵机中置
 	STM_STORAGE_ORE_DOWN, //存矿下降
 	STM_FISISH,
@@ -179,8 +187,11 @@ typedef enum{
 	//小资源岛槽内取矿状态
 	STM_INIT_STATE,
 	STM_START_RISING_STATE, //抬升状态
+	STM_ARM_PROTRACT_STATE, //前伸状态
 	STM_ARM_RETURN_STATE,   //回正状态
+	STM_RISING_STEP_2_STATE, //再次上升
 	STM_RETRACT_STATE,      //收回状态
+	STM_FALLING_STATE,      //下降状态
 	STM_SERVO_INIT_STATE,   //舵机中置
 	STM_CYLINDER_OFF_STATE, //关闭气缸
 	STM_STORAGE_ORE_DOWN_STATE, //存矿下降
@@ -227,16 +238,22 @@ FSM Small_Take_Mine; //小资源岛槽内取矿事件
 FsmTable stm_table[]=
 {
 	{STM_INIT_STATE								,STM_INIT								,STM_START_RISING_STATE			,act_STM_BigResourceIsland_Init},
-	{STM_START_RISING_STATE				,STM_START_RISING				,STM_ARM_RETURN_STATE				,act_STM_BigResourceIsland_Rising},
-	{STM_ARM_RETURN_STATE					,STM_ARM_RETURN					,STM_RETRACT_STATE					,act_STM_BigResourceIsland_ArmReturn},
-	{STM_RETRACT_STATE						,STM_RETRACT						,STM_SERVO_INIT_STATE				,act_STM_BigResourceIsland_Retract},
+	{STM_START_RISING_STATE				,STM_START_RISING				,STM_ARM_PROTRACT_STATE			,act_STM_BigResourceIsland_Rising},
+	{STM_ARM_PROTRACT_STATE				,STM_ARM_PROTRACT				,STM_ARM_RETURN_STATE				,act_STM_BigResourceIsland_Protract},
+	{STM_ARM_RETURN_STATE					,STM_RISING_STEP_2			,STM_RISING_STEP_2_STATE		,act_STM_BigResourceIsland_ArmReturn},
+	{STM_RISING_STEP_2_STATE			,STM_ARM_RETURN					,STM_RETRACT_STATE					,act_STM_BigResourceIsland_Rising_Step_2},
+	{STM_RETRACT_STATE						,STM_RETRACT						,STM_FALLING_STATE					,act_STM_BigResourceIsland_Retract},
+	{STM_FALLING_STATE						,STM_FALLING						,STM_SERVO_INIT_STATE				,act_STM_BigResourceIsland_Falling},
 	{STM_SERVO_INIT_STATE					,STM_SERVO_INIT					,STM_STORAGE_ORE_DOWN_STATE	,act_STM_BigResourceIsland_Servo_Center},
-	{STM_STORAGE_ORE_DOWN_STATE   ,STM_STORAGE_ORE_DOWN		,STM_START_RISING_STATE 		,act_STM_BigResourceIsland_Storage_Down},
+	{STM_STORAGE_ORE_DOWN_STATE   ,STM_STORAGE_ORE_DOWN		,STM_INIT_STATE 						,act_STM_BigResourceIsland_Storage_Down},
 	
 	{STM_INIT_STATE								,FORMATTING							,STM_START_RISING_STATE			,act_STM_BigResourceIsland_Init},
 	{STM_START_RISING_STATE				,FORMATTING							,STM_START_RISING_STATE			,act_STM_BigResourceIsland_Init},
+	{STM_ARM_PROTRACT_STATE				,FORMATTING							,STM_START_RISING_STATE			,act_STM_BigResourceIsland_Init},
 	{STM_ARM_RETURN_STATE					,FORMATTING							,STM_START_RISING_STATE			,act_STM_BigResourceIsland_Init},
+	{STM_RISING_STEP_2_STATE			,FORMATTING							,STM_START_RISING_STATE			,act_STM_BigResourceIsland_Init},
 	{STM_RETRACT_STATE						,FORMATTING							,STM_START_RISING_STATE			,act_STM_BigResourceIsland_Init},
+	{STM_FALLING_STATE						,FORMATTING							,STM_START_RISING_STATE			,act_STM_BigResourceIsland_Init},
 	{STM_SERVO_INIT_STATE					,FORMATTING							,STM_START_RISING_STATE			,act_STM_BigResourceIsland_Init},
 	{STM_STORAGE_ORE_DOWN_STATE   ,FORMATTING							,STM_START_RISING_STATE 		,act_STM_BigResourceIsland_Init},
 };
@@ -264,7 +281,7 @@ void fsm_init(void)
 	
 	//大资源岛槽内取矿初始化
 	FSM_Regist(&Small_Take_Mine, stm_table);
-	Small_Take_Mine.size = 12;
+	Small_Take_Mine.size = 18;
 	FSM_StateTransfer(&Small_Take_Mine,STM_START_RISING_STATE);
 	Stm_Event = STM_INIT_STATE;
 }
@@ -302,6 +319,8 @@ void fsm_run(void)
 
 
 	PID_All_Cal();
+	
+	SoftReset();
 }
 void PID_All_Cal(void)
 {
@@ -453,17 +472,16 @@ void engineer_keyboard_control_ordinal_coordinates(void)   //以图传为坐标的控制 
 		{
 			target_can2_202_angle -= KEYBOARD_CONTROL_ANGLE_CAN2_202_CHANGE ;
 		}
-		else if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_OFFSET_S)					//键盘按下[SHIFT+S]时竖轴电机向后移动
+		else if(gimbal_control.gimbal_rc_ctrl->key.v & KEY_PRESSED_OFFSET_S)					//键盘按下[SHIFT+S]时竖轴电机向后移动
 		{
 			target_can2_202_angle += KEYBOARD_CONTROL_ANGLE_CAN2_202_CHANGE ;
 		}
-	
 		//横轴电机键盘控制
-		if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_OFFSET_A)               //键盘按下[SHIFT+A]时横轴电机向左移动
+		if(gimbal_control.gimbal_rc_ctrl->key.v & KEY_PRESSED_OFFSET_A)               //键盘按下[SHIFT+A]时横轴电机向左移动
 		{
 			target_can2_201_angle += KEYBOARD_CONTROL_ANGLE_CAN2_201_CHANGE ;
 		}
-		else if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_OFFSET_D)					//键盘按下[SHIFT+D]时横轴电机向右移动
+		else if(gimbal_control.gimbal_rc_ctrl->key.v & KEY_PRESSED_OFFSET_D)					//键盘按下[SHIFT+D]时横轴电机向右移动
 		{
 			target_can2_201_angle -= KEYBOARD_CONTROL_ANGLE_CAN2_201_CHANGE ;
 		}
@@ -492,6 +510,16 @@ void engineer_mouse_control(void)
 //		}
 	}
 }
+
+void SoftReset(void)
+{
+	if(rc_ctrl.key.v == KEY_PRESSED_CTRL_SHIFT)
+	{
+		__set_FAULTMASK(1); //关闭所有中断
+		NVIC_SystemReset(); //复位
+	}
+}
+
 
 void act_Formatting(void)
 {
@@ -629,7 +657,7 @@ static void act_AG_BigResourceIsland_Cylinder_On(void)
 int STM_Flag;
 static void act_STM_Formatting(void)
 {
-	if(rc_ctrl.key.v == 272) //shift+r强制初始化
+	if(rc_ctrl.key.v == 10000) //Ctrl+X强制初始化
 	{
 		act_Formatting();
 		Stm_Event = FORMATTING;
@@ -640,12 +668,11 @@ static void act_STM_Formatting(void)
 static void act_STM_BigResourceIsland_Init(void)
 {
 	STM_Flag = 1;
-	if( rc_ctrl.key.v == 2064)  //按键shift+z即可运行
+	if( rc_ctrl.key.v == 544)  //按键Ctrl+f即可运行
 	{
 		low_speed=2;//离开低速模式  [待修改] 本应进入
 		target_can2_202_angle = TARGET_BTM_CAN2_202_ANGLE_INIT; //收回竖直伸出
 		target_can2_204_angle = TARGET_BTM_CAN2_204_ANGLE_INIT;  //机械臂爪收回
-		start_flag = 1;
 	}
 	if(STM_Flag) 
 	{
@@ -666,7 +693,7 @@ static void act_STM_BigResourceIsland_Init(void)
 		}
 	}
 }
-//由于取矿已处于一个状态，故不予初始化
+
 static void act_STM_BigResourceIsland_Rising(void)
 {
 
@@ -675,7 +702,24 @@ static void act_STM_BigResourceIsland_Rising(void)
 		target_can2_205_angle = TARGET_BTM_CAN2_205_ANGLE_RISING; //抬升上升
 		target_can2_206_angle = -TARGET_BTM_CAN2_206_ANGLE_RISING;
 	}
-	if(angle_can2_205 < TARGET_BTM_CAN2_205_ANGLE_RISING - 10) //需调整
+	if(angle_can2_205 < TARGET_BTM_CAN2_205_ANGLE_RISING - 70) //需调整
+	{
+		return;
+	}
+	else
+	{
+		Stm_Event = STM_ARM_PROTRACT_STATE;
+		Small_Take_Mine.transfer_flag = 1;
+	}
+}
+static void act_STM_BigResourceIsland_Protract(void)
+{
+	act_STM_Formatting();
+	if(STM_Flag)	
+	{
+		target_can2_202_angle = TARGET_BTM_CAN2_202_ANGLE_Protract; //前伸
+	}
+	if(angle_can2_202 < TARGET_BTM_CAN2_202_ANGLE_Protract - 27) //需调整
 	{
 		return;
 	}
@@ -685,7 +729,7 @@ static void act_STM_BigResourceIsland_Rising(void)
 		Small_Take_Mine.transfer_flag = 1;
 	}
 }
-//此函数用于机械臂中心回到存矿
+//此函数用于机械臂中心来到正前方
 static void act_STM_BigResourceIsland_ArmReturn(void)
 {
 	act_STM_Formatting();
@@ -693,7 +737,32 @@ static void act_STM_BigResourceIsland_ArmReturn(void)
 	{
 		target_can2_207_angle_6020 = TARGET_BTM_CAN2_207_ANGLE_6020_RETURN; //回正
 	}
-	if(fabs(angle_can2_207_6020) >  TARGET_BTM_CAN2_207_ANGLE_6020_RETURN - 1) //待修改
+	if(fabs(angle_can2_207_6020) >  TARGET_BTM_CAN2_207_ANGLE_6020_RETURN - 3) //待修改
+	{
+		return;
+	}
+	else
+	{
+		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,19999);//打开气泵
+		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_3,19999);
+		Stm_Event = STM_RISING_STEP_2_STATE;    
+		Small_Take_Mine.transfer_flag = 1;
+		STM_Flag = 0;
+	}
+}
+static void act_STM_BigResourceIsland_Rising_Step_2(void)
+{
+	act_STM_Formatting(); //2080
+	if(rc_ctrl.key.v == KEY_PRESSED_CTRL_Z)
+	{
+		STM_Flag = 1;
+	}
+	if(STM_Flag)
+	{
+		target_can2_205_angle = TARGET_BTM_CAN2_205_ANGLE_RISING_STEP_2; //抬升上升 取出小资源岛
+		target_can2_206_angle = -TARGET_BTM_CAN2_206_ANGLE_RISING_STEP_2;
+	}
+	if(angle_can2_205 < TARGET_BTM_CAN2_205_ANGLE_RISING_STEP_2 - 70) //需调整
 	{
 		return;
 	}
@@ -711,6 +780,24 @@ static void act_STM_BigResourceIsland_Retract(void)
 		target_can2_202_angle = TARGET_BTM_CAN2_202_ANGLE_RETRACR;  //前伸收回
 	}
 	if(angle_can2_202 > TARGET_BTM_CAN2_202_ANGLE_RETRACR - 1) //待修改
+	{
+		return;
+	}
+	else
+	{
+		Stm_Event = STM_FALLING;
+		Small_Take_Mine.transfer_flag = 1;
+	}
+}
+static void act_STM_BigResourceIsland_Falling(void)
+{
+	act_STM_Formatting();
+	if(STM_Flag)
+	{
+		target_can2_205_angle = TARGET_BTM_CAN2_205_ANGLE_FALLING; //抬升上升 取出小资源岛
+		target_can2_206_angle = -TARGET_BTM_CAN2_205_ANGLE_FALLING;
+	}
+	if(angle_can2_205 > TARGET_BTM_CAN2_205_ANGLE_FALLING - 50) //需调整
 	{
 		return;
 	}
@@ -742,15 +829,17 @@ static void act_STM_BigResourceIsland_Storage_Down(void)
 			target_can2_207_angle_6020 = TARGET_BTM_CAN2_207_6020_ARMTURNAROUND;
 		}
 	}
-	if(angle_can2_208 > TARGET_BTM_CAN2_208_ANGLE_DOWN - 1) //待修改
-	{
-		return;
-	}
-	else
-	{
-		Stm_Event = STM_START_RISING;
-		Small_Take_Mine.transfer_flag = 1;
-	}
+//	if(angle_can2_208 > TARGET_BTM_CAN2_208_ANGLE_DOWN - 1) //待修改
+//	{
+//		return;
+//	}
+//	else
+//	{
+//		Stm_Event = STM_INIT_STATE;
+//		Small_Take_Mine.transfer_flag = 1;
+//	}
+	Stm_Event = STM_INIT_STATE;
+	Small_Take_Mine.transfer_flag = 1;
 }
 //在存矿下降后可
 static void act_STM_BigResourceIsland_ArmTurnAround(void);

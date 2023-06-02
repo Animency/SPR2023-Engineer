@@ -63,18 +63,26 @@ extern "C" {
 
  /*-----------------------------------------------------槽内取矿宏定义--------------------------------------------------------*/
 /**********初始化宏定义**************/
-#define TARGET_BTM_CAN2_202_ANGLE_INIT 0
-#define TARGET_BTM_CAN2_204_ANGLE_INIT 0
-#define TARGET_BTM_CAN2_205_ANGLE_INIT 0
-#define TARGET_BTM_CAN2_206_ANGLE_INIT 0
-#define TARGET_BTM_CAN2_207_ANGLE_6020_INIT 0
+#define TARGET_BTM_CAN2_202_ANGLE_INIT 1
+#define TARGET_BTM_CAN2_204_ANGLE_INIT 4
+#define TARGET_BTM_CAN2_205_ANGLE_INIT 4
+#define TARGET_BTM_CAN2_206_ANGLE_INIT 1
+#define TARGET_BTM_CAN2_207_ANGLE_6020_INIT 123
 /**********抬升宏定义**************/
-#define TARGET_BTM_CAN2_205_ANGLE_RISING 0x00
-#define TARGET_BTM_CAN2_206_ANGLE_RISING 0x00
+#define TARGET_BTM_CAN2_205_ANGLE_RISING 780
+#define TARGET_BTM_CAN2_206_ANGLE_RISING 780
+/**********前伸宏定义**************/
+#define TARGET_BTM_CAN2_202_ANGLE_Protract 100
 /**********回正宏定义**************/
-#define TARGET_BTM_CAN2_207_ANGLE_6020_RETURN 0x00
+#define TARGET_BTM_CAN2_207_ANGLE_6020_RETURN 213
+/**********再次上升宏定义**************/
+#define TARGET_BTM_CAN2_205_ANGLE_RISING_STEP_2 1020
+#define TARGET_BTM_CAN2_206_ANGLE_RISING_STEP_2 1020
 /**********前伸收回宏定义***********/
-#define TARGET_BTM_CAN2_202_ANGLE_RETRACR 0x00
+#define TARGET_BTM_CAN2_202_ANGLE_RETRACR 10
+/**********抬升下降宏定义***********/
+#define TARGET_BTM_CAN2_205_ANGLE_FALLING 100
+#define TARGET_BTM_CAN2_206_ANGLE_FALLING 100
 /**********存矿与机械臂回正下降宏定义***********/
 #define TARGET_BTM_CAN2_208_ANGLE_DOWN 0x00
 #define TARGET_BTM_CAN2_207_6020_ARMTURNAROUND 0

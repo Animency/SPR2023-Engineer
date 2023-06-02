@@ -60,8 +60,8 @@
 //不跟随云台的时候 遥控器的yaw遥杆（max 660）转化成车体旋转速度的比例
 #define CHASSIS_WZ_RC_SEN 0.01f
 
-#define CHASSIS_ACCEL_X_NUM 0.1666666667f
-#define CHASSIS_ACCEL_Y_NUM 0.1666666667f //0.3333333333f
+#define CHASSIS_ACCEL_X_NUM 0.01666666667f
+#define CHASSIS_ACCEL_Y_NUM 0.01666666667f //0.3333333333f
 
 //rocker value deadline
 //摇杆死区
@@ -132,7 +132,7 @@
 #define SPEED_I_FRONT 0
 #define SPEED_D_FRONT 0
 //底盘电机调试后 后轮速度环PID
-#define SPEED_P_BEHIND 20000
+#define SPEED_P_BEHIND 25000
 #define SPEED_I_BEHIND 0
 #define SPEED_D_BEHIND 0
 //底盘电机角度环PID
