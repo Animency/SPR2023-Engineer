@@ -69,6 +69,16 @@ static void act_AOS_retract_ore_in(void);
 static void act_AOS_protract(void);
 static void act_AOS_storage_ore_down(void);
 static void act_AOS_arm_return(void);
+//全部机械结构复位声明如下:
+static void act_AMI_Formatting(void);
+static void act_AMI_init(void);
+static void act_AMI_row_middle(void);
+static void act_AMI_arm_vertical_horizon(void);
+static void act_AMI_arm_return(void);
+static void act_AMI_protratc(void);
+static void act_AMI_sidesway_middle(void);
+static void act_AMI_down(void);
+static void act_AMI_finish(void);
 //键盘鼠标控制云台函数声明如下:
 void engineer_gimbal_behaviour_keyboard_control(void);
 void engineer_keyboard_control_ordinal_coordinates(void);
@@ -76,6 +86,7 @@ void engineer_keyboard_control_except_coordinates(void);
 void engineer_keyboard_control_mechanical_servo_coordinates(void);
 void engineer_keyboard_control_mechanical_arm_coordinates(void);
 void engineer_mouse_control(void);
+
 //软件复位函数声明如下
 __STATIC_INLINE void __set_FAULTMASK(uint32_t faultMask);
 void SoftReset(void);
@@ -170,6 +181,15 @@ typedef enum{
 	AOS_PROTRACT,                  //机械臂稍微前伸
 	AOS_STORAGE_ORE_DOWN,          //存矿下降
 	AOS_ARM_RETURN,                //机械臂回正
+	
+	//自动机械臂初始化事件
+	AMI_INIT,
+	AMI_ROW_MIDDLE,           //2006中置
+	AMI_ARM_VERTICAL_HORIZON, //机械臂翻转水平
+	AMI_ARM_RETURN,           //机械臂回正
+	AMI_PROTRACT,             //前伸回收
+	AMI_SIDESWAY_MIDDLE,      //横移中置
+	AMI_DOWN,                 //抬升下降
 
 	//强制初始化事件
 	FORMATTING
@@ -210,6 +230,15 @@ typedef enum{
 	AOS_PROTRACT_STATE,                  //机械臂稍微前伸状态
 	AOS_STORAGE_ORE_DOWN_STATE,          //存矿下降状态
 	AOS_ARM_RETURN_STATE,                //机械臂回正状态
+	
+		//自动机械臂初始化事件
+	AMI_INIT_STATE,
+	AMI_ROW_MIDDLE_STATE,           //2006中置状态
+	AMI_ARM_VERTICAL_HORIZON_STATE, //机械臂翻转水平状态
+	AMI_ARM_RETURN_STATE,           //机械臂回正状态
+	AMI_PROTRACT_STATE,             //前伸回收状态
+	AMI_SIDESWAY_MIDDLE_STATE,      //横移中置状态
+	AMI_DOWN_STATE,                 //抬升下降状态
 	
 }State;
 //------------------------------------------------------连招状态机定义区--------------------------------------------------------------------------//
@@ -270,6 +299,29 @@ FsmTable aos_table[] =
 	{AOS_STORAGE_ORE_UP_STATE			,AOS_STORAGE_ORE_UP				,AOS_RETRACT_STATE						,act_AOS_storage_ore_up},
 };
 int Aos_Event;
+
+//____________________________________________________________所有机械臂软件归位____________________________________________________________________//
+FSM Auto_Machine_Init;
+
+FsmTable ami_table[] = 
+{
+	{AMI_INIT_STATE										,AMI_INIT									,AMI_ROW_MIDDLE_STATE								,act_AMI_init},
+	{AMI_ROW_MIDDLE_STATE							,AMI_ROW_MIDDLE						,AMI_ARM_VERTICAL_HORIZON_STATE			,act_AMI_row_middle},
+	{AMI_ARM_VERTICAL_HORIZON_STATE		,AMI_ARM_VERTICAL_HORIZON	,AMI_ARM_RETURN_STATE								,act_AMI_arm_vertical_horizon},
+	{AMI_ARM_RETURN_STATE							,AMI_ARM_RETURN						,AMI_PROTRACT_STATE									,act_AMI_arm_return},
+	{AMI_PROTRACT_STATE								,AMI_PROTRACT							,AMI_SIDESWAY_MIDDLE_STATE					,act_AMI_protratc},
+	{AMI_SIDESWAY_MIDDLE_STATE				,AMI_SIDESWAY_MIDDLE			,AMI_DOWN_STATE											,act_AMI_sidesway_middle},
+	{AMI_DOWN_STATE										,AMI_DOWN									,AMI_INIT_STATE											,act_AMI_down},
+	
+	{AMI_INIT_STATE										,FORMATTING								,AMI_ROW_MIDDLE_STATE								,act_AMI_init},
+	{AMI_ROW_MIDDLE_STATE							,FORMATTING								,AMI_ROW_MIDDLE_STATE								,act_AMI_init},
+	{AMI_ARM_VERTICAL_HORIZON_STATE		,FORMATTING								,AMI_ROW_MIDDLE_STATE								,act_AMI_init},
+	{AMI_ARM_RETURN_STATE							,FORMATTING								,AMI_ROW_MIDDLE_STATE								,act_AMI_init},
+	{AMI_PROTRACT_STATE								,FORMATTING								,AMI_ROW_MIDDLE_STATE								,act_AMI_init},
+	{AMI_SIDESWAY_MIDDLE_STATE				,FORMATTING								,AMI_ROW_MIDDLE_STATE								,act_AMI_init},
+	{AMI_DOWN_STATE										,FORMATTING								,AMI_ROW_MIDDLE_STATE								,act_AMI_init},
+};
+int Ami_Event;
 //--------------------------------------------------------状态机初始化函数----------------------------------------------------------//
 void fsm_init(void)
 {
@@ -282,8 +334,14 @@ void fsm_init(void)
 	//大资源岛槽内取矿初始化
 	FSM_Regist(&Small_Take_Mine, stm_table);
 	Small_Take_Mine.size = 18;
-	FSM_StateTransfer(&Small_Take_Mine,STM_START_RISING_STATE);
-	Stm_Event = STM_INIT_STATE;
+	FSM_StateTransfer(&Small_Take_Mine,STM_INIT_STATE);
+	Stm_Event = STM_INIT;
+	
+	//自动置位初始化
+	FSM_Regist(&Auto_Machine_Init, ami_table);
+	Auto_Machine_Init.size = 14;
+	FSM_StateTransfer(&Auto_Machine_Init,AMI_INIT_STATE);
+	Ami_Event = AMI_INIT;
 }
 //--------------------------------------------------------状态机运行函数-------------------------------------------------//
 
@@ -302,7 +360,9 @@ void fsm_run(void)
 	laser_flag_right  =   gimbal_control.ore_flag.laser_flag_right;
 	
 	//大资源岛空接状态机处理函数
-	FSM_EventHandle(&Air_Get,Ag_Event); 
+	FSM_EventHandle(&Air_Get						,Ag_Event); 
+	FSM_EventHandle(&Small_Take_Mine		,Stm_Event);
+	FSM_EventHandle(&Auto_Machine_Init	,Ami_Event);
 	
 	//键盘控制处理函数
 	engineer_gimbal_behaviour_keyboard_control();
@@ -398,12 +458,12 @@ void engineer_keyboard_control_except_coordinates(void) //除坐标系转换外的电机控
 	//键盘控制行走已写在chassis_task中
 	
 	//云台舵机气泵控制
-	if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_OFFSET_G) 		 								//键盘按下G时开泵
+	if(gimbal_control.gimbal_rc_ctrl->key.v & KEY_PRESSED_OFFSET_G) 		 								//键盘按下G时开泵
 	{
 		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,19999);
 		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_3,19999);
 	}
-	else if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_OFFSET_V)               //键盘按下V时关泵
+	else if(gimbal_control.gimbal_rc_ctrl->key.v & KEY_PRESSED_OFFSET_V)               //键盘按下V时关泵
 	{
 		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,0);
 		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_3,0);
@@ -513,7 +573,7 @@ void engineer_mouse_control(void)
 
 void SoftReset(void)
 {
-	if(rc_ctrl.key.v == KEY_PRESSED_CTRL_SHIFT)
+	if(rc_ctrl.key.v == KEY_PRESSED_CTRL_SHIFT) //Shift+Ctrl开始软件置位
 	{
 		__set_FAULTMASK(1); //关闭所有中断
 		NVIC_SystemReset(); //复位
@@ -657,7 +717,7 @@ static void act_AG_BigResourceIsland_Cylinder_On(void)
 int STM_Flag;
 static void act_STM_Formatting(void)
 {
-	if(rc_ctrl.key.v == 10000) //Ctrl+X强制初始化
+	if(rc_ctrl.key.v == KEY_PRESSED_CTRL_X) //Ctrl+X强制初始化
 	{
 		act_Formatting();
 		Stm_Event = FORMATTING;
@@ -949,6 +1009,130 @@ static void act_AOS_retract(void)
 	else
 	{
 		Aos_Event = AOS_RETRACT;
+		Auto_Ore_Storage.transfer_flag = 1;
+	}
+}
+//--------------------------------------------------------自动置位连招函数-------------------------------------------------//
+
+int AMI_flag;
+static void act_AMI_Formatting(void)
+{
+	if(rc_ctrl.key.v == KEY_PRESSED_CTRL_V) //Ctrl+V 为云台复位初始化
+	{
+		act_Formatting();
+		Ami_Event = FORMATTING;
+		Auto_Machine_Init.transfer_flag = 1;
+	}
+}
+static void act_AMI_init(void)
+{
+	AMI_flag = 1;
+	if( rc_ctrl.key.v == KEY_PRESSED_CTRL_G)  //按键Ctrl+g即可运行
+	{
+		Ami_Event = AMI_ROW_MIDDLE;
+		Auto_Machine_Init.transfer_flag = 1;
+	}
+}
+static void act_AMI_row_middle(void)
+{
+	act_AMI_Formatting();
+	if(AMI_flag)
+	{
+		target_can2_203_angle = TARGET_AMI_CAN2_203_MIDDLE; //row轴中置
+	}
+	if(fabs(angle_can2_203) > TARGET_AMI_CAN2_203_MIDDLE - 20) //待修改
+	{
+		return;
+	}
+	else
+	{
+		Ami_Event = AMI_ARM_VERTICAL_HORIZON;
+		Auto_Machine_Init.transfer_flag = 1;
+	}
+}
+static void act_AMI_arm_vertical_horizon(void)
+{
+	act_AMI_Formatting();
+	if(AMI_flag)
+	{
+		target_can2_204_angle = TARGET_AMI_CAN2_204_HORIZON; 
+	}
+	if(fabs(angle_can2_204) > TARGET_AMI_CAN2_204_HORIZON - 20) //待修改
+	{
+		return;
+	}
+	else
+	{
+		Ami_Event = AMI_ARM_RETURN;
+		Auto_Machine_Init.transfer_flag = 1;
+	}
+}
+static void act_AMI_arm_return(void)
+{
+	act_AMI_Formatting();
+	if(AMI_flag)
+	{
+		target_can2_207_angle_6020 = TARGET_AMI_CAN2_207_6020_HORIZON; 
+	}
+	if(fabs(angle_can2_207_6020) > TARGET_AMI_CAN2_207_6020_HORIZON - 20) //待修改
+	{
+		return;
+	}
+	else
+	{
+		Ami_Event = AMI_PROTRACT;
+		Auto_Machine_Init.transfer_flag = 1;
+	}
+}
+static void act_AMI_protratc(void)
+{
+	act_AMI_Formatting();
+	if(AMI_flag)
+	{
+		target_can2_202_angle = TARGET_AMI_CAN2_202_PROTRACT; 
+	}
+	if(fabs(angle_can2_202) > TARGET_AMI_CAN2_202_PROTRACT - 20) //待修改
+	{
+		return;
+	}
+	else
+	{
+		Ami_Event = AMI_SIDESWAY_MIDDLE;
+		Auto_Machine_Init.transfer_flag = 1;
+	}
+}
+static void act_AMI_sidesway_middle(void)  //横移中置
+{
+	act_AMI_Formatting();
+	if(AMI_flag)
+	{
+		target_can2_201_angle = TARGET_AMI_CAN2_201_MIDDLE; 
+	}
+	if(fabs(angle_can2_201) > TARGET_AMI_CAN2_201_MIDDLE - 10) //待修改
+	{
+		return;
+	}
+	else
+	{
+		Ami_Event = AMI_DOWN;
+		Auto_Machine_Init.transfer_flag = 1;
+	}
+}
+static void act_AMI_down(void)
+{
+	act_AMI_Formatting();
+	if(AMI_flag)
+	{
+		target_can2_205_angle = TARGET_AMI_CAN2_205_ANGLE_DOWN; //抬升上升
+		target_can2_206_angle = -TARGET_AMI_CAN2_206_ANGLE_DOWN;
+	}
+	if(angle_can2_205 > TARGET_AOS_CAN2_205_ANGLE_RISING + 20) //待修改
+	{
+		return;
+	}
+	else
+	{
+		Aos_Event = AMI_INIT;
 		Auto_Ore_Storage.transfer_flag = 1;
 	}
 }

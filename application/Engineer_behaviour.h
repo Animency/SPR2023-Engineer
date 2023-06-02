@@ -99,6 +99,15 @@ extern "C" {
 #define TARGET_AOS_CAN2_208_STORAGE_UP 0
 /**********前伸收回宏定义**************/
 #define TARGET_AOS_CAN2_202_RETRACT 0
+/*-----------------------------------------------------自动置位宏定义--------------------------------------------------------*/
+/**********row轴定义**************/
+#define TARGET_AMI_CAN2_203_MIDDLE 0
+#define TARGET_AMI_CAN2_204_HORIZON 0
+#define TARGET_AMI_CAN2_207_6020_HORIZON 213
+#define TARGET_AMI_CAN2_202_PROTRACT 10
+#define TARGET_AMI_CAN2_201_MIDDLE 2
+#define TARGET_AMI_CAN2_205_ANGLE_DOWN 20
+#define TARGET_AMI_CAN2_206_ANGLE_DOWN 20
 /*-----------------------------------------------------相关结构体定义--------------------------------------------------------*/
 typedef struct
 {
