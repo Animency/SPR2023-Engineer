@@ -470,6 +470,21 @@
           <WinNumber>1</WinNumber>
           <ItemText>vy_test</ItemText>
         </Ww>
+        <Ww>
+          <count>63</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>angle_can2_202</ItemText>
+        </Ww>
+        <Ww>
+          <count>64</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>target_can2_202_angle</ItemText>
+        </Ww>
+        <Ww>
+          <count>65</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>pump_flag_left</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>
@@ -661,6 +676,21 @@
           <count>37</count>
           <WinNumber>2</WinNumber>
           <ItemText>relative_angle_to_mechanical_arm</ItemText>
+        </Ww>
+        <Ww>
+          <count>38</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>Small_Take_Mine</ItemText>
+        </Ww>
+        <Ww>
+          <count>39</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>AG_INIT_STATE</ItemText>
+        </Ww>
+        <Ww>
+          <count>40</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>Auto_Machine_Init</ItemText>
         </Ww>
       </WatchWindow2>
       <Tracepoint>

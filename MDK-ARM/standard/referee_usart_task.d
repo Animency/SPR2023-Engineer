@@ -70,3 +70,5 @@
 .\standard\referee_usart_task.o: ..\application\protocol\protocol.h
 .\standard\referee_usart_task.o: ..\application\referee.h
 .\standard\referee_usart_task.o: ..\application\custom_ui_draw.h
+.\standard\referee_usart_task.o: ..\application\remote_control.h
+.\standard\referee_usart_task.o: ..\boards\bsp_rc.h

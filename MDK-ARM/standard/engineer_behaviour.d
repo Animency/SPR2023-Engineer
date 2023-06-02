@@ -58,3 +58,7 @@
 .\standard\engineer_behaviour.o: ..\application\remote_control.h
 .\standard\engineer_behaviour.o: ..\components\controller\fsm.h
 .\standard\engineer_behaviour.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+.\standard\engineer_behaviour.o: ..\application\custom_ui_draw.h
+.\standard\engineer_behaviour.o: ..\components\support\CRC8_CRC16.h
+.\standard\engineer_behaviour.o: ..\application\protocol\protocol.h
+.\standard\engineer_behaviour.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
