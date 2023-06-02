@@ -74,9 +74,11 @@
 #define KEY_PRESSED_CTRL_R							((uint16_t) 30000 )
 #define KEY_PRESSED_CTRL_S							((uint16_t) 10000 )
 #define KEY_PRESSED_CTRL_Z              ((uint16_t) 2080  )
-#define KEY_PRESSED_CTRL_G							((uint16_t) 1040  )
+#define KEY_PRESSED_CTRL_G							((uint16_t) 1056  )
+#define KEY_PRESSED_CTRL_F							((uint16_t) 544   )
 #define KEY_PRESSED_CTRL_SHIFT					((uint16_t) 48		)
 #define KEY_PRESSED_CTRL_X							((uint16_t) 4128  )
+#define KEY_PRESSED_CTRL_Q              ((uint16_t) 96  	)
 /* ----------------------- PC Mouse Definition-------------------------------- */ //在2023版工程中与Engineer_behaviour配合使用
 #define MOUSE_PRESSED_OFFSET_RIGHT      ((uint8_t)1 << 0)
 #define MOUSE_PRESSED_OFFSET_LEFT       ((uint8_t)1 << 1)

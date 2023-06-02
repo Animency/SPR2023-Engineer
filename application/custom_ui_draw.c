@@ -65,7 +65,8 @@ uint16_t claw_data=0;
 uint16_t send_id;
 uint16_t receive_id;
 extern int pump10_flag;
-
+extern uint8_t pump_flag_left;
+extern uint8_t pump_flag_right;
 /*打包发送*/
 extern UART_HandleTypeDef huart6;
 uint8_t seq = 0;
@@ -222,6 +223,7 @@ void draw_current_mode(uint16_t sender_id, uint16_t receiver_id, uint16_t op_typ
     }
 		
 		//用于显示当前云台控制模式是以哪个为坐标 当你看到这个地方时 恭喜你已经是一个成功的RmEngineerER了 听我一句劝 没有两个电控 不要干这个活
+		draw_init.data[end_angle_flag++] = ' ';
 		draw_init.data[end_angle_flag++] = 'G';
     draw_init.data[end_angle_flag++] = 'I';
     draw_init.data[end_angle_flag++] = 'M';
@@ -755,15 +757,27 @@ void draw_card_position(uint16_t sender_id, uint16_t receiver_id, uint16_t op_ty
     draw_init.grapic_data_struct.radius = 0;
     memset(draw_init.data, 0, sizeof(draw_init.data));
 
-    draw_init.data[0] = 'C';
-    draw_init.data[1] = 'A';
-    draw_init.data[2] = 'R';
-    draw_init.data[3] = 'D';
+    draw_init.data[0] = 'P';
+    draw_init.data[1] = 'U';
+    draw_init.data[2] = 'M';
+    draw_init.data[3] = 'P';
     draw_init.data[4] = ' ';
-    draw_init.data[5] = 'P';
-    draw_init.data[6] = 'O';
-    draw_init.data[7] = 'S';
-    draw_init.data[8] = ':';
+		
+		if(pump_flag_left == 1)
+		{
+			draw_init.data[5] = 'O';
+			draw_init.data[6] = 'P';
+			draw_init.data[7] = 'E';
+			draw_init.data[8] = 'N';
+			
+		}
+    else if(pump_flag_left == 0)
+		{
+			draw_init.data[5] = 'O';
+			draw_init.data[6] = 'F';
+			draw_init.data[7] = 'F';
+			draw_init.data[8] = ' ';
+		}
 
     draw_init.grapic_data_struct.end_angle = 9; //字符长度
 

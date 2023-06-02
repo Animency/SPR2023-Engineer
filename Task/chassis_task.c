@@ -454,8 +454,8 @@ static void gimbal_sensor_data_update(gimbal_control_t *gimbal_sensor_data_resol
 {
 	//接受来自外部单片机的数据
 	HAL_UART_Receive(&huart1,&gimbal_sensor_data,sizeof(uint8_t),0);
-	gimbal_sensor_data_resolve->ore_flag.air_pump_flag_left 	= ((gimbal_sensor_data & 0x08) >> 3);
-	gimbal_sensor_data_resolve->ore_flag.air_pump_flag_right 	= ((gimbal_sensor_data & 0x04) >> 2);
-	gimbal_sensor_data_resolve->ore_flag.laser_flag_left 			= ((gimbal_sensor_data & 0x02) >> 1);
-	gimbal_sensor_data_resolve->ore_flag.laser_flag_right 		= ((gimbal_sensor_data & 0x01));
+//	gimbal_sensor_data_resolve->ore_flag.air_pump_flag_left 	= ((gimbal_sensor_data & 0x08) >> 3);
+//	gimbal_sensor_data_resolve->ore_flag.air_pump_flag_right 	= ((gimbal_sensor_data & 0x04) >> 2);
+//	gimbal_sensor_data_resolve->ore_flag.laser_flag_left 			= ((gimbal_sensor_data & 0x02) >> 1);
+//	gimbal_sensor_data_resolve->ore_flag.laser_flag_right 		= ((gimbal_sensor_data & 0x01));
 }

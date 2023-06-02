@@ -39,7 +39,7 @@ extern "C" {
  /*-----------------------------------------------------空接宏定义--------------------------------------------------------*/
 /**********初始化宏定义**************/
 #define TARGET_CAN2_205_206_ANGLE_FORMATTING 2
-#define TARGET_CAN2_207_6020_ANGLE_FORMATTING 3
+#define TARGET_CAN2_207_6020_ANGLE_FORMATTING 213
 #define TARGET_CAN2_208_ANGLE_FORMATTING 2
 
 /**********初始化宏定义**************/
@@ -63,29 +63,29 @@ extern "C" {
 
  /*-----------------------------------------------------槽内取矿宏定义--------------------------------------------------------*/
 /**********初始化宏定义**************/
-#define TARGET_BTM_CAN2_202_ANGLE_INIT 1
-#define TARGET_BTM_CAN2_204_ANGLE_INIT 4
-#define TARGET_BTM_CAN2_205_ANGLE_INIT 4
-#define TARGET_BTM_CAN2_206_ANGLE_INIT 1
-#define TARGET_BTM_CAN2_207_ANGLE_6020_INIT 123
+#define TARGET_BTM_CAN2_202_ANGLE_INIT 1.0f
+#define TARGET_BTM_CAN2_204_ANGLE_INIT 4.0f
+#define TARGET_BTM_CAN2_205_ANGLE_INIT 4.0f
+#define TARGET_BTM_CAN2_206_ANGLE_INIT 1.0f
+#define TARGET_BTM_CAN2_207_ANGLE_6020_INIT 123.0f
 /**********抬升宏定义**************/
-#define TARGET_BTM_CAN2_205_ANGLE_RISING 780
-#define TARGET_BTM_CAN2_206_ANGLE_RISING 780
+#define TARGET_BTM_CAN2_205_ANGLE_RISING 900.0f
+#define TARGET_BTM_CAN2_206_ANGLE_RISING 900.0f
 /**********前伸宏定义**************/
-#define TARGET_BTM_CAN2_202_ANGLE_Protract 100
+#define TARGET_BTM_CAN2_202_ANGLE_Protract -100.0f
 /**********回正宏定义**************/
-#define TARGET_BTM_CAN2_207_ANGLE_6020_RETURN 213
+#define TARGET_BTM_CAN2_207_ANGLE_6020_RETURN 213.0f
 /**********再次上升宏定义**************/
-#define TARGET_BTM_CAN2_205_ANGLE_RISING_STEP_2 1020
-#define TARGET_BTM_CAN2_206_ANGLE_RISING_STEP_2 1020
+#define TARGET_BTM_CAN2_205_ANGLE_RISING_STEP_2 1020.0f
+#define TARGET_BTM_CAN2_206_ANGLE_RISING_STEP_2 1020.0f
 /**********前伸收回宏定义***********/
-#define TARGET_BTM_CAN2_202_ANGLE_RETRACR 10
+#define TARGET_BTM_CAN2_202_ANGLE_RETRACR 2.0f
 /**********抬升下降宏定义***********/
-#define TARGET_BTM_CAN2_205_ANGLE_FALLING 100
-#define TARGET_BTM_CAN2_206_ANGLE_FALLING 100
+#define TARGET_BTM_CAN2_205_ANGLE_FALLING 100.0f
+#define TARGET_BTM_CAN2_206_ANGLE_FALLING 100.0f
 /**********存矿与机械臂回正下降宏定义***********/
-#define TARGET_BTM_CAN2_208_ANGLE_DOWN 0x00
-#define TARGET_BTM_CAN2_207_6020_ARMTURNAROUND 0
+#define TARGET_BTM_CAN2_208_ANGLE_DOWN 0x00f
+#define TARGET_BTM_CAN2_207_6020_ARMTURNAROUND 0.0f
 
 /*-----------------------------------------------------自动存矿宏定义--------------------------------------------------------*/
 /**********抬升宏定义**************/

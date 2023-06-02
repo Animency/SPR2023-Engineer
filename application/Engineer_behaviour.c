@@ -29,6 +29,19 @@
 #include "fsm.h"
 #include "math.h"
 #include "cmsis_armcc.h"  //此头文件包含软件复位操作函数
+#include "custom_ui_draw.h"
+
+#define rm_deadband_judge(input,dealine)             \
+  {                                                  \
+    if ((input) > (dealine) || (input) < -(dealine)) \
+    {                                                \
+      (output) = (input);                            \
+    }                                                \
+    else                                             \
+    {                                                \
+      (output) = 0;                                  \
+    }                                                \
+  }
 //*****************************************************************结构体取回区************************************************//
 extern gimbal_control_t gimbal_control;
 extern RC_ctrl_t rc_ctrl;
@@ -90,6 +103,9 @@ void engineer_mouse_control(void);
 //软件复位函数声明如下
 __STATIC_INLINE void __set_FAULTMASK(uint32_t faultMask);
 void SoftReset(void);
+
+//判断是否在死区范围内
+int engineer_deadband_judge(float input,float deadline,float deadband);
 //************************************************************PID计算参数定义/声明区*******************************************//
 float target_can2_201_angle = 0;
 float target_can2_202_angle = 0;
@@ -125,6 +141,8 @@ extern float angle_can2_207_6020;
 extern float angle_can2_208;
 
 extern int duoji;
+extern uint16_t receive_id;
+extern uint16_t send_id;
 //********************************************************标志位定义区********************************************************//
 uint8_t 	pump_flag_left 		= 0;
 uint8_t 	pump_flag_right		= 0;
@@ -269,8 +287,8 @@ FsmTable stm_table[]=
 	{STM_INIT_STATE								,STM_INIT								,STM_START_RISING_STATE			,act_STM_BigResourceIsland_Init},
 	{STM_START_RISING_STATE				,STM_START_RISING				,STM_ARM_PROTRACT_STATE			,act_STM_BigResourceIsland_Rising},
 	{STM_ARM_PROTRACT_STATE				,STM_ARM_PROTRACT				,STM_ARM_RETURN_STATE				,act_STM_BigResourceIsland_Protract},
-	{STM_ARM_RETURN_STATE					,STM_RISING_STEP_2			,STM_RISING_STEP_2_STATE		,act_STM_BigResourceIsland_ArmReturn},
-	{STM_RISING_STEP_2_STATE			,STM_ARM_RETURN					,STM_RETRACT_STATE					,act_STM_BigResourceIsland_Rising_Step_2},
+	{STM_ARM_RETURN_STATE					,STM_ARM_RETURN					,STM_RISING_STEP_2_STATE		,act_STM_BigResourceIsland_ArmReturn},
+	{STM_RISING_STEP_2_STATE			,STM_RISING_STEP_2      ,STM_RETRACT_STATE					,act_STM_BigResourceIsland_Rising_Step_2},
 	{STM_RETRACT_STATE						,STM_RETRACT						,STM_FALLING_STATE					,act_STM_BigResourceIsland_Retract},
 	{STM_FALLING_STATE						,STM_FALLING						,STM_SERVO_INIT_STATE				,act_STM_BigResourceIsland_Falling},
 	{STM_SERVO_INIT_STATE					,STM_SERVO_INIT					,STM_STORAGE_ORE_DOWN_STATE	,act_STM_BigResourceIsland_Servo_Center},
@@ -343,6 +361,17 @@ void fsm_init(void)
 	FSM_StateTransfer(&Auto_Machine_Init,AMI_INIT_STATE);
 	Ami_Event = AMI_INIT;
 }
+int engineer_deadband_judge(float input,float deadline,float deadband)
+{
+	if((input >= (deadline - deadband)) &&(input < (deadline + deadband)))
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
 //--------------------------------------------------------状态机运行函数-------------------------------------------------//
 
 /**
@@ -354,10 +383,10 @@ void fsm_init(void)
 void fsm_run(void)
 {
 	//传感器标志更新
-	pump_flag_left 		= 	gimbal_control.ore_flag.air_pump_flag_left;
-	pump_flag_right 	= 	gimbal_control.ore_flag.air_pump_flag_right;
-	laser_flag_left		=		gimbal_control.ore_flag.laser_flag_left;
-	laser_flag_right  =   gimbal_control.ore_flag.laser_flag_right;
+//	pump_flag_left 		= 	gimbal_control.ore_flag.air_pump_flag_left;
+//	pump_flag_right 	= 	gimbal_control.ore_flag.air_pump_flag_right;
+//	laser_flag_left		=		gimbal_control.ore_flag.laser_flag_left;
+//	laser_flag_right  =   gimbal_control.ore_flag.laser_flag_right;
 	
 	//大资源岛空接状态机处理函数
 	FSM_EventHandle(&Air_Get						,Ag_Event); 
@@ -457,17 +486,27 @@ void engineer_keyboard_control_except_coordinates(void) //除坐标系转换外的电机控
 	
 	//键盘控制行走已写在chassis_task中
 	
-	//云台舵机气泵控制
-	if(gimbal_control.gimbal_rc_ctrl->key.v & KEY_PRESSED_OFFSET_G) 		 								//键盘按下G时开泵
+	if(!((gimbal_control.gimbal_rc_ctrl->key.v & KEY_PRESSED_OFFSET_SHIFT) || (gimbal_control.gimbal_rc_ctrl->key.v & KEY_PRESSED_OFFSET_CTRL)))
 	{
-		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,19999);
-		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_3,19999);
+		//云台舵机气泵控制
+		if(gimbal_control.gimbal_rc_ctrl->key.v & KEY_PRESSED_OFFSET_G) 		 								//键盘按下G时开泵
+		{
+			__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,19999);
+			__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_3,19999);
+			pump_flag_left = 1;
+			pump_flag_right = 1;
+			draw_card_position(send_id, receive_id, 2);
+		}
+		else if(gimbal_control.gimbal_rc_ctrl->key.v & KEY_PRESSED_OFFSET_V)               //键盘按下V时关泵
+		{
+			__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,0);
+			__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_3,0);
+			pump_flag_left = 0;
+			pump_flag_right = 0;
+			draw_card_position(send_id, receive_id, 2);
+		}
 	}
-	else if(gimbal_control.gimbal_rc_ctrl->key.v & KEY_PRESSED_OFFSET_V)               //键盘按下V时关泵
-	{
-		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,0);
-		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_3,0);
-	}
+	
 }
 void engineer_keyboard_control_mechanical_servo_coordinates(void)
 {
@@ -571,9 +610,10 @@ void engineer_mouse_control(void)
 	}
 }
 
+//软件复位单片机
 void SoftReset(void)
 {
-	if(rc_ctrl.key.v == KEY_PRESSED_CTRL_SHIFT) //Shift+Ctrl开始软件置位
+	if(rc_ctrl.key.v == KEY_PRESSED_CTRL_Q) //Ctrl+Q开始软件置位
 	{
 		__set_FAULTMASK(1); //关闭所有中断
 		NVIC_SystemReset(); //复位
@@ -708,6 +748,9 @@ static void act_AG_BigResourceIsland_Cylinder_On(void)
 	if(ag_flag)
 	{
 		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,19999); 
+		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_3,19999); 
+		pump_flag_left = 1;
+		pump_flag_right = 1;
 		Ag_Event = AG_INIT;
 		Air_Get.transfer_flag = 1;
 		//已结束故不执行
@@ -727,12 +770,12 @@ static void act_STM_Formatting(void)
 }
 static void act_STM_BigResourceIsland_Init(void)
 {
-	STM_Flag = 1;
-	if( rc_ctrl.key.v == 544)  //按键Ctrl+f即可运行
+	if( rc_ctrl.key.v == KEY_PRESSED_CTRL_F)  //按键Ctrl+f即可运行
 	{
-		low_speed=2;//离开低速模式  [待修改] 本应进入
+		low_speed=2;//进入低速模式 
 		target_can2_202_angle = TARGET_BTM_CAN2_202_ANGLE_INIT; //收回竖直伸出
 		target_can2_204_angle = TARGET_BTM_CAN2_204_ANGLE_INIT;  //机械臂爪收回
+		STM_Flag = 1;
 	}
 	if(STM_Flag) 
 	{
@@ -740,17 +783,11 @@ static void act_STM_BigResourceIsland_Init(void)
 				return;
 		else //当达到预设值时
 		{
-			target_can2_205_angle = TARGET_BTM_CAN2_205_ANGLE_INIT; //抬升下降
-			target_can2_206_angle = -TARGET_BTM_CAN2_206_ANGLE_INIT; //抬升下降
-			if(angle_can2_205 < 10) //待修改 用于判断是否下降充分
-			{
-				target_can2_207_angle_6020 = TARGET_BTM_CAN2_207_ANGLE_6020_INIT;
 				__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,0); //继电器低电平，失能
 				__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_3,0); //同上
-			}
+		}
 			Stm_Event = STM_START_RISING;
 			Small_Take_Mine.transfer_flag = 1;
-		}
 	}
 }
 
@@ -762,14 +799,14 @@ static void act_STM_BigResourceIsland_Rising(void)
 		target_can2_205_angle = TARGET_BTM_CAN2_205_ANGLE_RISING; //抬升上升
 		target_can2_206_angle = -TARGET_BTM_CAN2_206_ANGLE_RISING;
 	}
-	if(angle_can2_205 < TARGET_BTM_CAN2_205_ANGLE_RISING - 70) //需调整
+	if(engineer_deadband_judge(angle_can2_205,TARGET_BTM_CAN2_205_ANGLE_RISING,70))
 	{
-		return;
+		Stm_Event = STM_ARM_PROTRACT;
+		Small_Take_Mine.transfer_flag = 1;
 	}
 	else
 	{
-		Stm_Event = STM_ARM_PROTRACT_STATE;
-		Small_Take_Mine.transfer_flag = 1;
+		return;
 	}
 }
 static void act_STM_BigResourceIsland_Protract(void)
@@ -779,14 +816,14 @@ static void act_STM_BigResourceIsland_Protract(void)
 	{
 		target_can2_202_angle = TARGET_BTM_CAN2_202_ANGLE_Protract; //前伸
 	}
-	if(angle_can2_202 < TARGET_BTM_CAN2_202_ANGLE_Protract - 27) //需调整
+	if(engineer_deadband_judge(angle_can2_202,TARGET_BTM_CAN2_202_ANGLE_Protract,27))
 	{
-		return;
+		Stm_Event = STM_ARM_RETURN;
+		Small_Take_Mine.transfer_flag = 1;
 	}
 	else
 	{
-		Stm_Event = STM_ARM_RETURN_STATE;
-		Small_Take_Mine.transfer_flag = 1;
+		return;
 	}
 }
 //此函数用于机械臂中心来到正前方
@@ -797,7 +834,7 @@ static void act_STM_BigResourceIsland_ArmReturn(void)
 	{
 		target_can2_207_angle_6020 = TARGET_BTM_CAN2_207_ANGLE_6020_RETURN; //回正
 	}
-	if(fabs(angle_can2_207_6020) >  TARGET_BTM_CAN2_207_ANGLE_6020_RETURN - 3) //待修改
+	if(fabs(angle_can2_207_6020) >  TARGET_BTM_CAN2_207_ANGLE_6020_RETURN + 3 || fabs(angle_can2_207_6020) < TARGET_BTM_CAN2_207_ANGLE_6020_RETURN - 3) //待修改
 	{
 		return;
 	}
@@ -805,7 +842,9 @@ static void act_STM_BigResourceIsland_ArmReturn(void)
 	{
 		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,19999);//打开气泵
 		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_3,19999);
-		Stm_Event = STM_RISING_STEP_2_STATE;    
+		pump_flag_left = 1;
+		pump_flag_right = 1;
+		Stm_Event = STM_RISING_STEP_2;    
 		Small_Take_Mine.transfer_flag = 1;
 		STM_Flag = 0;
 	}
@@ -822,14 +861,14 @@ static void act_STM_BigResourceIsland_Rising_Step_2(void)
 		target_can2_205_angle = TARGET_BTM_CAN2_205_ANGLE_RISING_STEP_2; //抬升上升 取出小资源岛
 		target_can2_206_angle = -TARGET_BTM_CAN2_206_ANGLE_RISING_STEP_2;
 	}
-	if(angle_can2_205 < TARGET_BTM_CAN2_205_ANGLE_RISING_STEP_2 - 70) //需调整
+	if(engineer_deadband_judge(angle_can2_205,TARGET_BTM_CAN2_205_ANGLE_RISING_STEP_2,70))
 	{
-		return;
+		Stm_Event = STM_RETRACT;
+		Small_Take_Mine.transfer_flag = 1;
 	}
 	else
 	{
-		Stm_Event = STM_RETRACT_STATE;
-		Small_Take_Mine.transfer_flag = 1;
+		return;
 	}
 }
 static void act_STM_BigResourceIsland_Retract(void)
@@ -837,16 +876,16 @@ static void act_STM_BigResourceIsland_Retract(void)
 	act_STM_Formatting();
 	if(STM_Flag)
 	{
-		target_can2_202_angle = TARGET_BTM_CAN2_202_ANGLE_RETRACR;  //前伸收回
+		target_can2_202_angle = -2;  //前伸收回
 	}
-	if(angle_can2_202 > TARGET_BTM_CAN2_202_ANGLE_RETRACR - 1) //待修改
-	{
-		return;
-	}
-	else
+	if(engineer_deadband_judge(angle_can2_202,-TARGET_BTM_CAN2_202_ANGLE_RETRACR,10))
 	{
 		Stm_Event = STM_FALLING;
 		Small_Take_Mine.transfer_flag = 1;
+	}
+	else
+	{
+		return ;
 	}
 }
 static void act_STM_BigResourceIsland_Falling(void)
@@ -857,14 +896,14 @@ static void act_STM_BigResourceIsland_Falling(void)
 		target_can2_205_angle = TARGET_BTM_CAN2_205_ANGLE_FALLING; //抬升上升 取出小资源岛
 		target_can2_206_angle = -TARGET_BTM_CAN2_205_ANGLE_FALLING;
 	}
-	if(angle_can2_205 > TARGET_BTM_CAN2_205_ANGLE_FALLING - 50) //需调整
-	{
-		return;
-	}
-	else
+	if(engineer_deadband_judge(angle_can2_205,TARGET_BTM_CAN2_205_ANGLE_FALLING,50))
 	{
 		Stm_Event = STM_SERVO_INIT;
 		Small_Take_Mine.transfer_flag = 1;
+	}
+	else
+	{
+		return;
 	}
 }
 static void act_STM_BigResourceIsland_Servo_Center(void)
@@ -872,8 +911,10 @@ static void act_STM_BigResourceIsland_Servo_Center(void)
 	act_STM_Formatting();
 	if(STM_Flag)
 	{
-		target_can2_203_angle = 90; //舵机值待修改
-		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,19999);  //关闭气缸
+		target_can2_203_angle = 0; //舵机值待修改
+		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,19999);  //打开
+		pump_flag_left = 1;
+		pump_flag_right = 1;
 		Stm_Event = STM_STORAGE_ORE_DOWN;
 		Small_Take_Mine.transfer_flag = 1;
 	}
@@ -895,11 +936,12 @@ static void act_STM_BigResourceIsland_Storage_Down(void)
 //	}
 //	else
 //	{
-//		Stm_Event = STM_INIT_STATE;
+//		Stm_Event = STM_INIT;
 //		Small_Take_Mine.transfer_flag = 1;
 //	}
-	Stm_Event = STM_INIT_STATE;
+	Stm_Event = STM_INIT;
 	Small_Take_Mine.transfer_flag = 1;
+	STM_Flag = 0;
 }
 //在存矿下降后可
 static void act_STM_BigResourceIsland_ArmTurnAround(void);
@@ -1040,14 +1082,14 @@ static void act_AMI_row_middle(void)
 	{
 		target_can2_203_angle = TARGET_AMI_CAN2_203_MIDDLE; //row轴中置
 	}
-	if(fabs(angle_can2_203) > TARGET_AMI_CAN2_203_MIDDLE - 20) //待修改
-	{
-		return;
-	}
-	else
+	if(engineer_deadband_judge(angle_can2_203,TARGET_AMI_CAN2_203_MIDDLE,20))
 	{
 		Ami_Event = AMI_ARM_VERTICAL_HORIZON;
 		Auto_Machine_Init.transfer_flag = 1;
+	}
+	else
+	{
+		return;
 	}
 }
 static void act_AMI_arm_vertical_horizon(void)
@@ -1057,14 +1099,14 @@ static void act_AMI_arm_vertical_horizon(void)
 	{
 		target_can2_204_angle = TARGET_AMI_CAN2_204_HORIZON; 
 	}
-	if(fabs(angle_can2_204) > TARGET_AMI_CAN2_204_HORIZON - 20) //待修改
-	{
-		return;
-	}
-	else
+	if(engineer_deadband_judge(angle_can2_204,TARGET_AMI_CAN2_204_HORIZON,20))
 	{
 		Ami_Event = AMI_ARM_RETURN;
 		Auto_Machine_Init.transfer_flag = 1;
+	}
+	else
+	{
+		return;
 	}
 }
 static void act_AMI_arm_return(void)
@@ -1074,14 +1116,14 @@ static void act_AMI_arm_return(void)
 	{
 		target_can2_207_angle_6020 = TARGET_AMI_CAN2_207_6020_HORIZON; 
 	}
-	if(fabs(angle_can2_207_6020) > TARGET_AMI_CAN2_207_6020_HORIZON - 20) //待修改
-	{
-		return;
-	}
-	else
+	if(engineer_deadband_judge(target_can2_207_angle_6020,TARGET_AMI_CAN2_207_6020_HORIZON,20))
 	{
 		Ami_Event = AMI_PROTRACT;
 		Auto_Machine_Init.transfer_flag = 1;
+	}
+	else
+	{
+		return;
 	}
 }
 static void act_AMI_protratc(void)
@@ -1091,14 +1133,14 @@ static void act_AMI_protratc(void)
 	{
 		target_can2_202_angle = TARGET_AMI_CAN2_202_PROTRACT; 
 	}
-	if(fabs(angle_can2_202) > TARGET_AMI_CAN2_202_PROTRACT - 20) //待修改
-	{
-		return;
-	}
-	else
+	if(engineer_deadband_judge(angle_can2_202,TARGET_AMI_CAN2_202_PROTRACT,40))
 	{
 		Ami_Event = AMI_SIDESWAY_MIDDLE;
 		Auto_Machine_Init.transfer_flag = 1;
+	}
+	else
+	{
+		return;
 	}
 }
 static void act_AMI_sidesway_middle(void)  //横移中置
@@ -1108,14 +1150,14 @@ static void act_AMI_sidesway_middle(void)  //横移中置
 	{
 		target_can2_201_angle = TARGET_AMI_CAN2_201_MIDDLE; 
 	}
-	if(fabs(angle_can2_201) > TARGET_AMI_CAN2_201_MIDDLE - 10) //待修改
-	{
-		return;
-	}
-	else
+	if(engineer_deadband_judge(target_can2_201_angle,TARGET_AMI_CAN2_201_MIDDLE,30))
 	{
 		Ami_Event = AMI_DOWN;
 		Auto_Machine_Init.transfer_flag = 1;
+	}
+	else
+	{
+		return;
 	}
 }
 static void act_AMI_down(void)
@@ -1124,15 +1166,16 @@ static void act_AMI_down(void)
 	if(AMI_flag)
 	{
 		target_can2_205_angle = TARGET_AMI_CAN2_205_ANGLE_DOWN; //抬升上升
-		target_can2_206_angle = -TARGET_AMI_CAN2_206_ANGLE_DOWN;
+		target_can2_206_angle = -20;
 	}
-	if(angle_can2_205 > TARGET_AOS_CAN2_205_ANGLE_RISING + 20) //待修改
+	if(engineer_deadband_judge(angle_can2_205,TARGET_AMI_CAN2_205_ANGLE_DOWN,40))
 	{
-		return;
+		Ami_Event = AMI_INIT;
+		Auto_Machine_Init.transfer_flag = 1;
+		AMI_flag = 0;
 	}
 	else
 	{
-		Aos_Event = AMI_INIT;
-		Auto_Ore_Storage.transfer_flag = 1;
+		return;
 	}
 }

@@ -437,7 +437,6 @@ static void chassis_keyboard_control_normal(float *vx_set, float *vy_set, float 
 			chassis_keyboard_control_low(vx_set, vy_set, wz_set, chassis_move_keyboard_to_vector);  //在低速模式下成倍更改速度值
 			*vx_set *= 3;
 			*vy_set *= 3;
-			*wz_set *= 3;
 			break;
 		case 2:
 			chassis_keyboard_control_low(vx_set, vy_set, wz_set, chassis_move_keyboard_to_vector);
@@ -479,18 +478,18 @@ static void chassis_keyboard_control_low(float *vx_set, float *vy_set, float *wz
 			*vx_set = chassis_keyboard_control_low->vx_max_speed / 30.0;
 		}
 		//键盘x轴移动速度控制底盘旋转
-//	if(chassis_move_keyboard_to_vector->chassis_RC->mouse.x | 0x00)
-//	{
-//		*wz_set = chassis_move_keyboard_to_vector->chassis_RC->mouse.x * CHASSIS_MOUSE_CONTROL_CHANGE_TO_VEL;
-//	}
-		if(chassis_keyboard_control_low->chassis_RC->key.v & KEY_PRESSED_OFFSET_Q)
+		if(chassis_keyboard_control_low->chassis_RC->mouse.x | 0x00)
 		{
-			*wz_set = 1.0;
+			*wz_set = -chassis_keyboard_control_low->chassis_RC->mouse.x * CHASSIS_MOUSE_CONTROL_CHANGE_TO_VEL;
 		}
-		else if(chassis_keyboard_control_low->chassis_RC->key.v & KEY_PRESSED_OFFSET_E)
-		{
-			*wz_set = -1.0;
-		}
+//		if(chassis_keyboard_control_low->chassis_RC->key.v & KEY_PRESSED_OFFSET_Q)
+//		{
+//			*wz_set = 1.0;
+//		}
+//		else if(chassis_keyboard_control_low->chassis_RC->key.v & KEY_PRESSED_OFFSET_E)
+//		{
+//			*wz_set = -1.0;
+//		}
 	}
 	
 }
@@ -525,19 +524,19 @@ static void chassis_keyboard_control_heigh(float *vx_set, float *vy_set, float *
 //		{
 //			*vx_set = chassis_keyboard_control_heigh->vx_max_speed;
 //		}
-//	//键盘x轴移动速度控制底盘旋转
-////	if(chassis_move_keyboard_to_vector->chassis_RC->mouse.x | 0x00)
-////	{
-////		*wz_set = chassis_move_keyboard_to_vector->chassis_RC->mouse.x * CHASSIS_MOUSE_CONTROL_CHANGE_TO_VEL;
-////	}
-		if(chassis_keyboard_control_heigh->chassis_RC->key.v & KEY_PRESSED_OFFSET_Q)
+	//键盘x轴移动速度控制底盘旋转
+		if(chassis_keyboard_control_heigh->chassis_RC->mouse.x | 0x00)
 		{
-			*wz_set = 5.0;
+			*wz_set = -chassis_keyboard_control_heigh->chassis_RC->mouse.x * CHASSIS_MOUSE_CONTROL_CHANGE_TO_VEL;
 		}
-		else if(chassis_keyboard_control_heigh->chassis_RC->key.v & KEY_PRESSED_OFFSET_E)
-		{
-			*wz_set = -5.0;
-		}	
+//		if(chassis_keyboard_control_heigh->chassis_RC->key.v & KEY_PRESSED_OFFSET_Q)
+//		{
+//			*wz_set = 5.0;
+//		}
+//		else if(chassis_keyboard_control_heigh->chassis_RC->key.v & KEY_PRESSED_OFFSET_E)
+//		{
+//			*wz_set = -5.0;
+//		}	
 		
 		//键盘控制
   if (chassis_keyboard_control_heigh->chassis_RC->key.v & KEY_PRESSED_OFFSET_A) //左移
