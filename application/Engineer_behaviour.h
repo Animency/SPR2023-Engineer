@@ -76,8 +76,8 @@ extern "C" {
 /**********回正宏定义**************/
 #define TARGET_BTM_CAN2_207_ANGLE_6020_RETURN 213.0f
 /**********再次上升宏定义**************/
-#define TARGET_BTM_CAN2_205_ANGLE_RISING_STEP_2 1020.0f
-#define TARGET_BTM_CAN2_206_ANGLE_RISING_STEP_2 1020.0f
+#define TARGET_BTM_CAN2_205_ANGLE_RISING_STEP_2 1061.0f
+#define TARGET_BTM_CAN2_206_ANGLE_RISING_STEP_2 1061.0f
 /**********前伸收回宏定义***********/
 #define TARGET_BTM_CAN2_202_ANGLE_RETRACR 2.0f
 /**********抬升下降宏定义***********/

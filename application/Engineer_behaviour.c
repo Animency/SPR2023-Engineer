@@ -783,11 +783,9 @@ static void act_STM_BigResourceIsland_Init(void)
 				return;
 		else //当达到预设值时
 		{
-				__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,0); //继电器低电平，失能
-				__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_3,0); //同上
-		}
 			Stm_Event = STM_START_RISING;
 			Small_Take_Mine.transfer_flag = 1;
+		}
 	}
 }
 
@@ -816,7 +814,7 @@ static void act_STM_BigResourceIsland_Protract(void)
 	{
 		target_can2_202_angle = TARGET_BTM_CAN2_202_ANGLE_Protract; //前伸
 	}
-	if(engineer_deadband_judge(angle_can2_202,TARGET_BTM_CAN2_202_ANGLE_Protract,27))
+	if(engineer_deadband_judge(angle_can2_202,TARGET_BTM_CAN2_202_ANGLE_Protract,40))
 	{
 		Stm_Event = STM_ARM_RETURN;
 		Small_Take_Mine.transfer_flag = 1;
@@ -878,7 +876,7 @@ static void act_STM_BigResourceIsland_Retract(void)
 	{
 		target_can2_202_angle = -2;  //前伸收回
 	}
-	if(engineer_deadband_judge(angle_can2_202,-TARGET_BTM_CAN2_202_ANGLE_RETRACR,10))
+	if(engineer_deadband_judge(angle_can2_202,-TARGET_BTM_CAN2_202_ANGLE_RETRACR,30))
 	{
 		Stm_Event = STM_FALLING;
 		Small_Take_Mine.transfer_flag = 1;

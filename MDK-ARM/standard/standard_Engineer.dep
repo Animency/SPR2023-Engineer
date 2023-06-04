@@ -345,7 +345,7 @@ I (..\boards\bsp_adc.h)(0x62C6876A)
 I (..\application\board_talk.h)(0x62CEA09A)
 I (..\boards\bsp_usart.h)(0x6458E132)
 I (..\Hardware\Inc\usart.h)(0x62CEA12E)
-I (..\application\Engineer_behaviour.h)(0x6479CB83)
+I (..\application\Engineer_behaviour.h)(0x647C1B2C)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x5E8E3CC2)
 F (..\Task\gimbal_task.c)(0x647778D1)(--c99 -c --cpu Cortex-M4.fp.sp -g -O0 --apcs=interwork --split_sections -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ..\application -I ..\application\protocol -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc -I ..\Hardware\Inc -I ..\User\Inc -I ..\boards -I ..\Task -I ..\components\algorithm -I ..\components\algorithm\Include -I ..\components\controller -I ..\components\devices -I ..\components\support-IC:\Users\16569\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.17.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="538" -DSTM32F407xx -DUSE_HAL_DRIVER -DSTM32F407xx -DUSE_HAL_DRIVER -DSTM32F407xx -DARM_MATH_CM4 -D__FPU_USED="1U" -D__FPU_PRESENT="1U" -D__CC_ARM -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING-o .\standard\gimbal_task.o --omf_browse .\standard\gimbal_task.crf --depend .\standard\gimbal_task.d)
 I (..\Task\gimbal_task.h)(0x64785D9D)
@@ -425,7 +425,7 @@ I (..\Task\chassis_task.h)(0x6478847A)
 I (..\components\algorithm\user_lib.h)(0x62C6876A)
 I (..\application\gimbal_pid.h)(0x646B8B19)
 I (..\Task\detect_task.h)(0x62C6876A)
-I (..\application\Engineer_behaviour.h)(0x6479CB83)
+I (..\application\Engineer_behaviour.h)(0x647C1B2C)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x5E8E3CC2)
 F (..\Task\referee_usart_task.c)(0x647A31E0)(--c99 -c --cpu Cortex-M4.fp.sp -g -O0 --apcs=interwork --split_sections -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ..\application -I ..\application\protocol -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc -I ..\Hardware\Inc -I ..\User\Inc -I ..\boards -I ..\Task -I ..\components\algorithm -I ..\components\algorithm\Include -I ..\components\controller -I ..\components\devices -I ..\components\support-IC:\Users\16569\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.17.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="538" -DSTM32F407xx -DUSE_HAL_DRIVER -DSTM32F407xx -DUSE_HAL_DRIVER -DSTM32F407xx -DARM_MATH_CM4 -D__FPU_USED="1U" -D__FPU_PRESENT="1U" -D__CC_ARM -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING-o .\standard\referee_usart_task.o --omf_browse .\standard\referee_usart_task.crf --depend .\standard\referee_usart_task.d)
 I (..\Task\referee_usart_task.h)(0x6458B7BC)
@@ -521,7 +521,7 @@ I (../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h)(0x62C6876A
 I (..\application\remote_control.h)(0x647A1276)
 I (..\application\struct_typedef.h)(0x62C6876A)
 I (..\boards\bsp_rc.h)(0x62CEA09A)
-I (..\application\Engineer_behaviour.h)(0x6479CB83)
+I (..\application\Engineer_behaviour.h)(0x647C1B2C)
 I (..\User\Inc\main.h)(0x634969AA)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x62C6876A)
 I (..\User\Inc\stm32f4xx_hal_conf.h)(0x62C6876A)
@@ -1285,7 +1285,7 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h)(0x62C6876A)
 I (..\Task\detect_task.h)(0x62C6876A)
 I (..\boards\bsp_usart.h)(0x6458E132)
 I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x5E8E3CC2)
-F (..\application\chassis_behaviour.c)(0x647A2015)(--c99 -c --cpu Cortex-M4.fp.sp -g -O0 --apcs=interwork --split_sections -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ..\application -I ..\application\protocol -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc -I ..\Hardware\Inc -I ..\User\Inc -I ..\boards -I ..\Task -I ..\components\algorithm -I ..\components\algorithm\Include -I ..\components\controller -I ..\components\devices -I ..\components\support-IC:\Users\16569\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.17.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="538" -DSTM32F407xx -DUSE_HAL_DRIVER -DSTM32F407xx -DUSE_HAL_DRIVER -DSTM32F407xx -DARM_MATH_CM4 -D__FPU_USED="1U" -D__FPU_PRESENT="1U" -D__CC_ARM -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING-o .\standard\chassis_behaviour.o --omf_browse .\standard\chassis_behaviour.crf --depend .\standard\chassis_behaviour.d)
+F (..\application\chassis_behaviour.c)(0x647C1B2C)(--c99 -c --cpu Cortex-M4.fp.sp -g -O0 --apcs=interwork --split_sections -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ..\application -I ..\application\protocol -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc -I ..\Hardware\Inc -I ..\User\Inc -I ..\boards -I ..\Task -I ..\components\algorithm -I ..\components\algorithm\Include -I ..\components\controller -I ..\components\devices -I ..\components\support-IC:\Users\16569\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.17.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="538" -DSTM32F407xx -DUSE_HAL_DRIVER -DSTM32F407xx -DUSE_HAL_DRIVER -DSTM32F407xx -DARM_MATH_CM4 -D__FPU_USED="1U" -D__FPU_PRESENT="1U" -D__CC_ARM -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING-o .\standard\chassis_behaviour.o --omf_browse .\standard\chassis_behaviour.crf --depend .\standard\chassis_behaviour.d)
 I (..\application\chassis_behaviour.h)(0x647A2003)
 I (..\application\struct_typedef.h)(0x62C6876A)
 I (..\Task\chassis_task.h)(0x6478847A)
@@ -1313,7 +1313,7 @@ I (../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h)(0x62C6876A)
 I (../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h)(0x62C6876A)
 I (C:\Keil_v5\ARM\ARMCC\include\math.h)(0x5E8E3CC2)
 I (..\application\gimbal_behaviour.h)(0x62C6876A)
-I (..\application\Engineer_behaviour.h)(0x6479CB83)
+I (..\application\Engineer_behaviour.h)(0x647C1B2C)
 I (..\User\Inc\main.h)(0x634969AA)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x62C6876A)
 I (..\User\Inc\stm32f4xx_hal_conf.h)(0x62C6876A)
@@ -1542,13 +1542,13 @@ I (..\components\controller\pid.h)(0x62C6876A)
 I (..\application\remote_control.h)(0x647A1276)
 I (..\components\algorithm\user_lib.h)(0x62C6876A)
 I (..\components\support\crc8_crc16.h)(0x62C6876A)
-F (..\application\Engineer_behaviour.c)(0x647A330D)(--c99 -c --cpu Cortex-M4.fp.sp -g -O0 --apcs=interwork --split_sections -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ..\application -I ..\application\protocol -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc -I ..\Hardware\Inc -I ..\User\Inc -I ..\boards -I ..\Task -I ..\components\algorithm -I ..\components\algorithm\Include -I ..\components\controller -I ..\components\devices -I ..\components\support-IC:\Users\16569\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.17.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="538" -DSTM32F407xx -DUSE_HAL_DRIVER -DSTM32F407xx -DUSE_HAL_DRIVER -DSTM32F407xx -DARM_MATH_CM4 -D__FPU_USED="1U" -D__FPU_PRESENT="1U" -D__CC_ARM -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING-o .\standard\engineer_behaviour.o --omf_browse .\standard\engineer_behaviour.crf --depend .\standard\engineer_behaviour.d)
+F (..\application\Engineer_behaviour.c)(0x647C1B2C)(--c99 -c --cpu Cortex-M4.fp.sp -g -O0 --apcs=interwork --split_sections -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ..\application -I ..\application\protocol -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc -I ..\Hardware\Inc -I ..\User\Inc -I ..\boards -I ..\Task -I ..\components\algorithm -I ..\components\algorithm\Include -I ..\components\controller -I ..\components\devices -I ..\components\support-IC:\Users\16569\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.17.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="538" -DSTM32F407xx -DUSE_HAL_DRIVER -DSTM32F407xx -DUSE_HAL_DRIVER -DSTM32F407xx -DARM_MATH_CM4 -D__FPU_USED="1U" -D__FPU_PRESENT="1U" -D__CC_ARM -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING-o .\standard\engineer_behaviour.o --omf_browse .\standard\engineer_behaviour.crf --depend .\standard\engineer_behaviour.d)
 I (..\components\controller\pid.h)(0x62C6876A)
 I (..\application\remote_control.h)(0x647A1276)
 I (..\application\struct_typedef.h)(0x62C6876A)
 I (..\boards\bsp_rc.h)(0x62CEA09A)
 I (..\application\CAN_receive.h)(0x6474B0F7)
-I (..\application\Engineer_behaviour.h)(0x6479CB83)
+I (..\application\Engineer_behaviour.h)(0x647C1B2C)
 I (..\User\Inc\main.h)(0x634969AA)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x62C6876A)
 I (..\User\Inc\stm32f4xx_hal_conf.h)(0x62C6876A)
@@ -1604,7 +1604,7 @@ I (..\application\custom_ui_draw.h)(0x6458E418)
 I (..\components\support\CRC8_CRC16.h)(0x62C6876A)
 I (..\application\protocol\protocol.h)(0x6458B5CE)
 I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x5E8E3CC2)
-F (..\application\Engineer_behaviour.h)(0x6479CB83)()
+F (..\application\Engineer_behaviour.h)(0x647C1B2C)()
 F (..\application\custom_ui_draw.c)(0x647A30B6)(--c99 -c --cpu Cortex-M4.fp.sp -g -O0 --apcs=interwork --split_sections -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ..\application -I ..\application\protocol -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc -I ..\Hardware\Inc -I ..\User\Inc -I ..\boards -I ..\Task -I ..\components\algorithm -I ..\components\algorithm\Include -I ..\components\controller -I ..\components\devices -I ..\components\support-IC:\Users\16569\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.17.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="538" -DSTM32F407xx -DUSE_HAL_DRIVER -DSTM32F407xx -DUSE_HAL_DRIVER -DSTM32F407xx -DARM_MATH_CM4 -D__FPU_USED="1U" -D__FPU_PRESENT="1U" -D__CC_ARM -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING-o .\standard\custom_ui_draw.o --omf_browse .\standard\custom_ui_draw.crf --depend .\standard\custom_ui_draw.d)
 I (..\application\custom_ui_draw.h)(0x6458E418)
 I (..\User\Inc\main.h)(0x634969AA)
@@ -1663,7 +1663,7 @@ I (..\components\controller\pid.h)(0x62C6876A)
 I (..\application\remote_control.h)(0x647A1276)
 I (..\boards\bsp_rc.h)(0x62CEA09A)
 I (..\components\algorithm\user_lib.h)(0x62C6876A)
-I (..\application\Engineer_behaviour.h)(0x6479CB83)
+I (..\application\Engineer_behaviour.h)(0x647C1B2C)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x5E8E3CC2)
 I (..\application\referee.h)(0x6458DC4B)
 F (..\components\algorithm\AHRS_middleware.c)(0x62C6876A)(--c99 -c --cpu Cortex-M4.fp.sp -g -O0 --apcs=interwork --split_sections -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ..\application -I ..\application\protocol -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc -I ..\Hardware\Inc -I ..\User\Inc -I ..\boards -I ..\Task -I ..\components\algorithm -I ..\components\algorithm\Include -I ..\components\controller -I ..\components\devices -I ..\components\support-IC:\Users\16569\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.17.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="538" -DSTM32F407xx -DUSE_HAL_DRIVER -DSTM32F407xx -DUSE_HAL_DRIVER -DSTM32F407xx -DARM_MATH_CM4 -D__FPU_USED="1U" -D__FPU_PRESENT="1U" -D__CC_ARM -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING-o .\standard\ahrs_middleware.o --omf_browse .\standard\ahrs_middleware.crf --depend .\standard\ahrs_middleware.d)

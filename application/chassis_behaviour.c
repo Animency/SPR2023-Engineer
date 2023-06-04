@@ -435,8 +435,8 @@ static void chassis_keyboard_control_normal(float *vx_set, float *vy_set, float 
 			break;
 		case 1:
 			chassis_keyboard_control_low(vx_set, vy_set, wz_set, chassis_move_keyboard_to_vector);  //在低速模式下成倍更改速度值
-			*vx_set *= 3;
-			*vy_set *= 3;
+			*vx_set *= 5;
+			*vy_set *= 5;
 			break;
 		case 2:
 			chassis_keyboard_control_low(vx_set, vy_set, wz_set, chassis_move_keyboard_to_vector);
@@ -632,20 +632,20 @@ static void chassis_keyboard_control_heigh(float *vx_set, float *vy_set, float *
 		//速度限幅
 		if(vx_set_channel >= chassis_keyboard_control_heigh->vx_max_speed)
 		{
-			vx_set_channel = chassis_keyboard_control_heigh->vx_max_speed - 2;
+			vx_set_channel = chassis_keyboard_control_heigh->vx_max_speed - 4;
 		}
 		else if(vx_set_channel < chassis_keyboard_control_heigh->vx_min_speed)
 		{
-			vx_set_channel = chassis_keyboard_control_heigh->vx_min_speed + 2;
+			vx_set_channel = chassis_keyboard_control_heigh->vx_min_speed + 4;
 		}
 		
 		if(vy_set_channel >= chassis_keyboard_control_heigh->vy_max_speed)
 		{
-			vy_set_channel = chassis_keyboard_control_heigh->vy_max_speed - 2;
+			vy_set_channel = chassis_keyboard_control_heigh->vy_max_speed - 4;
 		}
 		else if(vy_set_channel < chassis_keyboard_control_heigh->vy_min_speed)
 		{
-			vy_set_channel = chassis_keyboard_control_heigh->vy_min_speed + 2;
+			vy_set_channel = chassis_keyboard_control_heigh->vy_min_speed + 4;
 		}
 		
 		*vx_set = vx_set_channel;

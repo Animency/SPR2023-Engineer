@@ -27,6 +27,24 @@ Project File Date:  05/28/2023
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'Engineer'
+compiling servo_task.c...
+..\application\remote_control.h(120): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\Engineer_behaviour.h(131): warning:  #1-D: last line of file ends without a newline
+  #endif 
+..\Task\servo_task.c: 2 warnings, 0 errors
+compiling custom_ui_draw.c...
+..\application\remote_control.h(120): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\remote_control.h(120): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\Engineer_behaviour.h(131): warning:  #1-D: last line of file ends without a newline
+  #endif 
+..\application\custom_ui_draw.c(132): warning:  #223-D: function "osDelay" declared implicitly
+      osDelay(100);
+..\application\custom_ui_draw.c(979): warning:  #1-D: last line of file ends without a newline
+  }
+..\application\custom_ui_draw.c: 5 warnings, 0 errors
 compiling Engineer_behaviour.c...
 ..\application\remote_control.h(120): warning:  #1-D: last line of file ends without a newline
   //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
@@ -36,7 +54,7 @@ compiling Engineer_behaviour.c...
   //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
 ..\application\Engineer_behaviour.c(68): warning:  #177-D: function "act_STM_BigResourceIsland_OverTurn"  was declared but never referenced
   static void act_STM_BigResourceIsland_OverTurn(void);
-..\application\Engineer_behaviour.c(1040): warning:  #177-D: function "act_AOS_retract"  was declared but never referenced
+..\application\Engineer_behaviour.c(1038): warning:  #177-D: function "act_AOS_retract"  was declared but never referenced
   static void act_AOS_retract(void)
 ..\application\Engineer_behaviour.c(78): warning:  #177-D: function "act_AOS_cylinder_off"  was declared but never referenced
   static void act_AOS_cylinder_off(void);
@@ -54,13 +72,99 @@ compiling Engineer_behaviour.c...
   static void act_AOS_arm_return(void);
 ..\application\Engineer_behaviour.c(94): warning:  #177-D: function "act_AMI_finish"  was declared but never referenced
   static void act_AMI_finish(void);
-..\application\Engineer_behaviour.c(947): warning:  #177-D: function "act_STM_BigResourceIsland_ArmTurnAround"  was declared but never referenced
+..\application\Engineer_behaviour.c(945): warning:  #177-D: function "act_STM_BigResourceIsland_ArmTurnAround"  was declared but never referenced
   static void act_STM_BigResourceIsland_ArmTurnAround(void);
 ..\application\Engineer_behaviour.c: 14 warnings, 0 errors
+compiling chassis_behaviour.c...
+..\application\remote_control.h(120): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\remote_control.h(120): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\Engineer_behaviour.h(131): warning:  #1-D: last line of file ends without a newline
+  #endif 
+..\application\chassis_behaviour.c(412): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	rc_deadband_limit(*vx_set,*vx_set,0.15);
+..\application\chassis_behaviour.c(413): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	rc_deadband_limit(*vy_set,*vy_set,0.15);
+..\application\chassis_behaviour.c(414): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	rc_deadband_limit(*wz_set,*wz_set,0.15);
+..\application\chassis_behaviour.c(465): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  			*vy_set = -chassis_keyboard_control_low->vy_max_speed / 30.0;
+..\application\chassis_behaviour.c(469): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  			*vy_set = -chassis_keyboard_control_low->vy_min_speed / 30.0;
+..\application\chassis_behaviour.c(474): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  			*vx_set = chassis_keyboard_control_low->vx_min_speed / 30.0;
+..\application\chassis_behaviour.c(478): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  			*vx_set = chassis_keyboard_control_low->vx_max_speed / 30.0;
+..\application\chassis_behaviour.c(658): warning:  #1-D: last line of file ends without a newline
+  }
+..\application\chassis_behaviour.c(281): warning:  #177-D: function "chassis_zero_force_control"  was declared but never referenced
+  static void chassis_zero_force_control(float *vx_can_set, float *vy_can_set, float *wz_can_set, chassis_move_t *chassis_move_rc_to_vector)
+..\application\chassis_behaviour.c(301): warning:  #177-D: function "chassis_no_move_control"  was declared but never referenced
+  static void chassis_no_move_control(float *vx_set, float *vy_set, float *wz_set, chassis_move_t *chassis_move_rc_to_vector)
+..\application\chassis_behaviour.c(321): warning:  #177-D: function "chassis_follow_gimbal_yaw_control"  was declared but never referenced
+  static void chassis_follow_gimbal_yaw_control(float *vx_set, float *vy_set, float *angle_set, chassis_move_t *chassis_move_rc_to_vector)
+..\application\chassis_behaviour.c(338): warning:  #177-D: function "chassis_no_follow_yaw_control"  was declared but never referenced
+  static void chassis_no_follow_yaw_control(float *vx_set, float *vy_set, float *wz_set, chassis_move_t *chassis_move_rc_to_vector)
+..\application\chassis_behaviour.c(357): warning:  #177-D: function "chassis_open_set_control"  was declared but never referenced
+  static void chassis_open_set_control(float *vx_set, float *vy_set, float *wz_set, chassis_move_t *chassis_move_rc_to_vector)
+..\application\chassis_behaviour.c(152): warning:  #177-D: function "chassis_Debug_control"  was declared but never referenced
+  static void chassis_Debug_control(float *vx_set, float *vy_set, float *wz_set, chassis_move_t *chassis_move_rc_to_vector);
+..\application\chassis_behaviour.c: 17 warnings, 0 errors
+compiling chassis_task.c...
+..\application\remote_control.h(120): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\remote_control.h(120): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\Engineer_behaviour.h(131): warning:  #1-D: last line of file ends without a newline
+  #endif 
+..\Task\chassis_task.c(220): warning:  #177-D: variable "vx_set"  was declared but never referenced
+  	float vx_set = 0.0f, vy_set = 0.0f , angle_set = 0.0f;
+..\Task\chassis_task.c(220): warning:  #177-D: variable "vy_set"  was declared but never referenced
+  	float vx_set = 0.0f, vy_set = 0.0f , angle_set = 0.0f;
+..\Task\chassis_task.c(220): warning:  #177-D: variable "angle_set"  was declared but never referenced
+  	float vx_set = 0.0f, vy_set = 0.0f , angle_set = 0.0f;
+..\Task\chassis_task.c(461): warning:  #1-D: last line of file ends without a newline
+  }
+..\Task\chassis_task.c: 7 warnings, 0 errors
+compiling gimbal_task.c...
+..\application\remote_control.h(120): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\application\remote_control.h(120): warning:  #1-D: last line of file ends without a newline
+  //#define REMOTE_CONTROL_CHANNEL_DUOJI 3
+..\components\algorithm\user_lib.h(54): warning:  #47-D: incompatible redefinition of macro "PI"  (declared at line 326 of "..\components\algorithm\Include\arm_math.h")
+  #define PI 3.14
+..\application\Engineer_behaviour.h(131): warning:  #1-D: last line of file ends without a newline
+  #endif 
+..\Task\gimbal_task.c(346): warning:  #177-D: variable "max_vector"  was declared but never referenced
+  	fp32 max_vector = 0.0f, vector_rate = 0.0f;
+..\Task\gimbal_task.c(346): warning:  #177-D: variable "vector_rate"  was declared but never referenced
+  	fp32 max_vector = 0.0f, vector_rate = 0.0f;
+..\Task\gimbal_task.c(347): warning:  #550-D: variable "temp"  was set but never used
+    fp32 temp = 0.0f;
+..\Task\gimbal_task.c(370): warning:  #177-D: variable "max_vector"  was declared but never referenced
+  	fp32 max_vector = 0.0f, vector_rate = 0.0f;
+..\Task\gimbal_task.c(370): warning:  #177-D: variable "vector_rate"  was declared but never referenced
+  	fp32 max_vector = 0.0f, vector_rate = 0.0f;
+..\Task\gimbal_task.c(371): warning:  #550-D: variable "temp"  was set but never used
+    fp32 temp = 0.0f;
+..\Task\gimbal_task.c(569): warning:  #1-D: last line of file ends without a newline
+  }
+..\Task\gimbal_task.c(437): warning:  #177-D: function "gimbal_heng"  was declared but never referenced
+  static void gimbal_heng(gimbal_control_t *gimbal_heng)
+..\Task\gimbal_task.c(446): warning:  #177-D: function "gimbal_shu"  was declared but never referenced
+  static void gimbal_shu(gimbal_control_t *gimbal_shu)
+..\Task\gimbal_task.c(454): warning:  #177-D: function "gimbal_xuan"  was declared but never referenced
+  static void gimbal_xuan(gimbal_control_t *gimbal_xuan)
+..\Task\gimbal_task.c(463): warning:  #177-D: function "gimbal_fan"  was declared but never referenced
+  static void gimbal_fan(gimbal_control_t *gimbal_fan)
+..\Task\gimbal_task.c(119): warning:  #177-D: function "gimbal_ore"  was declared but never referenced
+  static void gimbal_ore(gimbal_control_t *gimbal_ore);
+..\Task\gimbal_task.c: 16 warnings, 0 errors
 linking...
-Program Size: Code=95736 RO-data=4004 RW-data=1808 ZI-data=52848  
+Program Size: Code=95724 RO-data=4000 RW-data=1808 ZI-data=52848  
 FromELF: creating hex file...
-".\standard\Engineer.axf" - 0 Error(s), 14 Warning(s).
+".\standard\Engineer.axf" - 0 Error(s), 61 Warning(s).
 
 <h2>Software Packages used:</h2>
 
