@@ -14,7 +14,6 @@
  */
 #define SENDER_ID 2
 #define RECEIVER_ID 0x0102
-
 /*屏幕分辨率*/
 #define SCREEN_WIDTH 1080
 #define SCREEN_LENGTH 1920

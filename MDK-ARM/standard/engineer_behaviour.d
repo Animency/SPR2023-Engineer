@@ -62,3 +62,7 @@
 .\standard\engineer_behaviour.o: ..\components\support\CRC8_CRC16.h
 .\standard\engineer_behaviour.o: ..\application\protocol\protocol.h
 .\standard\engineer_behaviour.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+.\standard\engineer_behaviour.o: ..\application\chassis_behaviour.h
+.\standard\engineer_behaviour.o: ..\Task\chassis_task.h
+.\standard\engineer_behaviour.o: ..\application\remote_control.h
+.\standard\engineer_behaviour.o: ..\components\algorithm\user_lib.h

@@ -63,7 +63,7 @@ void referee_usart_task(void const *argument)
     fifo_s_init(&referee_fifo, referee_fifo_buf, REFEREE_FIFO_BUF_LENGTH);
     usart6_init(usart6_buf[0], usart6_buf[1], USART_RX_BUF_LENGHT);
 
-    draw_init_all(send_id, receive_id);
+//    draw_init_all(send_id, receive_id);
     while (1)
     {
 			draw_get_robot_id();
@@ -92,21 +92,19 @@ void referee_usart_task(void const *argument)
         }
         else if (time_heart_ms % 230 == 0)
         {
-            //draw_card_data(send_id, receive_id, 2);
 						draw_card_position(send_id, receive_id, 2);
         }
         else if (time_heart_ms % 150 == 0)
         {
             draw_current_mode(send_id, receive_id, 2);
-
         }
 				else if (time_heart_ms % 90 == 0)
         {
-            draw_claw_data(send_id, receive_id, 2);
+					draw_card_position(send_id, receive_id, 2);
         }
         else if (time_heart_ms % 40 == 0)
         {
-            draw_state_circle(send_id, receive_id, 2);
+					draw_current_mode(send_id, receive_id, 2);
         }
         osDelay(10);
     }

@@ -91,8 +91,18 @@ void Calc_6020_Angle_Gimbal(motor_measure_t *motor_gimbal)
   }
   motor_gimbal->angle = (motor_gimbal->round * ANGLE_T + motor_gimbal->last_ecd) * 0.0439506776f;//轴一圈对应360°
 }
-
-
+//void Calc_3508_Angle_pitch(motor_measure_t *motor_gimbal)
+//{
+//  if (motor_gimbal->ecd - motor_gimbal->last_ecd > 4095.5)
+//  {
+//    motor_gimbal->round--;
+//  }
+//  else if (motor_gimbal->ecd - motor_gimbal->last_ecd < -4095.5)
+//  {
+//    motor_gimbal->round++;
+//  }
+//  motor_gimbal->angle = (motor_gimbal->round * ANGLE_T + motor_gimbal->last_ecd) * 0.052074631021999f;//减速比换算 pitch
+//}
 /**
  * @brief          hal CAN fifo call back, receive motor data
  * @param[in]      hcan, the point to CAN handle

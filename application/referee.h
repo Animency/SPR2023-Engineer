@@ -14,13 +14,13 @@ typedef enum
     RED_STANDARD_3  = 5,
     RED_AERIAL      = 6,
     RED_SENTRY      = 7,
-    BLUE_HERO       = 11,
-    BLUE_ENGINEER   = 12,
-    BLUE_STANDARD_1 = 13,
-    BLUE_STANDARD_2 = 14,
-    BLUE_STANDARD_3 = 15,
-    BLUE_AERIAL     = 16,
-    BLUE_SENTRY     = 17,
+    BLUE_HERO       = 101,
+    BLUE_ENGINEER   = 102,
+    BLUE_STANDARD_1 = 103,
+    BLUE_STANDARD_2 = 104,
+    BLUE_STANDARD_3 = 105,
+    BLUE_AERIAL     = 106,
+    BLUE_SENTRY     = 107,
 } robot_id_t;
 typedef enum
 {

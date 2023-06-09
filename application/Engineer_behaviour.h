@@ -25,17 +25,17 @@ extern "C" {
   /*-----------------------------------------------------键盘控制灵敏度宏定义--------------------------------------------------------*/
 #define KEYBOARD_CONTROL_ANGLE_CAN2_201_CHANGE 5
 #define KEYBOARD_CONTROL_ANGLE_CAN2_202_CHANGE 5
-#define KEYBOARD_CONTROL_ANGLE_CAN2_204_CHANGE 3
+#define KEYBOARD_CONTROL_ANGLE_CAN2_204_CHANGE 1
 #define KEYBOARD_CONTROL_ANGLE_CAN2_205_206_CHANGE 8
 #define KEYBOARD_CONTROL_ANGLE_CAN2_207_6020_CHANGE 1
-
+#define KEYBOARD_CONTROL_ANGLE_CAN2_208_CHANGE 2
 #define KEYBOARD_CONTROL_ANGLE_MECHANICAL_ARM_COORDINATES_CHANGE 5
 #define KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE 4
 #define MOUSE_CONTROL_ANGLE_CAN2_201_CHANGE  0.4 /*按键为4*/
 #define MOUSE_CONTROL_ANGLE_CAN2_202_CHANGE  0
 
 #define ANGLE_TO_ECD 0.017453292519943f
-#define RM_2023_ENGINEER_LIFTING_TO_HENG_SCALE 1.255813953488f
+#define RM_2023_ENGINEER_LIFTING_TO_HENG_SCALE 1.255813953488f  //此处由减速比得到
  /*-----------------------------------------------------空接宏定义--------------------------------------------------------*/
 /**********初始化宏定义**************/
 #define TARGET_CAN2_205_206_ANGLE_FORMATTING 2
@@ -69,32 +69,46 @@ extern "C" {
 #define TARGET_BTM_CAN2_206_ANGLE_INIT 1.0f
 #define TARGET_BTM_CAN2_207_ANGLE_6020_INIT 123.0f
 /**********抬升宏定义**************/
-#define TARGET_BTM_CAN2_205_ANGLE_RISING 900.0f
-#define TARGET_BTM_CAN2_206_ANGLE_RISING 900.0f
+#define TARGET_BTM_CAN2_205_ANGLE_RISING 300.0f
+#define TARGET_BTM_CAN2_206_ANGLE_RISING 300.0f
 /**********前伸宏定义**************/
 #define TARGET_BTM_CAN2_202_ANGLE_Protract -100.0f
 /**********回正宏定义**************/
 #define TARGET_BTM_CAN2_207_ANGLE_6020_RETURN 213.0f
 /**********再次上升宏定义**************/
-#define TARGET_BTM_CAN2_205_ANGLE_RISING_STEP_2 1061.0f
-#define TARGET_BTM_CAN2_206_ANGLE_RISING_STEP_2 1061.0f
-/**********前伸收回宏定义***********/
-#define TARGET_BTM_CAN2_202_ANGLE_RETRACR 2.0f
+#define TARGET_BTM_CAN2_205_ANGLE_RISING_STEP_2 900.0f
+#define TARGET_BTM_CAN2_206_ANGLE_RISING_STEP_2 900.0f
+/**********前伸与回存矿收回宏定义***********/
+#define TARGET_BTM_CAN2_202_ANGLE_RETRACR 200.0f
+#define TARGET_STM_CAN2_207_6020_ANGLE_ORE 33.0f
+#define TARGET_BTM_CAN2_204_ANGLE_OVERTURN 98.0f
 /**********抬升下降宏定义***********/
-#define TARGET_BTM_CAN2_205_ANGLE_FALLING 100.0f
-#define TARGET_BTM_CAN2_206_ANGLE_FALLING 100.0f
+#define TARGET_BTM_CAN2_205_ANGLE_FALLING 10.0f
+#define TARGET_BTM_CAN2_206_ANGLE_FALLING 10.0f
 /**********存矿与机械臂回正下降宏定义***********/
-#define TARGET_BTM_CAN2_208_ANGLE_DOWN 0x00f
-#define TARGET_BTM_CAN2_207_6020_ARMTURNAROUND 0.0f
+#define TARGET_BTM_CAN2_204_ANGLE_OVERTURN_SECOND -20.0f
+#define TARGET_BTM_CAN2_208_ANGLE_DOWN 0.0f
+#define TARGET_BTM_CAN2_208_ANGLE_UP 80.0f
+/**********存矿处取矿宏定义***********/
+#define TARGET_BTM_CAN2_202_ANGLE_RETRACT_ORE 2.0f
+#define TARGET_BTM_CAN2_204_ANGLE_OVERTURN_ORE 98.0f
+#define TARGET_BTM_CAN2_202_ANGLE_PROTRACT_ORE 500.0f
+#define TARGET_BTM_CAN2_207_6020_ANGLE_ARM_RETURN_ORE 213.0f
 
 /*-----------------------------------------------------自动存矿宏定义--------------------------------------------------------*/
 /**********抬升宏定义**************/
-#define TARGET_AOS_CAN2_205_ANGLE_RISING 0
-#define TARGET_AOS_CAN2_206_ANGLE_RISING 0
-/**********翻转宏定义**************/
-#define TARGET_AOS_CAN2_204_ARM_OVERTURN 0
+#define TARGET_AOS_CAN2_205_ANGLE_DOWN 5.0f
+#define TARGET_AOS_CAN2_206_ANGLE_DOWN -5.0f
+/**********横移回正宏定义**************/
+#define TARGET_AOS_CAN2_202_HORIZON_CENTER 5.0f
 /**********机械臂回正宏定义**************/
-#define TARGET_AOS_CAN2_207_6020_ARM_TURNAROUND 0
+#define TARGET_AOS_CAN2_207_6020_ARM_TURNAROUND 213.0f
+/**********舵机中置宏定义**************/
+#define TARGET_CAN2_203_SERVO_INIT 90.0f
+/**********小臂翻转宏定义**************/
+#define TARGET_AOS_CAN2_204_OVERTURN_HORIZON 60.0f
+/**********前伸收回宏定义**************/
+#define TARGET_AOS_CAN2_202_RETRACT_FIRST 15.0f
 /**********存矿宏定义**************/
 #define TARGET_AOS_CAN2_208_STORAGE_UP 0
 /**********前伸收回宏定义**************/
@@ -103,7 +117,7 @@ extern "C" {
 /**********row轴定义**************/
 #define TARGET_AMI_CAN2_203_MIDDLE 0
 #define TARGET_AMI_CAN2_204_HORIZON 0
-#define TARGET_AMI_CAN2_207_6020_HORIZON 213
+#define TARGET_AMI_CAN2_207_6020_HORIZON 57.0f
 #define TARGET_AMI_CAN2_202_PROTRACT 10
 #define TARGET_AMI_CAN2_201_MIDDLE 2
 #define TARGET_AMI_CAN2_205_ANGLE_DOWN 20

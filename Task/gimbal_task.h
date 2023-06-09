@@ -162,7 +162,8 @@ extern "C" {
 #define GIMBAL_VEL 0.001
 #define GIMBAL_ZHUAN_VEL 0.0005
 
-
+//3508电机减速比
+#define GIMBAL_3508_ANGLE_TR 1.18484250677f
 //2023工程电子限位角度值
 #define TARGET_CAN2_201_MAX 480
 #define TARGET_CAN2_202_MAX -10
@@ -181,7 +182,7 @@ extern "C" {
 #define TARGET_CAN2_205_MIN -20
 #define TARGET_CAN2_206_MIN -1100
 #define TARGET_CAN2_207_6020_MIN -720
-#define TARGET_CAN2_208_MIN -8
+#define TARGET_CAN2_208_MIN -400
 #define PWM_SERVO_MIN	500
 
 typedef enum

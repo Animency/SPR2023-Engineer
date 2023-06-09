@@ -134,20 +134,20 @@ void draw_init_all(uint16_t sender_id, uint16_t receiver_id)
     osDelay(100);
     draw_current_mode(sender_id, receiver_id, 1); //速度
     osDelay(100);
-    draw_ore_pump(sender_id, receiver_id, 1); //上气泵
-    osDelay(100);
-    draw_ground_pump(sender_id, receiver_id, 1); //下气泵
-    osDelay(100);
-    draw_up_air(sender_id, receiver_id, 1); //上气缸
-    osDelay(100);
-    draw_assistant_air(sender_id, receiver_id, 1); //下气缸
-    osDelay(100);
-    draw_dragon_air(sender_id, receiver_id, 1); //龙门
-    osDelay(100);
-    draw_state_circle(sender_id, receiver_id, 1); //状态
-    osDelay(100);
-    draw_claw_position(sender_id, receiver_id, 1); //上爪位置
-    osDelay(100);
+//    draw_ore_pump(sender_id, receiver_id, 1); //上气泵
+//    osDelay(100);
+//    draw_ground_pump(sender_id, receiver_id, 1); //下气泵
+//    osDelay(100);
+//    draw_up_air(sender_id, receiver_id, 1); //上气缸
+//    osDelay(100);
+//    draw_assistant_air(sender_id, receiver_id, 1); //下气缸
+//    osDelay(100);
+//    draw_dragon_air(sender_id, receiver_id, 1); //龙门
+//    osDelay(100);
+//    draw_state_circle(sender_id, receiver_id, 1); //状态
+//    osDelay(100);
+//    draw_claw_position(sender_id, receiver_id, 1); //上爪位置
+//    osDelay(100);
     draw_card_position(sender_id, receiver_id, 1); //救援卡位置
     osDelay(100);
     draw_claw_data(sender_id, receiver_id, 1);
@@ -745,7 +745,7 @@ void draw_card_position(uint16_t sender_id, uint16_t receiver_id, uint16_t op_ty
     draw_init.grapic_data_struct.operate_tpye = op_type;
     draw_init.grapic_data_struct.graphic_tpye = 7;
     draw_init.grapic_data_struct.layer = 1;
-    draw_init.grapic_data_struct.color = 8;
+    draw_init.grapic_data_struct.color = 0;
 
     draw_init.grapic_data_struct.start_angle = FONT_SIZE; //字符大小
 

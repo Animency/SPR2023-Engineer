@@ -92,8 +92,12 @@ static void chassis_control_loop(chassis_move_t *chassis_move_control_loop);
  * @retval         none
  */
 static void gimbal_sensor_data_update(gimbal_control_t *gimbal_sensor_data_resolve);
-
-
+/**
+ * @brief          限制电流防止超载
+ * @param[out]     chassis_pid_limit:"chassis_move"变量指针.
+ * @retval         none
+ */
+static void chassis_pid_limit(chassis_move_t *chassis_pid_limit);
 void chassis_rc_to_control_vector(fp32 *vx_set, fp32 *vy_set, chassis_move_t *chassis_move_rc_to_vector);
 //底盘运动数据
 chassis_move_t chassis_move;
@@ -129,12 +133,19 @@ void chassis_task(void const *pvParameters)
 		
 		//云台传感器数据更新
 		gimbal_sensor_data_update(&gimbal_control);
+		
+		//底盘电流限制防止超载
+		chassis_pid_limit(&chassis_move);
       //当遥控器掉线的时候，发送给底盘电机零电流.
       if (toe_is_error(DBUS_TOE))
       {
         CAN_cmd_chassis(0,0,0,0);
 				CAN2_cmd_gimbal(0,0,0,0);
 				CAN2_cmd_gimbal_tai(0,0,0,0);
+				for(int i=0;i<4;i++)
+				{
+					chassis_move.motor_chassis[i].give_current = 0;
+				}
       }
       else
       {
@@ -163,6 +174,7 @@ static void chassis_init(chassis_move_t *chassis_move_init)
 
   const static float chassis_x_order_filter[1] = {CHASSIS_ACCEL_X_NUM};
   const static float chassis_y_order_filter[1] = {CHASSIS_ACCEL_Y_NUM};
+  const static float chassis_z_order_filter[1] = {CHASSIS_ACCEL_Z_NUM};
   uint8_t i;
 	
   //底盘开机状态
@@ -194,6 +206,7 @@ static void chassis_init(chassis_move_t *chassis_move_init)
 	 //用一阶滤波代替斜波函数生成
   first_order_filter_init(&chassis_move.chassis_cmd_slow_set_vx, CHASSIS_CONTROL_TIME, chassis_x_order_filter);
   first_order_filter_init(&chassis_move.chassis_cmd_slow_set_vy, CHASSIS_CONTROL_TIME, chassis_y_order_filter);
+  first_order_filter_init(&chassis_move.chassis_cmd_slow_set_wz, CHASSIS_CONTROL_TIME, chassis_z_order_filter);
 
 	//初始化机器人走直PID
 	PID_init(&chassis_move_init->chassis_straighten_pid, 15.0, 0, 30.5, 100.5, 500.5);
@@ -358,14 +371,14 @@ static void chassis_set_contorl(chassis_move_t *chassis_move_control)
 		chassis_move_control->vy_set = vy_set ;
 		chassis_move_control->wz_set = angle_set ;
 		/*借助C板陀螺仪控制机器走直*/
-		if (angle_set !=0)
+		if (angle_set !=0 || low_speed == 2)
 			zhuanwan_flag=1;
 		if (zhuanwan_flag==1&&angle_set==0)
 		{
 			INS_angle_init =INS_data .angle_yaw;
 			zhuanwan_flag=0;
 		}
-		if (angle_set==0)
+		if (angle_set==0 && low_speed != 2)
 			chassis_move_control->wz_set=PID_calc(&chassis_move_control->chassis_straighten_pid  , INS_data .angle_yaw   , INS_angle_init );
 		vw_test = chassis_move_control->wz_set;
 		
@@ -458,4 +471,25 @@ static void gimbal_sensor_data_update(gimbal_control_t *gimbal_sensor_data_resol
 //	gimbal_sensor_data_resolve->ore_flag.air_pump_flag_right 	= ((gimbal_sensor_data & 0x04) >> 2);
 //	gimbal_sensor_data_resolve->ore_flag.laser_flag_left 			= ((gimbal_sensor_data & 0x02) >> 1);
 //	gimbal_sensor_data_resolve->ore_flag.laser_flag_right 		= ((gimbal_sensor_data & 0x01));
+}
+static void chassis_pid_limit(chassis_move_t *chassis_pid_limit)
+{
+	double pid_max = 0;
+	float k; //用于限制电流
+	for(int i = 0;i < 4;i ++)
+	{
+		pid_max += fabs((double)chassis_pid_limit->motor_chassis[i].give_current);
+	}
+	if(pid_max > CHASSIS_CURRENT_MAX)
+	{
+		k = pid_max / CHASSIS_CURRENT_MAX;
+		for(int i=0;i<4;i++)
+		{
+			chassis_pid_limit->motor_chassis[i].give_current /= k;
+		}
+	}
+	else
+	{
+		return;
+	}
 }

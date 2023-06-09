@@ -504,7 +504,7 @@ static void chassis_keyboard_control_low(float *vx_set, float *vy_set, float *wz
  */
 static void chassis_keyboard_control_heigh(float *vx_set, float *vy_set, float *wz_set, chassis_move_t *chassis_keyboard_control_heigh)
 {
-		float vy_set_channel,vx_set_channel;
+		float vy_set_channel,vx_set_channel,wz_set_channel;
 	if(!(chassis_keyboard_control_heigh->chassis_RC->key.v & KEY_PRESSED_OFFSET_SHIFT)) //当没有点按SHIFT时 因点按SHIFT会触发云台运动 故此处理
 	{
 			//键盘控制设定值
@@ -527,7 +527,16 @@ static void chassis_keyboard_control_heigh(float *vx_set, float *vy_set, float *
 	//键盘x轴移动速度控制底盘旋转
 		if(chassis_keyboard_control_heigh->chassis_RC->mouse.x | 0x00)
 		{
-			*wz_set = -chassis_keyboard_control_heigh->chassis_RC->mouse.x * CHASSIS_MOUSE_CONTROL_CHANGE_TO_VEL;
+			wz_set_channel = -chassis_keyboard_control_heigh->chassis_RC->mouse.x * CHASSIS_MOUSE_CONTROL_CHANGE_TO_VEL;
+		}
+		rc_deadband_limit(wz_set_channel,wz_set_channel,MOUSE_CONTROL_WZ_LIMIT);
+		if(wz_set_channel > 8)
+		{
+			wz_set_channel = 8;
+		}
+		else if(wz_set_channel < -8)
+		{
+			wz_set_channel = -8;
 		}
 //		if(chassis_keyboard_control_heigh->chassis_RC->key.v & KEY_PRESSED_OFFSET_Q)
 //		{
@@ -611,46 +620,77 @@ static void chassis_keyboard_control_heigh(float *vx_set, float *vy_set, float *
   }
 	if(!(chassis_keyboard_control_heigh->chassis_RC->key.v & KEY_PRESSED_OFFSET_W) && !(chassis_keyboard_control_heigh->chassis_RC->key.v & KEY_PRESSED_OFFSET_S))
 	{
-		vy_set_use=0.0f;
+		if(vy_set_use > 0)
+		{
+			vy_set_use-=0.01f;
+		}
+		else if(vy_set_use < 0)
+		{
+			vy_set_use+=0.01f;
+		}
+		else
+		{
+			vy_set_use = 0.0f;
+		}
+		vy_set_channel=vy_set_use;
+	}
+	if(!(chassis_keyboard_control_heigh->chassis_RC->key.v & KEY_PRESSED_OFFSET_A) && !(chassis_keyboard_control_heigh->chassis_RC->key.v & KEY_PRESSED_OFFSET_D))
+	{
+		if(vx_set_use > 0)
+		{
+			vx_set_use-=0.01f;
+		}
+		else if(vx_set_use < 0)
+		{
+			vx_set_use+=0.01f;
+		}
+		else
+		{
+			vx_set_use = 0.0f;
+		}
+		vx_set_channel=vx_set_use;
 	}
 		// first order low-pass replace ramp function, calculate chassis speed set-point to improve control performance
 		//一阶低通滤波代替斜波作为底盘速度输入
 		first_order_filter_cali(&chassis_keyboard_control_heigh->chassis_cmd_slow_set_vx, vx_set_channel);
 		first_order_filter_cali(&chassis_keyboard_control_heigh->chassis_cmd_slow_set_vy, vy_set_channel);
+		first_order_filter_cali(&chassis_keyboard_control_heigh->chassis_cmd_slow_set_wz, wz_set_channel);
+
 		// stop command, need not slow change, set zero derectly
-		//停止信号，不需要缓慢加速，直接减速到零
-		if (vx_set_channel < CHASSIS_RC_DEADLINE * CHASSIS_VX_RC_SEN && vx_set_channel > -CHASSIS_RC_DEADLINE * CHASSIS_VX_RC_SEN)
-		{
-			chassis_keyboard_control_heigh->chassis_cmd_slow_set_vx.out = 0.0f;
-		}
 	
-		if (vy_set_channel < CHASSIS_RC_DEADLINE * CHASSIS_VY_RC_SEN && vy_set_channel > -CHASSIS_RC_DEADLINE * CHASSIS_VY_RC_SEN)
-		{
-			chassis_keyboard_control_heigh->chassis_cmd_slow_set_vy.out = 0.0f;
-		}
+		//停止信号，不需要缓慢加速，直接减速到零
+//		if (vx_set_channel < CHASSIS_RC_DEADLINE * CHASSIS_VX_RC_SEN && vx_set_channel > -CHASSIS_RC_DEADLINE * CHASSIS_VX_RC_SEN)
+//		{
+//			chassis_keyboard_control_heigh->chassis_cmd_slow_set_vx.out = 0.0f;
+//		}
+//	
+//		if (vy_set_channel < CHASSIS_RC_DEADLINE * CHASSIS_VY_RC_SEN && vy_set_channel > -CHASSIS_RC_DEADLINE * CHASSIS_VY_RC_SEN)
+//		{
+//			chassis_keyboard_control_heigh->chassis_cmd_slow_set_vy.out = 0.0f;
+//		}
 		
 		//速度限幅
 		if(vx_set_channel >= chassis_keyboard_control_heigh->vx_max_speed)
 		{
-			vx_set_channel = chassis_keyboard_control_heigh->vx_max_speed - 4;
+			vx_set_channel = chassis_keyboard_control_heigh->vx_max_speed - 6;
 		}
 		else if(vx_set_channel < chassis_keyboard_control_heigh->vx_min_speed)
 		{
-			vx_set_channel = chassis_keyboard_control_heigh->vx_min_speed + 4;
+			vx_set_channel = chassis_keyboard_control_heigh->vx_min_speed + 6;
 		}
 		
 		if(vy_set_channel >= chassis_keyboard_control_heigh->vy_max_speed)
 		{
-			vy_set_channel = chassis_keyboard_control_heigh->vy_max_speed - 4;
+			vy_set_channel = chassis_keyboard_control_heigh->vy_max_speed - 6;
 		}
 		else if(vy_set_channel < chassis_keyboard_control_heigh->vy_min_speed)
 		{
-			vy_set_channel = chassis_keyboard_control_heigh->vy_min_speed + 4;
+			vy_set_channel = chassis_keyboard_control_heigh->vy_min_speed + 6;
 		}
 		
 		*vx_set = vx_set_channel;
 		*vy_set = vy_set_channel;
-	
+		*wz_set = wz_set_channel;
 	}
 	
 	vx_test = *vx_set;

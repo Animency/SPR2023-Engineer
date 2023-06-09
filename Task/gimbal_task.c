@@ -139,8 +139,6 @@ gimbal_control_t gimbal_control;
 /*气泵控制*/
 uint8_t Pump_Flag,Pump_Control_Flag;
 uint16_t Pump_Value[2] = {0,19999};
-uint8_t key_c_flag;
-uint8_t key_b_flag;
 /*pid测试用变量*/
 float pid_test_1 = 0;  //输入数据
 float pid_test_2 = 0;  //输出数据
@@ -163,6 +161,13 @@ void gimbal_task(void const *pvParameters)
       CAN_cmd_chassis(0,0,0,0);
 			CAN2_cmd_gimbal(0,0,0,0);
 			CAN2_cmd_gimbal_tai(0,0,0,0);
+			
+			//防止进入其它模式时pid没有更新导致疯车
+			for(int i=0;i<9;i++)
+			{
+				gimbal_control.horizontal_scroll_motor[i].give_current = 0;
+			}
+			gimbal_control.gimbal_6020_motor.give_current = 0;
     }
 		else
 		{
@@ -289,7 +294,7 @@ void gimbal_feedback_update(gimbal_control_t *gimbal_move_update)
 	//键盘控制数据更新
 	gimbal_mouse_keyboard_identify();
 	relative_angle_to_mechanical_arm = gimbal_move_update->gimbal_6020_motor.gimbal_motor_measure->angle - 118;
-	relative_angle_to_servo = gimbal_move_update->horizontal_scroll_motor[3].gimbal_motor_measure->angle - 90 ;
+	relative_angle_to_servo = gimbal_move_update->horizontal_scroll_motor[3].gimbal_motor_measure->angle / GIMBAL_3508_ANGLE_TR;
 	for(int i = 0;i < 4; i++)
 	{
 		if((int)fabs(relative_angle_to_mechanical_arm) == i*360)
@@ -392,7 +397,7 @@ static void gimbal_jiaodubihuan_mechanical_arm(gimbal_control_t *gimbal_jiaodubi
 	target_can2_207_angle_6020+=gimbal_jiaodubihuan_mechanical_arm->gimbal_rc_ctrl ->rc .ch [YAW_CHANNEL]/(REMOTE_CONTROL_CHANNEL_LONG-400);
 	target_can2_204_angle+=gimbal_jiaodubihuan_mechanical_arm->gimbal_rc_ctrl ->rc .ch [PITCH_CHANNEL]/(REMOTE_CONTROL_CHANNEL_LONG-500);
 	//target_can2_207_angle_6020 += (gimbal_jiaodubihuan_mechanical_arm->gimbal_6020_motor.gimbal_motor_measure->angle + gimbal_jiaodubihuan_mechanical_arm->gimbal_rc_ctrl ->rc .ch [YAW_CHANNEL]/(REMOTE_CONTROL_CHANNEL_LONG-500));
-	pid_test_2 = target_can2_207_angle_6020;
+//	pid_test_2 = target_can2_207_angle_6020;
 	
 	//电子限位 防止位置过于溢出
 	electric_limit(target_can2_201_angle,target_can2_201_angle,TARGET_CAN2_201_MAX,TARGET_CAN2_201_MIN);
@@ -407,6 +412,8 @@ static void gimbal_jiaodubihuan_mechanical_arm(gimbal_control_t *gimbal_jiaodubi
 	gimbal_3508_angle_control_loop(&gimbal_control,4,target_can2_205_angle);
 	gimbal_3508_angle_control_loop(&gimbal_control,5,target_can2_206_angle);
 	gimbal_3508_angle_control_loop(&gimbal_control,6,target_can2_208_angle);
+	gimbal_3508_angle_control_loop(&gimbal_control,7,target_can2_203_angle);
+
 
 }
 
@@ -484,6 +491,7 @@ static void gimbal_tai(gimbal_control_t *gimbal_tai)
 static void gimbal_duoji(gimbal_control_t *gimbal_duoji)
 {
 	target_can2_203_angle += gimbal_duoji->gimbal_rc_ctrl->rc.ch[GIMBAL_MODE_RIGHT_CHANNEL]/(REMOTE_CONTROL_CHANNEL_LONG-600);
+	electric_limit(target_can2_203_angle,target_can2_203_angle,TARGET_CAN2_208_MAX,TARGET_CAN2_208_MIN);
 	gimbal_3508_angle_control_loop(&gimbal_control,7,target_can2_203_angle);
 //	target_can2_203_angle = 0;
 //	if(gimbal_duoji->gimbal_rc_ctrl->rc.ch[GIMBAL_MODE_RIGHT_CHANNEL] == 0)

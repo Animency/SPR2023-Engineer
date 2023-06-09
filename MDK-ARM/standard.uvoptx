@@ -398,92 +398,82 @@
         <Ww>
           <count>48</count>
           <WinNumber>1</WinNumber>
-          <ItemText>mouse_keyboard_state_flag.key_C.former_state,0x0A</ItemText>
+          <ItemText>angle_can2_203</ItemText>
         </Ww>
         <Ww>
           <count>49</count>
           <WinNumber>1</WinNumber>
-          <ItemText>mouse_keyboard_state_flag.key_C.current_state,0x0A</ItemText>
+          <ItemText>cmd_id</ItemText>
         </Ww>
         <Ww>
           <count>50</count>
           <WinNumber>1</WinNumber>
-          <ItemText>mouse_keyboard_state_flag.key_B.current_state,0x0A</ItemText>
+          <ItemText>test_id,0x10</ItemText>
         </Ww>
         <Ww>
           <count>51</count>
           <WinNumber>1</WinNumber>
-          <ItemText>mouse_keyboard_state_flag.key_B.former_state,0x0A</ItemText>
+          <ItemText>send_id</ItemText>
         </Ww>
         <Ww>
           <count>52</count>
           <WinNumber>1</WinNumber>
-          <ItemText>angle_can2_203</ItemText>
+          <ItemText>vx_set,0x10</ItemText>
         </Ww>
         <Ww>
           <count>53</count>
           <WinNumber>1</WinNumber>
-          <ItemText>cmd_id</ItemText>
+          <ItemText>vw_test</ItemText>
         </Ww>
         <Ww>
           <count>54</count>
           <WinNumber>1</WinNumber>
-          <ItemText>test_id,0x10</ItemText>
+          <ItemText>relative_angle_to_servo</ItemText>
         </Ww>
         <Ww>
           <count>55</count>
           <WinNumber>1</WinNumber>
-          <ItemText>send_id</ItemText>
+          <ItemText>engineer_keyboard_control_ordinal_coordinates,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>56</count>
           <WinNumber>1</WinNumber>
-          <ItemText>vx_set,0x10</ItemText>
+          <ItemText>coordinates_control_flag,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>57</count>
           <WinNumber>1</WinNumber>
-          <ItemText>vw_test</ItemText>
+          <ItemText>vx_test</ItemText>
         </Ww>
         <Ww>
           <count>58</count>
           <WinNumber>1</WinNumber>
-          <ItemText>relative_angle_to_servo</ItemText>
+          <ItemText>vy_test</ItemText>
         </Ww>
         <Ww>
           <count>59</count>
           <WinNumber>1</WinNumber>
-          <ItemText>engineer_keyboard_control_ordinal_coordinates,0x0A</ItemText>
+          <ItemText>angle_can2_202</ItemText>
         </Ww>
         <Ww>
           <count>60</count>
           <WinNumber>1</WinNumber>
-          <ItemText>coordinates_control_flag,0x0A</ItemText>
+          <ItemText>target_can2_202_angle</ItemText>
         </Ww>
         <Ww>
           <count>61</count>
           <WinNumber>1</WinNumber>
-          <ItemText>vx_test</ItemText>
+          <ItemText>pump_flag_left</ItemText>
         </Ww>
         <Ww>
           <count>62</count>
           <WinNumber>1</WinNumber>
-          <ItemText>vy_test</ItemText>
+          <ItemText>relative_angle_to_servo</ItemText>
         </Ww>
         <Ww>
           <count>63</count>
           <WinNumber>1</WinNumber>
-          <ItemText>angle_can2_202</ItemText>
-        </Ww>
-        <Ww>
-          <count>64</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>target_can2_202_angle</ItemText>
-        </Ww>
-        <Ww>
-          <count>65</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>pump_flag_left</ItemText>
+          <ItemText>robot_state</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -505,190 +495,175 @@
         <Ww>
           <count>3</count>
           <WinNumber>2</WinNumber>
-          <ItemText>p_arm_horizon_angle</ItemText>
+          <ItemText>gimabl_1_angle_change</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>2</WinNumber>
-          <ItemText>d_arm_horizon_angle</ItemText>
+          <ItemText>gimabl_3_angle_change</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>2</WinNumber>
-          <ItemText>max_out_arm_horizon_angle</ItemText>
+          <ItemText>gimbal_angle_tai_change</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>2</WinNumber>
-          <ItemText>gimabl_1_angle_change</ItemText>
+          <ItemText>duoji,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
           <WinNumber>2</WinNumber>
-          <ItemText>gimabl_3_angle_change</ItemText>
+          <ItemText>p_shu</ItemText>
         </Ww>
         <Ww>
           <count>8</count>
           <WinNumber>2</WinNumber>
-          <ItemText>gimbal_angle_tai_change</ItemText>
+          <ItemText>p_shu_angle</ItemText>
         </Ww>
         <Ww>
           <count>9</count>
           <WinNumber>2</WinNumber>
-          <ItemText>duoji,0x0A</ItemText>
+          <ItemText>max_out_shu_angle</ItemText>
         </Ww>
         <Ww>
           <count>10</count>
           <WinNumber>2</WinNumber>
-          <ItemText>p_shu</ItemText>
+          <ItemText>d_shu</ItemText>
         </Ww>
         <Ww>
           <count>11</count>
           <WinNumber>2</WinNumber>
-          <ItemText>p_shu_angle</ItemText>
+          <ItemText>max_out_heng_angle</ItemText>
         </Ww>
         <Ww>
           <count>12</count>
           <WinNumber>2</WinNumber>
-          <ItemText>max_out_shu_angle</ItemText>
+          <ItemText>p_arm_horizon</ItemText>
         </Ww>
         <Ww>
           <count>13</count>
           <WinNumber>2</WinNumber>
-          <ItemText>d_shu</ItemText>
+          <ItemText>max_out_arm_horizon_angle</ItemText>
         </Ww>
         <Ww>
           <count>14</count>
           <WinNumber>2</WinNumber>
-          <ItemText>max_out_heng_angle</ItemText>
+          <ItemText>target_can2_207_angle_6020,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>15</count>
           <WinNumber>2</WinNumber>
-          <ItemText>p_arm_horizon</ItemText>
+          <ItemText>target_can2_206_angle,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>16</count>
           <WinNumber>2</WinNumber>
-          <ItemText>max_out_arm_horizon_angle</ItemText>
+          <ItemText>target_can2_205_angle,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>17</count>
           <WinNumber>2</WinNumber>
-          <ItemText>target_can2_207_angle_6020,0x0A</ItemText>
+          <ItemText>target_can2_204_angle,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>18</count>
           <WinNumber>2</WinNumber>
-          <ItemText>target_can2_206_angle,0x0A</ItemText>
+          <ItemText>target_can2_202_angle,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>19</count>
           <WinNumber>2</WinNumber>
-          <ItemText>target_can2_205_angle,0x0A</ItemText>
+          <ItemText>angle_can2_202</ItemText>
         </Ww>
         <Ww>
           <count>20</count>
           <WinNumber>2</WinNumber>
-          <ItemText>target_can2_204_angle,0x0A</ItemText>
+          <ItemText>target_can2_207_angle_6020,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>21</count>
           <WinNumber>2</WinNumber>
-          <ItemText>target_can2_202_angle,0x0A</ItemText>
+          <ItemText>angle_can2_202</ItemText>
         </Ww>
         <Ww>
           <count>22</count>
           <WinNumber>2</WinNumber>
-          <ItemText>angle_can2_202</ItemText>
+          <ItemText>give_angle_test</ItemText>
         </Ww>
         <Ww>
           <count>23</count>
           <WinNumber>2</WinNumber>
-          <ItemText>target_can2_207_angle_6020,0x0A</ItemText>
+          <ItemText>angle_can2_205</ItemText>
         </Ww>
         <Ww>
           <count>24</count>
           <WinNumber>2</WinNumber>
-          <ItemText>angle_can2_202</ItemText>
+          <ItemText>p_arm_horizon_angle</ItemText>
         </Ww>
         <Ww>
           <count>25</count>
           <WinNumber>2</WinNumber>
-          <ItemText>give_angle_test</ItemText>
+          <ItemText>d_arm_horizon_angle</ItemText>
         </Ww>
         <Ww>
           <count>26</count>
           <WinNumber>2</WinNumber>
-          <ItemText>angle_can2_205</ItemText>
+          <ItemText>i_arm_horizon_angle</ItemText>
         </Ww>
         <Ww>
           <count>27</count>
           <WinNumber>2</WinNumber>
-          <ItemText>p_arm_horizon_angle</ItemText>
+          <ItemText>max_i_out_arm_horizon_angle</ItemText>
         </Ww>
         <Ww>
           <count>28</count>
           <WinNumber>2</WinNumber>
-          <ItemText>d_arm_horizon_angle</ItemText>
+          <ItemText>max_out_arm_horizon_angle</ItemText>
         </Ww>
         <Ww>
           <count>29</count>
           <WinNumber>2</WinNumber>
-          <ItemText>i_arm_horizon_angle</ItemText>
+          <ItemText>max_out_arm_horizon</ItemText>
         </Ww>
         <Ww>
           <count>30</count>
           <WinNumber>2</WinNumber>
-          <ItemText>max_i_out_arm_horizon_angle</ItemText>
+          <ItemText>d_arm_horizon</ItemText>
         </Ww>
         <Ww>
           <count>31</count>
           <WinNumber>2</WinNumber>
-          <ItemText>max_out_arm_horizon_angle</ItemText>
+          <ItemText>p_arm_horizon</ItemText>
         </Ww>
         <Ww>
           <count>32</count>
           <WinNumber>2</WinNumber>
-          <ItemText>max_out_arm_horizon</ItemText>
+          <ItemText>target_can2_206_angle</ItemText>
         </Ww>
         <Ww>
           <count>33</count>
           <WinNumber>2</WinNumber>
-          <ItemText>d_arm_horizon</ItemText>
+          <ItemText>low_speed,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>34</count>
           <WinNumber>2</WinNumber>
-          <ItemText>p_arm_horizon</ItemText>
+          <ItemText>relative_angle_to_mechanical_arm</ItemText>
         </Ww>
         <Ww>
           <count>35</count>
           <WinNumber>2</WinNumber>
-          <ItemText>target_can2_206_angle</ItemText>
+          <ItemText>Small_Take_Mine</ItemText>
         </Ww>
         <Ww>
           <count>36</count>
           <WinNumber>2</WinNumber>
-          <ItemText>low_speed,0x0A</ItemText>
-        </Ww>
-        <Ww>
-          <count>37</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>relative_angle_to_mechanical_arm</ItemText>
-        </Ww>
-        <Ww>
-          <count>38</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>Small_Take_Mine</ItemText>
-        </Ww>
-        <Ww>
-          <count>39</count>
-          <WinNumber>2</WinNumber>
           <ItemText>AG_INIT_STATE</ItemText>
         </Ww>
         <Ww>
-          <count>40</count>
+          <count>37</count>
           <WinNumber>2</WinNumber>
           <ItemText>Auto_Machine_Init</ItemText>
         </Ww>

@@ -90,6 +90,8 @@
 #define CHASSIS_STATIC_VEL 0.4f
 #define CHASSIS_REMOTE_CONTROL_CHANGE_TO_VEL 0.005714f //0.006377f  0.005714
 #define CHASSIS_MOUSE_CONTROL_CHANGE_TO_VEL 0.3f
+#define MOUSE_CONTROL_WZ_LIMIT 0.5f
+#define CHASSIS_LOW_SPEED_ANGLE 300 //自动低速模式抬升高度
 typedef enum
 {
   CHASSIS_ZERO_FORCE,                   //chassis will be like no power,底盘无力, 跟没上电那样

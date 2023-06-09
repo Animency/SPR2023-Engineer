@@ -30,7 +30,7 @@
 #include "math.h"
 #include "cmsis_armcc.h"  //此头文件包含软件复位操作函数
 #include "custom_ui_draw.h"
-
+#include "chassis_behaviour.h"
 #define rm_deadband_judge(input,dealine)             \
   {                                                  \
     if ((input) > (dealine) || (input) < -(dealine)) \
@@ -68,6 +68,10 @@ static void act_STM_BigResourceIsland_Falling(void);
 static void act_STM_BigResourceIsland_OverTurn(void);
 static void act_STM_BigResourceIsland_Servo_Center(void);
 static void act_STM_BigResourceIsland_Storage_Down(void);
+static void act_STM_BigResourceIsland_Storage_up(void);
+static void act_STM_BigResourceIsland_Retract_Ore(void);
+static void act_STM_BigResourceIsland_Protract_Ore(void);
+static void act_STM_BigResourceIsland_Arm_Return_Ore(void);
 //存矿连招函数声明如下:
 static void act_AOS_rising(void);
 static void act_AOS_arm_overturn(void);
@@ -159,7 +163,7 @@ int time_flag2=0;//此标志位为0.4s的延迟标志位
 int time_flag3=0;//此标志位为1.5s的延迟标志位
 int gfo2_flag=1;//此标志位为仅定义一次延迟标志位
 int aim_flag=0;
-
+uint8_t STM_6020_flag = 1;
 //定义读取鼠标键盘状态
 mouse_keyboard_state_flag_t mouse_keyboard_state_flag;
 //***************************************************状态机状态、事件定义区*******************************************************//
@@ -183,22 +187,29 @@ typedef enum{
 	STM_FALLING,      //下降事件
 	STM_SERVO_INIT,   //舵机中置
 	STM_STORAGE_ORE_DOWN, //存矿下降
-	STM_FISISH,
+	STM_STORAGE_ORE_UP,   //存矿上升
+	STM_RETRACT_ORE,      //存矿处前伸回收
+	STM_PROTRACT_OVERTURN_ORE,     //存矿处前伸前伸与翻转
+	STM_ARM_RETURN_ORE,						 //机械臂回正
 	
-	//自动存取矿石事件
-	AOS_RISING,          		       //抬升上升
+	//自动存取矿石事件 此状态机作用为解决比赛规则限制抬升高度问题导致兑矿困难
+	AOS_INIT,          		         //抬升下降初始化
+	AOS_HORIZON_CENTER,            //横移回正
 	AOS_ARM_OVERTURN,   	 	       //机械臂翻转
 	AOS_ARM_TURNAROUND,  		       //机械臂回到中心
 	AOS_SERVO_INIT,                //舵机中置
-	AOS_STORAGE_ORE_UP,  		       //存矿上升
-	AOS_RETRACT,        	 	       //前伸收回
+	AOS_ARM_OVERTURN_HORIZON,      //机械臂翻转到水平
+	AOS_RETRACT_FIRST,        	 	 //前伸第一次收回
 	AOS_CYLINDER_OFF,       		   //气泵关闭
-	AOS_ARM_VERTICAL_DOWN,   		   //机械臂翻转下降
-	AOS_ARM_VERTIVAL_DOWN_HORIZON, //机械臂翻转再次运动到水平
-	AOS_RETRACT_ORE_IN,            //存矿矿石里推
-	AOS_PROTRACT,                  //机械臂稍微前伸
+	AOS_PROTRACT_FIRST,            //第一次微伸 
+	AOS_STORAGE_ORE_UP,  		       //存矿上升
+	AOS_CYLINDER_ON,               //气泵打开
+	AOS_RETRACT_SECOND,            //前伸第二次收回
+	AOS_PROTRACT_SECOND,					 //前伸第二次伸出
 	AOS_STORAGE_ORE_DOWN,          //存矿下降
 	AOS_ARM_RETURN,                //机械臂回正
+	AOS_RETRACT_THIRD,						 //前伸第三次收回
+	AOS_FINISH,										 //自动存矿结束
 	
 	//自动机械臂初始化事件
 	AMI_INIT,
@@ -233,21 +244,31 @@ typedef enum{
 	STM_SERVO_INIT_STATE,   //舵机中置
 	STM_CYLINDER_OFF_STATE, //关闭气缸
 	STM_STORAGE_ORE_DOWN_STATE, //存矿下降
+	STM_STORAGE_ORE_UP_STATE,   //存矿上升
+	STM_RETRACT_ORE_STATE,      //存矿处前伸回收
+	STM_PROTRACT_OVERTURN_ORE_STATE,     //存矿处前伸前伸与翻转
+	STM_ARM_RETURN_ORE_STATE,						 //机械臂回正
 	
-	//自动存取矿石状态
-	AOS_RISING_STATE,          		       //抬升上升状态
-	AOS_ARM_OVERTURN_STATE,   	 	       //机械臂翻转状态
-	AOS_ARM_TURNAROUND_STATE,  		       //机械臂回到中心状态
-	AOS_SERVO_INIT_STATE,                //舵机中置状态
-	AOS_STORAGE_ORE_UP_STATE,  		       //存矿上升状态
-	AOS_RETRACT_STATE,        	 	       //前伸收回状态
-	AOS_CYLINDER_OFF_STATE,       		   //气泵关闭状态
-	AOS_ARM_VERTICAL_DOWN_STATE,   		   //机械臂翻转下降状态
-	AOS_ARM_VERTIVAL_DOWN_HORIZON_STATE, //机械臂翻转再次运动到水平状态
-	AOS_RETRACT_ORE_IN_STATE,            //存矿矿石里推状态
-	AOS_PROTRACT_STATE,                  //机械臂稍微前伸状态
-	AOS_STORAGE_ORE_DOWN_STATE,          //存矿下降状态
-	AOS_ARM_RETURN_STATE,                //机械臂回正状态
+	
+	
+	//自动存取矿石事件 此状态机作用为解决比赛规则限制抬升高度问题导致兑矿困难
+	AOS_INIT_STATE,          		         //抬升下降初始化
+	AOS_HORIZON_CENTER_STATE,            //横移回正
+	AOS_ARM_OVERTURN_STATE,   	 	       //机械臂翻转
+	AOS_ARM_TURNAROUND_STATE,  		       //机械臂回到中心
+	AOS_SERVO_INIT_STATE,                //舵机中置
+	AOS_ARM_OVERTURN_HORIZON_STATE,      //机械臂翻转到水平
+	AOS_RETRACT_FIRST_STATE,        	 	 //前伸第一次收回
+	AOS_CYLINDER_OFF_STATE,       		   //气泵关闭
+	AOS_PROTRACT_FIRST_STATE,            //第一次微伸 
+	AOS_STORAGE_ORE_UP_STATE,  		       //存矿上升
+	AOS_CYLINDER_ON_SATET,               //气泵打开
+	AOS_RETRACT_SECOND_STATE,            //前伸第二次收回
+	AOS_PROTRACT_SECOND_STATE,					 //前伸第二次伸出
+	AOS_STORAGE_ORE_DOWN_STATE,          //存矿下降
+	AOS_ARM_RETURN_STATE,                //机械臂回正
+	AOS_RETRACT_THIRD_STATE,						 //前伸第三次收回
+	AOS_FINISH_STATE,										 //自动存矿结束
 	
 		//自动机械臂初始化事件
 	AMI_INIT_STATE,
@@ -284,38 +305,46 @@ FSM Small_Take_Mine; //小资源岛槽内取矿事件
 
 FsmTable stm_table[]=
 {
-	{STM_INIT_STATE								,STM_INIT								,STM_START_RISING_STATE			,act_STM_BigResourceIsland_Init},
-	{STM_START_RISING_STATE				,STM_START_RISING				,STM_ARM_PROTRACT_STATE			,act_STM_BigResourceIsland_Rising},
-	{STM_ARM_PROTRACT_STATE				,STM_ARM_PROTRACT				,STM_ARM_RETURN_STATE				,act_STM_BigResourceIsland_Protract},
-	{STM_ARM_RETURN_STATE					,STM_ARM_RETURN					,STM_RISING_STEP_2_STATE		,act_STM_BigResourceIsland_ArmReturn},
-	{STM_RISING_STEP_2_STATE			,STM_RISING_STEP_2      ,STM_RETRACT_STATE					,act_STM_BigResourceIsland_Rising_Step_2},
-	{STM_RETRACT_STATE						,STM_RETRACT						,STM_FALLING_STATE					,act_STM_BigResourceIsland_Retract},
-	{STM_FALLING_STATE						,STM_FALLING						,STM_SERVO_INIT_STATE				,act_STM_BigResourceIsland_Falling},
-	{STM_SERVO_INIT_STATE					,STM_SERVO_INIT					,STM_STORAGE_ORE_DOWN_STATE	,act_STM_BigResourceIsland_Servo_Center},
-	{STM_STORAGE_ORE_DOWN_STATE   ,STM_STORAGE_ORE_DOWN		,STM_INIT_STATE 						,act_STM_BigResourceIsland_Storage_Down},
+	{STM_INIT_STATE										,STM_INIT										,STM_START_RISING_STATE							,act_STM_BigResourceIsland_Init},
+	{STM_START_RISING_STATE						,STM_START_RISING						,STM_ARM_PROTRACT_STATE							,act_STM_BigResourceIsland_Rising},
+	{STM_ARM_PROTRACT_STATE						,STM_ARM_PROTRACT						,STM_ARM_RETURN_STATE								,act_STM_BigResourceIsland_Protract},
+	{STM_ARM_RETURN_STATE							,STM_ARM_RETURN							,STM_RISING_STEP_2_STATE						,act_STM_BigResourceIsland_ArmReturn},
+	{STM_RISING_STEP_2_STATE					,STM_RISING_STEP_2     			,STM_RETRACT_STATE									,act_STM_BigResourceIsland_Rising_Step_2},
+	{STM_RETRACT_STATE								,STM_RETRACT								,STM_FALLING_STATE									,act_STM_BigResourceIsland_Retract},
+	{STM_FALLING_STATE								,STM_FALLING								,STM_SERVO_INIT_STATE								,act_STM_BigResourceIsland_Falling},
+	{STM_SERVO_INIT_STATE							,STM_SERVO_INIT							,STM_STORAGE_ORE_DOWN_STATE					,act_STM_BigResourceIsland_Servo_Center},
+	{STM_STORAGE_ORE_DOWN_STATE   		,STM_STORAGE_ORE_DOWN				,STM_STORAGE_ORE_UP_STATE 					,act_STM_BigResourceIsland_Storage_Down},
+	{STM_STORAGE_ORE_UP_STATE					,STM_STORAGE_ORE_UP					,STM_RETRACT_ORE_STATE							,act_STM_BigResourceIsland_Storage_up},
+	{STM_RETRACT_ORE_STATE						,STM_RETRACT_ORE						,STM_PROTRACT_OVERTURN_ORE_STATE		,act_STM_BigResourceIsland_Retract_Ore},
+	{STM_PROTRACT_OVERTURN_ORE_STATE	,STM_PROTRACT_OVERTURN_ORE	,STM_ARM_RETURN_ORE_STATE						,act_STM_BigResourceIsland_Protract_Ore},
+	{STM_ARM_RETURN_ORE_STATE					,STM_ARM_RETURN_ORE					,STM_INIT_STATE											,act_STM_BigResourceIsland_Arm_Return_Ore},
 	
-	{STM_INIT_STATE								,FORMATTING							,STM_START_RISING_STATE			,act_STM_BigResourceIsland_Init},
-	{STM_START_RISING_STATE				,FORMATTING							,STM_START_RISING_STATE			,act_STM_BigResourceIsland_Init},
-	{STM_ARM_PROTRACT_STATE				,FORMATTING							,STM_START_RISING_STATE			,act_STM_BigResourceIsland_Init},
-	{STM_ARM_RETURN_STATE					,FORMATTING							,STM_START_RISING_STATE			,act_STM_BigResourceIsland_Init},
-	{STM_RISING_STEP_2_STATE			,FORMATTING							,STM_START_RISING_STATE			,act_STM_BigResourceIsland_Init},
-	{STM_RETRACT_STATE						,FORMATTING							,STM_START_RISING_STATE			,act_STM_BigResourceIsland_Init},
-	{STM_FALLING_STATE						,FORMATTING							,STM_START_RISING_STATE			,act_STM_BigResourceIsland_Init},
-	{STM_SERVO_INIT_STATE					,FORMATTING							,STM_START_RISING_STATE			,act_STM_BigResourceIsland_Init},
-	{STM_STORAGE_ORE_DOWN_STATE   ,FORMATTING							,STM_START_RISING_STATE 		,act_STM_BigResourceIsland_Init},
+	{STM_INIT_STATE										,FORMATTING							,STM_START_RISING_STATE							,act_STM_BigResourceIsland_Init},
+	{STM_START_RISING_STATE						,FORMATTING							,STM_START_RISING_STATE							,act_STM_BigResourceIsland_Init},
+	{STM_ARM_PROTRACT_STATE						,FORMATTING							,STM_START_RISING_STATE							,act_STM_BigResourceIsland_Init},
+	{STM_ARM_RETURN_STATE							,FORMATTING							,STM_START_RISING_STATE							,act_STM_BigResourceIsland_Init},
+	{STM_RISING_STEP_2_STATE					,FORMATTING							,STM_START_RISING_STATE							,act_STM_BigResourceIsland_Init},
+	{STM_RETRACT_STATE								,FORMATTING							,STM_START_RISING_STATE							,act_STM_BigResourceIsland_Init},
+	{STM_FALLING_STATE								,FORMATTING							,STM_START_RISING_STATE							,act_STM_BigResourceIsland_Init},
+	{STM_SERVO_INIT_STATE							,FORMATTING							,STM_START_RISING_STATE							,act_STM_BigResourceIsland_Init},
+	{STM_STORAGE_ORE_DOWN_STATE   		,FORMATTING							,STM_START_RISING_STATE 						,act_STM_BigResourceIsland_Init},
+	{STM_STORAGE_ORE_UP_STATE					,FORMATTING							,STM_START_RISING_STATE							,act_STM_BigResourceIsland_Init},
+	{STM_RETRACT_ORE_STATE						,FORMATTING							,STM_START_RISING_STATE							,act_STM_BigResourceIsland_Init},
+	{STM_PROTRACT_OVERTURN_ORE_STATE	,FORMATTING							,STM_START_RISING_STATE							,act_STM_BigResourceIsland_Init},
+	{STM_ARM_RETURN_ORE_STATE					,FORMATTING							,STM_START_RISING_STATE							,act_STM_BigResourceIsland_Init},
 };
 int Stm_Event;
 //____________________________________________________________自动存矿___________________________________________________________________________//
 FSM Auto_Ore_Storage;
 
-FsmTable aos_table[] = 
-{
-	{AOS_RISING_STATE							,AOS_RISING								,AOS_ARM_OVERTURN_STATE				,act_AOS_rising},
-	{AOS_ARM_OVERTURN_STATE				,AOS_ARM_OVERTURN					,AOS_ARM_TURNAROUND_STATE			,act_AOS_arm_overturn},
-	{AOS_ARM_TURNAROUND_STATE			,AOS_ARM_TURNAROUND				,AOS_SERVO_INIT_STATE					,act_AOS_arm_turnaround},
-	{AOS_SERVO_INIT_STATE					,AOS_SERVO_INIT						,AOS_STORAGE_ORE_UP_STATE			,act_AOS_servo_init},
-	{AOS_STORAGE_ORE_UP_STATE			,AOS_STORAGE_ORE_UP				,AOS_RETRACT_STATE						,act_AOS_storage_ore_up},
-};
+//FsmTable aos_table[] = 
+//{
+//	{AOS_RISING_STATE							,AOS_RISING								,AOS_ARM_OVERTURN_STATE				,act_AOS_rising},
+//	{AOS_ARM_OVERTURN_STATE				,AOS_ARM_OVERTURN					,AOS_ARM_TURNAROUND_STATE			,act_AOS_arm_overturn},
+//	{AOS_ARM_TURNAROUND_STATE			,AOS_ARM_TURNAROUND				,AOS_SERVO_INIT_STATE					,act_AOS_arm_turnaround},
+//	{AOS_SERVO_INIT_STATE					,AOS_SERVO_INIT						,AOS_STORAGE_ORE_UP_STATE			,act_AOS_servo_init},
+//	{AOS_STORAGE_ORE_UP_STATE			,AOS_STORAGE_ORE_UP				,AOS_RETRACT_STATE						,act_AOS_storage_ore_up},
+//};
 int Aos_Event;
 
 //____________________________________________________________所有机械臂软件归位____________________________________________________________________//
@@ -351,7 +380,7 @@ void fsm_init(void)
 	
 	//大资源岛槽内取矿初始化
 	FSM_Regist(&Small_Take_Mine, stm_table);
-	Small_Take_Mine.size = 18;
+	Small_Take_Mine.size = 26;
 	FSM_StateTransfer(&Small_Take_Mine,STM_INIT_STATE);
 	Stm_Event = STM_INIT;
 	
@@ -382,7 +411,7 @@ int engineer_deadband_judge(float input,float deadline,float deadband)
  */
 void fsm_run(void)
 {
-	//传感器标志更新
+	//传感器标志更新  此处仅限于双板通信使用 处于非双板通信状态由键盘控制四个变量的更换
 //	pump_flag_left 		= 	gimbal_control.ore_flag.air_pump_flag_left;
 //	pump_flag_right 	= 	gimbal_control.ore_flag.air_pump_flag_right;
 //	laser_flag_left		=		gimbal_control.ore_flag.laser_flag_left;
@@ -406,7 +435,12 @@ void fsm_run(void)
 	electric_limit(target_can2_207_angle_6020	,target_can2_207_angle_6020	,TARGET_CAN2_207_6020_MAX	,TARGET_CAN2_207_6020_MIN);
 	electric_limit(target_can2_208_angle			,target_can2_208_angle			,TARGET_CAN2_208_MAX			,TARGET_CAN2_208_MIN);
 
-
+	//当抬升到一定高度时切换为低速模式
+	if(angle_can2_205 > CHASSIS_LOW_SPEED_ANGLE && low_speed == 0) 
+	{
+		low_speed = 2;
+	}
+	
 	PID_All_Cal();
 	
 	SoftReset();
@@ -505,6 +539,16 @@ void engineer_keyboard_control_except_coordinates(void) //除坐标系转换外的电机控
 			pump_flag_right = 0;
 			draw_card_position(send_id, receive_id, 2);
 		}
+		
+		//存矿电机控制
+		if(gimbal_control.gimbal_rc_ctrl->key.v & KEY_PRESSED_OFFSET_Q)
+		{
+			target_can2_208_angle += KEYBOARD_CONTROL_ANGLE_CAN2_208_CHANGE;
+		}
+		else if(gimbal_control.gimbal_rc_ctrl->key.v & KEY_PRESSED_OFFSET_E)
+		{
+			target_can2_208_angle -= KEYBOARD_CONTROL_ANGLE_CAN2_208_CHANGE;
+		}
 	}
 	
 }
@@ -515,15 +559,15 @@ void engineer_keyboard_control_mechanical_servo_coordinates(void)
 	{
 		target_can2_202_angle -= KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE * sin(	relative_angle_to_mechanical_arm 	* ANGLE_TO_ECD) * cos( relative_angle_to_servo * ANGLE_TO_ECD);
 		target_can2_201_angle -= KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE * cos(	relative_angle_to_mechanical_arm	* ANGLE_TO_ECD)	* cos( relative_angle_to_servo * ANGLE_TO_ECD);
-		target_can2_205_angle -= KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE * sin( relative_angle_to_servo * ANGLE_TO_ECD) * RM_2023_ENGINEER_LIFTING_TO_HENG_SCALE;
-		target_can2_206_angle += KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE * sin( relative_angle_to_servo * ANGLE_TO_ECD) * RM_2023_ENGINEER_LIFTING_TO_HENG_SCALE;
+		target_can2_205_angle += KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE * sin( relative_angle_to_servo * ANGLE_TO_ECD) * RM_2023_ENGINEER_LIFTING_TO_HENG_SCALE;
+		target_can2_206_angle -= KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE * sin( relative_angle_to_servo * ANGLE_TO_ECD) * RM_2023_ENGINEER_LIFTING_TO_HENG_SCALE;
 	}
 	else if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_S)					//键盘按下[SHIFT+S]时竖轴电机向后移动
 	{
 		target_can2_202_angle += KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE * sin(	relative_angle_to_mechanical_arm 	* ANGLE_TO_ECD) * cos( relative_angle_to_servo * ANGLE_TO_ECD);
 		target_can2_201_angle += KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE * cos(	relative_angle_to_mechanical_arm	* ANGLE_TO_ECD)	* cos( relative_angle_to_servo * ANGLE_TO_ECD);
-		target_can2_205_angle += KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE * sin( relative_angle_to_servo * ANGLE_TO_ECD) * RM_2023_ENGINEER_LIFTING_TO_HENG_SCALE;
-		target_can2_206_angle -= KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE * sin( relative_angle_to_servo * ANGLE_TO_ECD) * RM_2023_ENGINEER_LIFTING_TO_HENG_SCALE;
+		target_can2_205_angle -= KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE * sin( relative_angle_to_servo * ANGLE_TO_ECD) * RM_2023_ENGINEER_LIFTING_TO_HENG_SCALE;
+		target_can2_206_angle += KEYBOARD_CONTROL_ANGLE_SERVO_COORDINATES_CHANGE * sin( relative_angle_to_servo * ANGLE_TO_ECD) * RM_2023_ENGINEER_LIFTING_TO_HENG_SCALE;
 	}
 	//A+D 左右
 	if(gimbal_control.gimbal_rc_ctrl->key.v == KEY_PRESSED_SHIFT_A)               //键盘按下[SHIFT+A]时横轴电机向左移动
@@ -591,7 +635,7 @@ void engineer_mouse_control(void)
 	//当鼠标左键按下时暂设定为控制舵机
 	if(mouse_keyboard_state_flag.current_mouse_state & MOUSE_PRESSED_OFFSET_LEFT)
 	{
-		target_can2_203_angle -= 10;
+		target_can2_203_angle -= 4;
 //		//上一次状态为松开时
 //		if(!(mouse_keyboard_state_flag.former_mouse_state & MOUSE_PRESSED_OFFSET_LEFT))
 //		{
@@ -601,7 +645,7 @@ void engineer_mouse_control(void)
 	//当鼠标右键按下时
 	if(mouse_keyboard_state_flag.current_mouse_state & MOUSE_PRESSED_OFFSET_RIGHT)
 	{
-		target_can2_203_angle += 10;
+		target_can2_203_angle += 4;
 		//上一次状态为松开时
 //		if(!(mouse_keyboard_state_flag.former_mouse_state & MOUSE_PRESSED_OFFSET_RIGHT))
 //		{
@@ -859,7 +903,8 @@ static void act_STM_BigResourceIsland_Rising_Step_2(void)
 		target_can2_205_angle = TARGET_BTM_CAN2_205_ANGLE_RISING_STEP_2; //抬升上升 取出小资源岛
 		target_can2_206_angle = -TARGET_BTM_CAN2_206_ANGLE_RISING_STEP_2;
 	}
-	if(engineer_deadband_judge(angle_can2_205,TARGET_BTM_CAN2_205_ANGLE_RISING_STEP_2,70))
+
+	if(engineer_deadband_judge(angle_can2_205,TARGET_BTM_CAN2_205_ANGLE_RISING_STEP_2,100) && STM_Flag)
 	{
 		Stm_Event = STM_RETRACT;
 		Small_Take_Mine.transfer_flag = 1;
@@ -874,16 +919,20 @@ static void act_STM_BigResourceIsland_Retract(void)
 	act_STM_Formatting();
 	if(STM_Flag)
 	{
-		target_can2_202_angle = -2;  //前伸收回
+		target_can2_202_angle = -200.0;  //前伸收回
 	}
-	if(engineer_deadband_judge(angle_can2_202,-TARGET_BTM_CAN2_202_ANGLE_RETRACR,30))
+	if(engineer_deadband_judge(angle_can2_202,-TARGET_BTM_CAN2_202_ANGLE_RETRACR,40))
 	{
-		Stm_Event = STM_FALLING;
-		Small_Take_Mine.transfer_flag = 1;
-	}
-	else
-	{
-		return ;
+		target_can2_204_angle = TARGET_BTM_CAN2_204_ANGLE_OVERTURN; //在前伸收回的过程中机械臂翻转向上
+		if(engineer_deadband_judge(angle_can2_202,-TARGET_BTM_CAN2_202_ANGLE_RETRACR,30) && engineer_deadband_judge(target_can2_204_angle,TARGET_BTM_CAN2_204_ANGLE_OVERTURN,20.0))
+		{
+			Stm_Event = STM_FALLING;
+			Small_Take_Mine.transfer_flag = 1;
+		}
+		else
+		{
+			return ;
+		}
 	}
 }
 static void act_STM_BigResourceIsland_Falling(void)
@@ -891,18 +940,39 @@ static void act_STM_BigResourceIsland_Falling(void)
 	act_STM_Formatting();
 	if(STM_Flag)
 	{
-		target_can2_205_angle = TARGET_BTM_CAN2_205_ANGLE_FALLING; //抬升上升 取出小资源岛
-		target_can2_206_angle = -TARGET_BTM_CAN2_205_ANGLE_FALLING;
+		if(STM_6020_flag)
+		{
+			target_can2_207_angle_6020 -= 1.0f;
+		}
+		if(target_can2_207_angle_6020 == TARGET_STM_CAN2_207_6020_ANGLE_ORE) //在前伸收回的过程中6020回到存矿中
+		{
+			STM_6020_flag = 0;
+			target_can2_205_angle = TARGET_BTM_CAN2_205_ANGLE_FALLING; //抬升下降
+			target_can2_206_angle = -TARGET_BTM_CAN2_205_ANGLE_FALLING;
+			if(engineer_deadband_judge(angle_can2_205,TARGET_BTM_CAN2_205_ANGLE_FALLING,50) && engineer_deadband_judge(angle_can2_207_6020,TARGET_STM_CAN2_207_6020_ANGLE_ORE,10.0))
+			{
+				if(engineer_deadband_judge(angle_can2_205,TARGET_BTM_CAN2_205_ANGLE_FALLING,100))
+				{
+					Stm_Event = STM_SERVO_INIT;
+					Small_Take_Mine.transfer_flag = 1;
+					STM_6020_flag = 1;
+				}
+				else
+				{
+					return;
+				}
+			}
+			else
+			{
+				return;
+			}
+		}
+		else
+		{
+			return;
+		}
 	}
-	if(engineer_deadband_judge(angle_can2_205,TARGET_BTM_CAN2_205_ANGLE_FALLING,50))
-	{
-		Stm_Event = STM_SERVO_INIT;
-		Small_Take_Mine.transfer_flag = 1;
-	}
-	else
-	{
-		return;
-	}
+	
 }
 static void act_STM_BigResourceIsland_Servo_Center(void)
 {
@@ -910,11 +980,18 @@ static void act_STM_BigResourceIsland_Servo_Center(void)
 	if(STM_Flag)
 	{
 		target_can2_203_angle = 0; //舵机值待修改
-		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,19999);  //打开
-		pump_flag_left = 1;
-		pump_flag_right = 1;
-		Stm_Event = STM_STORAGE_ORE_DOWN;
-		Small_Take_Mine.transfer_flag = 1;
+		target_can2_204_angle = TARGET_BTM_CAN2_204_ANGLE_OVERTURN_SECOND;
+		pump_flag_left = 0;
+		pump_flag_right = 0;
+		if(engineer_deadband_judge(angle_can2_204,TARGET_BTM_CAN2_204_ANGLE_OVERTURN_SECOND,20))
+		{
+			Stm_Event = STM_STORAGE_ORE_DOWN;
+			Small_Take_Mine.transfer_flag = 1;
+		}
+		else
+		{
+			return ;
+		}
 	}
 }
 static void act_STM_BigResourceIsland_Storage_Down(void)
@@ -922,28 +999,114 @@ static void act_STM_BigResourceIsland_Storage_Down(void)
 	act_STM_Formatting();
 	if(STM_Flag)
 	{
-		if(rc_ctrl.key.v == 276) //由于气泵断开到矿石下落需要一定时间，故此处使用键盘判断值待修改
+		target_can2_208_angle = TARGET_BTM_CAN2_208_ANGLE_DOWN;  //存矿下降
+		if(engineer_deadband_judge(angle_can2_208,TARGET_BTM_CAN2_208_ANGLE_DOWN,80))
 		{
-			target_can2_208_angle = TARGET_BTM_CAN2_208_ANGLE_DOWN;  //存矿下降
-			target_can2_207_angle_6020 = TARGET_BTM_CAN2_207_6020_ARMTURNAROUND;
+			Stm_Event = STM_STORAGE_ORE_UP_STATE;
+		  Small_Take_Mine.transfer_flag = 1;
+			STM_Flag = 0;
+		}
+		else
+		{
+			return;
 		}
 	}
-//	if(angle_can2_208 > TARGET_BTM_CAN2_208_ANGLE_DOWN - 1) //待修改
-//	{
-//		return;
-//	}
-//	else
-//	{
-//		Stm_Event = STM_INIT;
-//		Small_Take_Mine.transfer_flag = 1;
-//	}
-	Stm_Event = STM_INIT;
-	Small_Take_Mine.transfer_flag = 1;
-	STM_Flag = 0;
 }
-//在存矿下降后可
-static void act_STM_BigResourceIsland_ArmTurnAround(void);
-
+//在存矿下降后可手动触发取出
+static void act_STM_BigResourceIsland_Storage_up(void)
+{
+	act_STM_Formatting();
+	if(rc_ctrl.key.v == KEY_PRESSED_CTRL_R)
+	{
+		STM_Flag = 1; //可继续后面的函数
+//		target_can2_208_angle = TARGET_BTM_CAN2_208_ANGLE_UP;
+	}
+	if(STM_Flag)
+	{
+//		if(engineer_deadband_judge(angle_can2_208,TARGET_BTM_CAN2_208_ANGLE_UP,40))
+//		{
+//			Stm_Event = STM_RETRACT_ORE;
+//		  Small_Take_Mine.transfer_flag = 1;
+//		}
+//		else
+//		{
+//			return;
+//		}
+		Stm_Event = STM_RETRACT_ORE;
+		Small_Take_Mine.transfer_flag = 1;
+	}
+}
+static void act_STM_BigResourceIsland_Retract_Ore(void)
+{
+	act_STM_Formatting();
+	if(STM_Flag)
+	{
+//		target_can2_202_angle = TARGET_BTM_CAN2_202_ANGLE_RETRACT_ORE;
+//		if(engineer_deadband_judge(target_can2_202_angle,TARGET_BTM_CAN2_202_ANGLE_RETRACT_ORE,10))
+//		{
+//			Stm_Event = STM_PROTRACT_OVERTURN_ORE;
+//			Small_Take_Mine.transfer_flag = 1;
+//		}
+//		else
+//		{
+//			return;
+//		}
+		Stm_Event = STM_PROTRACT_OVERTURN_ORE;
+		Small_Take_Mine.transfer_flag = 1;
+	}
+}
+static void act_STM_BigResourceIsland_Protract_Ore(void)
+{
+	act_STM_Formatting();
+	if(STM_Flag)
+	{
+		target_can2_202_angle = -TARGET_BTM_CAN2_202_ANGLE_PROTRACT_ORE;
+		if(engineer_deadband_judge(target_can2_202_angle,-TARGET_BTM_CAN2_202_ANGLE_PROTRACT_ORE,50))
+		{
+			target_can2_204_angle = TARGET_BTM_CAN2_204_ANGLE_OVERTURN_ORE;
+			if(engineer_deadband_judge(target_can2_202_angle,-TARGET_BTM_CAN2_202_ANGLE_PROTRACT_ORE,30) && engineer_deadband_judge(target_can2_204_angle,TARGET_BTM_CAN2_204_ANGLE_OVERTURN_ORE,30))
+			{
+					Stm_Event = STM_ARM_RETURN_ORE;
+					Small_Take_Mine.transfer_flag = 1;
+			}
+			else
+			{
+				return;
+			}
+		}
+		else
+		{
+			return;
+		}
+	}
+}
+static void act_STM_BigResourceIsland_Arm_Return_Ore(void)
+{
+	act_STM_Formatting();
+	if(STM_Flag)
+	{
+		if(STM_6020_flag)
+		{
+			target_can2_207_angle_6020 += 1.0f;
+		}
+		if(engineer_deadband_judge(target_can2_207_angle_6020,TARGET_BTM_CAN2_207_6020_ANGLE_ARM_RETURN_ORE,4.0f))
+		{
+			STM_6020_flag = 0;
+			if(engineer_deadband_judge(target_can2_207_angle_6020,TARGET_BTM_CAN2_207_6020_ANGLE_ARM_RETURN_ORE,20))
+			{
+				Stm_Event = STM_INIT;
+				Small_Take_Mine.transfer_flag = 1;
+				STM_Flag = 0;
+				STM_6020_flag = 1;
+			}
+			else
+			{
+				return;
+			}
+		}
+		
+	}
+}
 
 //--------------------------------------------------------自动存矿连招函数-------------------------------------------------//
 int AOS_flag;
@@ -956,15 +1119,32 @@ static void act_AOS_formatting(void)
 		Auto_Ore_Storage.transfer_flag = 1;
 	}
 }
-static void act_AOS_rising(void)
+static void act_AOS_init(void)
 {
 	AOS_flag = 1;
-	if(rc_ctrl.key.v == KEY_PRESSED_CTRL_I) //ctrl+I控制本连招
+	if(rc_ctrl.key.v == 6666) //ctrl+I控制本连招
 	{
-		target_can2_205_angle = TARGET_AOS_CAN2_205_ANGLE_RISING; //抬升上升
-		target_can2_206_angle = -TARGET_AOS_CAN2_206_ANGLE_RISING;
+		target_can2_205_angle = TARGET_AOS_CAN2_205_ANGLE_DOWN; //抬升下降
+		target_can2_206_angle = -TARGET_AOS_CAN2_206_ANGLE_DOWN;
 	}
-	if(angle_can2_205 > TARGET_AOS_CAN2_205_ANGLE_RISING - 40) //待修改
+	if(engineer_deadband_judge(angle_can2_205,TARGET_AOS_CAN2_205_ANGLE_DOWN,40.0)) //待修改
+	{
+		return;
+	}
+	else
+	{
+		Aos_Event = AOS_HORIZON_CENTER;
+		Auto_Ore_Storage.transfer_flag = 1;
+	}
+}
+static void act_AOS_horizon_center(void)
+{
+	act_AOS_formatting();
+	if(AOS_flag)
+	{
+		target_can2_202_angle = TARGET_AOS_CAN2_202_HORIZON_CENTER; //横移水平回正
+	}
+	if(engineer_deadband_judge(angle_can2_202,TARGET_AOS_CAN2_202_HORIZON_CENTER,20.0)) //待修改
 	{
 		return;
 	}
@@ -974,23 +1154,23 @@ static void act_AOS_rising(void)
 		Auto_Ore_Storage.transfer_flag = 1;
 	}
 }
-static void act_AOS_arm_overturn(void)
-{
-	act_AOS_formatting();
-	if(AOS_flag)
-	{
-		target_can2_204_angle = TARGET_AOS_CAN2_204_ARM_OVERTURN; //小臂翻转
-	}
-	if(angle_can2_204 > TARGET_AOS_CAN2_204_ARM_OVERTURN - 20) //待修改
-	{
-		return;
-	}
-	else
-	{
-		Aos_Event = AOS_ARM_TURNAROUND;
-		Auto_Ore_Storage.transfer_flag = 1;
-	}
-}
+//static void act_AOS_arm_overturn(void)
+//{
+//	act_AOS_formatting();
+//	if(AOS_flag)
+//	{
+//		target_can2_204_angle = TARGET_AOS_CAN2_204_ARM_OVERTURN; //小臂翻转
+//	}
+//	if(engineer_deadband_judge(angle_can2_204,TARGET_AOS_CAN2_204_ARM_OVERTURN,40.0)) //待修改
+//	{
+//		return;
+//	}
+//	else
+//	{
+//		Aos_Event = AOS_ARM_TURNAROUND;
+//		Auto_Ore_Storage.transfer_flag = 1;
+//	}
+//}
 static void act_AOS_arm_turnaround(void)
 {
 	act_AOS_formatting();
@@ -998,7 +1178,7 @@ static void act_AOS_arm_turnaround(void)
 	{
 		target_can2_207_angle_6020 = TARGET_AOS_CAN2_207_6020_ARM_TURNAROUND; //小臂翻转
 	}
-	if(angle_can2_207_6020 > TARGET_AOS_CAN2_207_6020_ARM_TURNAROUND - 10) //待修改
+	if(engineer_deadband_judge(angle_can2_207_6020,TARGET_AOS_CAN2_207_6020_ARM_TURNAROUND,40.0)) //待修改
 	{
 		return;
 	}
@@ -1008,50 +1188,117 @@ static void act_AOS_arm_turnaround(void)
 		Auto_Ore_Storage.transfer_flag = 1;
 	}
 }
+
+
 static void act_AOS_servo_init(void)
 {
 	act_AOS_formatting();
 	if(AOS_flag)
 	{
-		target_can2_203_angle = 90;
+		target_can2_203_angle = TARGET_CAN2_203_SERVO_INIT;
 	}
-	Aos_Event = AOS_STORAGE_ORE_UP;
+	Aos_Event = AOS_ARM_OVERTURN_HORIZON;
 	Auto_Ore_Storage.transfer_flag = 1;
 }
-static void act_AOS_storage_ore_up(void)
+
+
+static void act_AOS_arm_overturn_horizon(void)
 {
 	act_AOS_formatting();
 	if(AOS_flag)
 	{
-		target_can2_208_angle = TARGET_AOS_CAN2_208_STORAGE_UP; //小臂翻转
+		target_can2_204_angle = TARGET_AOS_CAN2_204_OVERTURN_HORIZON; //小臂翻转到水平
 	}
-	if(angle_can2_207_6020 > TARGET_AOS_CAN2_208_STORAGE_UP - 10) //待修改
+	if(engineer_deadband_judge(target_can2_204_angle,TARGET_AOS_CAN2_204_OVERTURN_HORIZON,30.0f)) //待修改
 	{
 		return;
 	}
 	else
 	{
-		Aos_Event = AOS_RETRACT;
+		Aos_Event = AOS_RETRACT_FIRST;
 		Auto_Ore_Storage.transfer_flag = 1;
 	}
 }
-static void act_AOS_retract(void)
-{
-	act_AOS_formatting();
-	if(AOS_flag)
-	{
-		target_can2_202_angle = TARGET_AOS_CAN2_202_RETRACT; //前伸收回
-	}
-	if(angle_can2_202 > TARGET_AOS_CAN2_202_RETRACT - 10) //待修改
-	{
-		return;
-	}
-	else
-	{
-		Aos_Event = AOS_RETRACT;
-		Auto_Ore_Storage.transfer_flag = 1;
-	}
-}
+
+//static void act_AOS_retract_first(void)
+//{
+//	act_AOS_formatting();
+//	if(AOS_flag)
+//	{
+//		target_can2_202_angle = TARGET_AOS_CAN2_202_RETRACT_FIRST; //小臂翻转到水平
+//	}
+//	if(engineer_deadband_judge(target_can2_202_angle,TARGET_AOS_CAN2_202_RETRACT_FIRST,30.0f)) //待修改
+//	{
+//		return;
+//	}
+//	else
+//	{
+//		Aos_Event = AOS_CYLINDER_OFF;
+//		Auto_Ore_Storage.transfer_flag = 1;
+//	}
+//}
+//static void act_AOS_cylinder_off(void)
+//{
+//	act_AOS_formatting();
+//	if(AOS_flag)
+//	{
+//		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_2,0);
+//		__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_3,0);
+//	}
+//		Aos_Event = AOS_PROTRACT_FIRST;
+//		Auto_Ore_Storage.transfer_flag = 1;
+//}
+//static void act_AOS_retract_first(void)
+//{
+//	act_AOS_formatting();
+//	if(AOS_flag)
+//	{
+//		target_can2_202_angle = TARGET_AOS_CAN2_202_RETRACT_FIRST; //小臂翻转到水平
+//	}
+//	if(engineer_deadband_judge(target_can2_202_angle,TARGET_AOS_CAN2_202_RETRACT_FIRST,30.0f)) //待修改
+//	{
+//		return;
+//	}
+//	else
+//	{
+//		Aos_Event = AOS_CYLINDER_OFF;
+//		Auto_Ore_Storage.transfer_flag = 1;
+//	}
+//}
+//static void act_AOS_storage_ore_up(void)
+//{
+//	act_AOS_formatting();
+//	if(AOS_flag)
+//	{
+//		target_can2_208_angle = TARGET_AOS_CAN2_208_STORAGE_UP; //小臂翻转
+//	}
+//	if(angle_can2_207_6020 > TARGET_AOS_CAN2_208_STORAGE_UP - 10) //待修改
+//	{
+//		return;
+//	}
+//	else
+//	{
+//		Aos_Event = AOS_RETRACT;
+//		Auto_Ore_Storage.transfer_flag = 1;
+//	}
+//}
+//static void act_AOS_retract(void)
+//{
+//	act_AOS_formatting();
+//	if(AOS_flag)
+//	{
+//		target_can2_202_angle = TARGET_AOS_CAN2_202_RETRACT; //前伸收回
+//	}
+//	if(angle_can2_202 > TARGET_AOS_CAN2_202_RETRACT - 10) //待修改
+//	{
+//		return;
+//	}
+//	else
+//	{
+//		Aos_Event = AOS_RETRACT;
+//		Auto_Ore_Storage.transfer_flag = 1;
+//	}
+//}
 //--------------------------------------------------------自动置位连招函数-------------------------------------------------//
 
 int AMI_flag;
@@ -1112,9 +1359,9 @@ static void act_AMI_arm_return(void)
 	act_AMI_Formatting();
 	if(AMI_flag)
 	{
-		target_can2_207_angle_6020 = TARGET_AMI_CAN2_207_6020_HORIZON; 
+		target_can2_207_angle_6020 = -TARGET_AMI_CAN2_207_6020_HORIZON; 
 	}
-	if(engineer_deadband_judge(target_can2_207_angle_6020,TARGET_AMI_CAN2_207_6020_HORIZON,20))
+	if(engineer_deadband_judge(target_can2_207_angle_6020,-TARGET_AMI_CAN2_207_6020_HORIZON,20))
 	{
 		Ami_Event = AMI_PROTRACT;
 		Auto_Machine_Init.transfer_flag = 1;
